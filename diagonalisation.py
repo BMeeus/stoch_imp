@@ -1,6 +1,7 @@
 import numpy as np
+import numpy.linalg as lin
 
-N = 6
+N = 4
 mu_L = 1
 mu_R = 1
 
@@ -25,4 +26,4 @@ for n in range(1, N-1):
 for n in range(N):
     W[n, n] = -sum(W[:, n])
 
-print(W)
+l, v = lin.eig(W)
