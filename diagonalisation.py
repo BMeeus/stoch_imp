@@ -45,3 +45,10 @@ for spc in res:
 
 evals[-1] = 0
 
+for vec in evecs:
+    print(sum(vec))
+    vec = vec/sum(vec)
+
+Peq = evecs[-1]
+print(evecs)
+print(sp.pretty_print(Peq))
