@@ -1,3 +1,7 @@
-a = 3+2
+import sympy as sp
 
-print(a)
+curr = [0, 1]
+
+weq = sp.Matrix([[0, 1], [2, 3]])
+
+print(weq[*curr])
