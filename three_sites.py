@@ -90,6 +90,7 @@ def getcoeff(curr, k):
         return -sp.simplify(p1coeffs[k] * (weq[curr[0], curr[1]] * vecs[k][curr[1]]
                               - weq[curr[1], curr[0]] * vecs[k][curr[0]]))
 
+
 wbase = sp.zeros(n+2, n+2)
 wbase[0, 1] = resratem(rl, mul)
 wbase[1, 0] = resratep(rl, mul)
@@ -108,7 +109,7 @@ winterim[0, -1] = wbase[-1, -2]
 for i in range(n+1):
     winterim[i, i] = - sum(winterim[:, i])
 
-weq = w(0)
+weq = winterim.subs({mu, 0})
 
 w1 = sp.diff(winterim, mu).subs({mu: 0})
 
