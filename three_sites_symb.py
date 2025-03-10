@@ -1,6 +1,9 @@
+from pyplot_funcs import *
+
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
+
 
 n = 3
 mu, om = sp.symbols("mu, omega", real=True)
@@ -90,6 +93,7 @@ def getcoeff(curr, k):
         return -sp.simplify(p1coeffs[k] * (weq[curr[0], curr[1]] * vecs[k][curr[1]]
                               - weq[curr[1], curr[0]] * vecs[k][curr[0]]))
 
+
 wbase = sp.zeros(n+2, n+2)
 wbase[0, 1] = resratem(rl, mul)
 wbase[1, 0] = resratep(rl, mul)
@@ -143,10 +147,30 @@ for i in range(n+2):
 coeffs = sp.Matrix([[getcoeff(current, l) for l in range(n+1)] for current in currents])
 
 conds = [sp.simplify(sum([coeffs[i, k] * (1 if k == 0 else (vals[k-1]/(1j*om - vals[k-1]))) for k in range(n+1)])) for i in range(len(currents))]
+ad_cond = conds[0].subs({om: 0})
+nconds = [c/ad_cond for c in conds]
 
-for cond in conds:
+fig, ax = plt.subplots()
+for cond in nconds:
     condf = sp.lambdify([om], cond)
-    om_arr = np.linspace(0, 100, 1000)
-    plt.plot(np.real(condf(om_arr)), np.imag(condf(om_arr)))
+    om_arr = np.linspace(0, 300, 10000)
+    line = ax.plot(np.real(condf(om_arr)), np.imag(condf(om_arr)))[0]
+    # add_arrow(line)
+
+
+plt.rcParams.update({
+    "text.usetex": True,
+    "font.family": "mathpazo"
+})
+ax.set_aspect('equal')
+ax.grid(True, which='both')
+y_ax = ax.axvline(x=0, color='k')
+x_ax = ax.axhline(y=0, color='k')
+x_min, x_max = ax.get_xlim()
+x_range = x_max-x_min
+y_min, y_max = ax.get_ylim()
+y_range = y_max - y_min
+ax.text(x_range/50, y_max-y_range/10, r"$\mathrm{Im}\, \frac{\sigma_{mn}}{\sigma(0)}$")
+ax.text(x_max-x_range/10, -y_range/15, r"$\mathrm{Re}\, \frac{\sigma_{mn}}{\sigma(0)}$")
 
 plt.show()
