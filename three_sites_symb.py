@@ -150,27 +150,21 @@ conds = [sp.simplify(sum([coeffs[i, k] * (1 if k == 0 else (vals[k-1]/(1j*om - v
 ad_cond = conds[0].subs({om: 0})
 nconds = [c/ad_cond for c in conds]
 
+
 fig, ax = plt.subplots()
+
 for cond in nconds:
     condf = sp.lambdify([om], cond)
     om_arr = np.linspace(0, 300, 10000)
     line = ax.plot(np.real(condf(om_arr)), np.imag(condf(om_arr)))[0]
-    # add_arrow(line)
+    add_arrow(line)
 
 
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "mathpazo"
 })
-ax.set_aspect('equal')
-ax.grid(True, which='both')
-y_ax = ax.axvline(x=0, color='k')
-x_ax = ax.axhline(y=0, color='k')
-x_min, x_max = ax.get_xlim()
-x_range = x_max-x_min
-y_min, y_max = ax.get_ylim()
-y_range = y_max - y_min
-ax.text(x_range/50, y_max-y_range/10, r"$\mathrm{Im}\, \frac{\sigma_{mn}}{\sigma(0)}$")
-ax.text(x_max-x_range/10, -y_range/15, r"$\mathrm{Re}\, \frac{\sigma_{mn}}{\sigma(0)}$")
+
+complex_axes(ax, r"\frac{\sigma_{mn}}{\sigma(0)}")
 
 plt.show()
