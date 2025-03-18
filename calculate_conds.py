@@ -1,16 +1,5 @@
 import numpy as np
-import sympy as sp
 import scipy.linalg as lin
-
-def inner(v1, v2):
-    """
-    Inner product of two vectors
-
-    :param v1: first vector
-    :param v2: second vector
-    :return: inner product of v1 and v2
-    """
-    return np.sum(v1*v2/Peq)
 
 
 def gram_schmidt(v_arr):
@@ -35,21 +24,6 @@ def gram_schmidt(v_arr):
         orthogonal[:, i] = v
     return orthogonal
 
-
-def getcoeff(curr, k):
-    """
-    gets the coefficients for a current m, n and an eigenvector k
-
-    :param curr: current m, n considered
-    :param k: eigenvector according to which the coefficient is calculated
-    :return: the calculated coefficient
-    """
-    if k == 0:
-        return -sp.simplify(w1[curr[0], curr[1]] * Peq[curr[1]] - w1[curr[1], curr[0]] * Peq[curr[0]])
-    else:
-        k -= 1
-        return -sp.simplify(p1coeffs[k] * (weq[curr[0], curr[1]] * vecs[k][curr[1]]
-                              - weq[curr[1], curr[0]] * vecs[k][curr[0]]))
 
 name = "loop"
 out = np.load(f"{name}.npz")
@@ -89,8 +63,10 @@ p1coeffs = np.sum(vecs[:, 1:].T * np.matmul(w1, Peq)/Peq, axis=1) / vals[1:]
 coeffs = np.zeros([n, n, n])
 for k in range(n):
     if k == 0:
-        coeffs[:, :, k] = w1 * Peq - (w1 * Peq).T
+        coeffs[:, :, k] = (w1 * Peq).T - w1 * Peq
     else:
-        coeffs[:, :, k] = p1coeffs[k-1] * (weq * vecs[:, k] - (weq * vecs[:, k]).T)
+        coeffs[:, :, k] = p1coeffs[k-1] * ((weq * vecs[:, k]).T - weq * vecs[:, k])
 
 np.savez(f"{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
+
+# TODO: Add comments, check validity of code

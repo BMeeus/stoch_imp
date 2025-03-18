@@ -14,11 +14,15 @@ def cond(om, i, j):
     c = sum([coeffs[i, j, k] * (1 if k == 0 else (vals[k] / (1j * om - vals[k]))) for k in range(len(coeffs[0, 0, :]))])
     return c
 
+def ncond(om, i, j):
+    c = sum([coeffs[i, j, k] * (1 if k == 0 else (vals[k] / (1j * om - vals[k]))) for k in range(len(coeffs[0, 0, :]))])
+    n = sum([coeffs[i, j, k] * (1 if k == 0 else -1) for k in range(len(coeffs[0, 0, :]))])
+    return c/n
 
 fig, ax = plt.subplots()
 
-for c in [[1, 0], [2, 1], [3, 2], [0, 3], [2, 0]]:
-    c_i, c_j = c
+for curr in [[0, 1], [1, 2], [2, 3], [3, 0]]:
+    c_i, c_j = curr
     om_arr = np.linspace(0, 300, 10000)
     res_arr = cond(om_arr, c_i, c_j)
     line = ax.plot(np.real(res_arr), np.imag(res_arr))[0]
@@ -34,3 +38,5 @@ complex_axes(ax, r"\frac{\sigma_{mn}}{\sigma(0)}")
 ax.tick_params(labelfontfamily="serif")
 
 plt.show()
+
+# TODO: Add current finding func

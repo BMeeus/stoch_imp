@@ -6,7 +6,7 @@ n = 4  # Number of sites
 f, om = sp.symbols("f, omega", real=True)  # variable chem. pot. and driving freq
 fEq = 0  # base value of chemical potential
 
-t = 0.5 # Transition rate between sites
+t = 1 # Transition rate between sites
 
 
 def add_trans(i, j, rate):
@@ -46,3 +46,6 @@ weq = np.array(sp.N(w.subs({f: fEq})), dtype=np.float64)
 w1 = np.array(sp.N(sp.diff(w, f).subs({f: 0})), dtype=np.float64)  # First term in taylor expansion
 
 np.savez("loop", weq=weq, w1=w1)
+
+
+# TODO: add comments
