@@ -3,7 +3,7 @@ from pyplot_funcs import *
 import numpy as np
 import sympy as sp
 import matplotlib.pyplot as plt
-
+import pickle
 
 n = 3  # Number of sites (excl. basins)
 mu, om = sp.symbols("mu, omega", real=True)  # variable chem. pot. and driving freq
@@ -52,7 +52,7 @@ def resratem(base, m):
 
 def add_trans(i, j, rate):
     """
-    Adds a symmetric transition to matrix wbase
+    Adds a symmetric transition to matrix w
 
     :param i: Outgoing site
     :param j: Incoming site
@@ -162,82 +162,8 @@ for i in range(n+1):
 """
 Calculate Weq, W1
 """
-weq = w.subs({mu: muEq})
+weq = np.array(sp.N(w.subs({mu: muEq})), dtype=np.float64)
 
-w1 = sp.diff(w, mu).subs({mu: 0})  # First term in taylor expansion
+w1 = np.array(sp.N(sp.diff(w, mu).subs({mu: 0})), dtype=np.float64)  # First term in taylor expansion
 
-"""
-Determine non-zero currents from base matrix
-"""
-currents = []
-for i in range(n+2):
-    for j in range(i, n+2):
-        if wbase[i, j] != 0 or wbase[j, i] != 0:
-            currents.append([i, j])
-
-"""
-Calculate conductivities using Weq, W1
-"""
-
-def calculate_conds(weq, w1, currents, normal=True):
-    global Peq, p1coeffs, vals, vecs
-    Peq = weq.nullspace()[0]
-    Peq /= sum(Peq)  # Force Peq to sum to unity
-
-    eig_syst = sorted(weq.eigenvects(), key=lambda x: x[0],
-                      reverse=True)  # Get eigensystem sorted by descending eigenvalue
-
-    vals = []
-    vecs = []
-
-    # Unpack eigensystem into two lists
-    for spc in eig_syst:
-        for degen in range(spc[1]):
-            vals.append(spc[0])
-            vecs.append(spc[2][degen])
-
-    # Orthogonalize and remove Peq
-    vals = vals[1:]
-    vecs = gram_schmidt(vecs)[1:]
-
-    # Check validity of eigenvectors
-    for i in range(len(vecs)):
-        if (sp.N(weq * vecs[i]) - sp.N(vals[i] * vecs[i])).norm() >= 10 ** -15:
-            raise ValueError("Incorrect computation of eigenvectors")
-
-    # Calculate Coeffs of Pad expanded in eigenvects
-    p1coeffs = [sp.simplify(inner(vecs[i], w1 * Peq) / vals[i]) for i in range(len(vecs))]
-
-    coeffs = sp.Matrix([[getcoeff(current, l) for l in range(n + 1)] for current in currents])
-
-    conds = [sp.simplify(
-        sum([coeffs[i, k] * (1 if k == 0 else (vals[k - 1] / (1j * om - vals[k - 1]))) for k in range(n + 1)])) for i in
-             range(len(currents))]
-    if not normal:
-        return conds
-    else:
-        ad_cond = conds[0].subs({om: 0})
-        nconds = [c / ad_cond for c in conds]
-        return nconds
-
-nconds = calculate_conds(weq, w1, currents)
-
-
-fig, ax = plt.subplots()
-
-for cond in nconds:
-    condf = sp.lambdify([om], cond)
-    om_arr = np.linspace(0, 300, 10000)
-    line = ax.plot(np.real(condf(om_arr)), np.imag(condf(om_arr)))[0]
-    add_arrow(line)
-
-
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "mathpazo"
-})
-
-complex_axes(ax, r"\frac{\sigma_{mn}}{\sigma(0)}")
-ax.tick_params(labelfontfamily="serif")
-
-plt.show()
+np.savez("test.npz", weq=weq, w1=w1)

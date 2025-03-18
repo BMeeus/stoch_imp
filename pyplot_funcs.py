@@ -16,6 +16,9 @@ def add_arrow(line, position=None, direction='right', size=15, color=None):
     xdata = line.get_xdata()
     ydata = line.get_ydata()
 
+    if len(xdata) < 2:
+        return
+
     if position is None:
         position = (xdata[0]+xdata[-1])/2
     # find closest index
