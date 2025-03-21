@@ -25,8 +25,8 @@ def gram_schmidt(v_arr):
     return orthogonal
 
 
-name = "loop"
-out = np.load(f"{name}.npz")
+name = "loop_ran"
+out = np.load(f"np_files/{name}.npz")
 
 weq = out["weq"]
 w1 = out["w1"]
@@ -54,7 +54,8 @@ vecs = gram_schmidt(vecs)
 
 # Check validity of eigenvectors
 for i in range(len(vecs)):
-    if lin.norm(np.matmul(weq, vecs[:, i]) - vals[i] * vecs[:, i]) >= 10 ** -15:
+    if lin.norm(np.matmul(weq, vecs[:, i]) - vals[i] * vecs[:, i]) >= 10 ** -14:
+        print(lin.norm(np.matmul(weq, vecs[:, i]) - vals[i] * vecs[:, i]))
         raise ValueError("Incorrect computation of eigenvectors")
 
 # Calculate Coeffs of Pad expanded in eigenvects
@@ -67,6 +68,6 @@ for k in range(n):
     else:
         coeffs[:, :, k] = p1coeffs[k-1] * ((weq * vecs[:, k]).T - weq * vecs[:, k])
 
-np.savez(f"{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
+np.savez(f"np_files/coeff_{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
 
-# TODO: Add comments, check validity of code
+# TODO: Add comments

@@ -45,7 +45,7 @@ weq = np.array(sp.N(w.subs({f: fEq})), dtype=np.float64)
 
 w1 = np.array(sp.N(sp.diff(w, f).subs({f: 0})), dtype=np.float64)  # First term in taylor expansion
 
-np.savez("loop", weq=weq, w1=w1)
+np.savez("np_files/loop", weq=weq, w1=w1)
 
 
 # TODO: add comments

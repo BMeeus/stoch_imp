@@ -93,7 +93,7 @@ weq = np.array(sp.N(w.subs({mu: muEq})), dtype=np.float64)
 
 w1 = np.array(sp.N(sp.diff(w, mu).subs({mu: 0})), dtype=np.float64)  # First term in taylor expansion
 
-np.savez("test.npz", weq=weq, w1=w1)
+np.savez("np_files/three.npz", weq=weq, w1=w1)
 
 
 # TODO: add comments

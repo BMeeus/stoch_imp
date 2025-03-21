@@ -1,2 +1,3 @@
 test.*
 *.npz
+np_files/*
