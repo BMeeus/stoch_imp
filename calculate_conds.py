@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.linalg as lin
+import sys
 
 
 def gram_schmidt(v_arr):
@@ -25,32 +26,30 @@ def gram_schmidt(v_arr):
     return orthogonal
 
 
-name = "loop_ran"
-out = np.load(f"np_files/{name}.npz")
+name = sys.argv[1]                          # read in name from command line argument
+foldername = sys.argv[2]                    # read in foldername from command line argument
+out = np.load(f"{foldername}/{name}.npz")   # load numpy data
 
 weq = out["weq"]
 w1 = out["w1"]
 
-n = len(weq[0, :])
+n = len(weq[0, :])                          # Infer matrix size from Weq
 
-Peq = lin.null_space(weq)
-Peq /= sum(Peq)  # Force Peq to sum to unity
-
-vals, vecs = lin.eig(weq)
+vals, vecs = lin.eig(weq)                   # Get eigenvalues and eigenvecs, ensure real
 vals = np.real(vals)
 vecs = np.real(vecs)
 
 
-ind_arr = np.flip(np.argsort(vals))
+ind_arr = np.flip(np.argsort(vals))         # Sort eigenvalues in descending order and rearrange eigenvecs according
 
 vals = vals[ind_arr]
 vecs = vecs[:, ind_arr]
 
-vecs[:, 0] /= sum(vecs[:, 0])
+vecs[:, 0] /= sum(vecs[:, 0])               # first eigenvector is Peq, normalize and rename
 Peq = vecs[:, 0]
 
 
-vecs = gram_schmidt(vecs)
+vecs = gram_schmidt(vecs)                   # Orthonormalize eigenvectors
 
 # Check validity of eigenvectors
 for i in range(len(vecs)):
@@ -61,6 +60,7 @@ for i in range(len(vecs)):
 # Calculate Coeffs of Pad expanded in eigenvects
 p1coeffs = np.sum(vecs[:, 1:].T * np.matmul(w1, Peq)/Peq, axis=1) / vals[1:]
 
+# Calculate coefficients and store in array
 coeffs = np.zeros([n, n, n])
 for k in range(n):
     if k == 0:
@@ -68,6 +68,6 @@ for k in range(n):
     else:
         coeffs[:, :, k] = p1coeffs[k-1] * ((weq * vecs[:, k]).T - weq * vecs[:, k])
 
-np.savez(f"np_files/coeff_{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
 
-# TODO: Add comments
+# Save results
+np.savez(f"{foldername}/{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
