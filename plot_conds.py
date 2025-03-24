@@ -35,7 +35,6 @@ for curr in [[0, 1], [2, 3], [0, 2]]:
     line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
     add_arrow(line)
 
-
 complex_axes(ax, r"\sigma_{mn}(\omega)", x_off=[-0.015, 0.03], y_off=[0.2, 0], sz=12)
 ax.tick_params(labelfontfamily="serif")
 
