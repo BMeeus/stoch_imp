@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import sympy as sp
 
@@ -47,5 +49,5 @@ w1 = np.array(sp.N(sp.diff(w, f).subs({f: 0})), dtype=np.float64)  # First term 
 
 np.savez("np_files/loop", weq=weq, w1=w1)
 
-
+os.system(r"$python calculate_conds.py weq w1")
 # TODO: add comments
