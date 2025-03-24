@@ -13,7 +13,7 @@ Simulation parameters
 n = 3                             # Number of sites (excl. basins)
 name = f"{n}_sites"
 foldername = "n_sites_lin"
-mu = sp.symbols("mu", real=True)  # variable chem. pot. and driving freq
+mu = sp.symbols("mu", real=True)  # variable chemical potential
 muEq = 0                          # base value of chemical potential
 
 rr = 1                            # Transition rate right basin
@@ -104,14 +104,16 @@ for col in range(n + 1):
 """
 Calculate Weq, W1
 """
+
 weq = np.array(sp.N(w.subs({mu: muEq})), dtype=np.float64)           # Equilibrium transfer matrix
 
-w1 = np.array(sp.N(sp.diff(w, mu).subs({mu: 0})), dtype=np.float64)  # First term in taylor expansion
+w1 = np.array(sp.N(sp.diff(w, mu).subs({mu: muEq})), dtype=np.float64)  # First term in taylor expansion
 
 
 """
 Calculate coefficients and save to npz file
 """
+
 try:
     os.makedirs(f"{foldername}")
 except FileExistsError:
