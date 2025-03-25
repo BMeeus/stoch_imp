@@ -2,13 +2,13 @@ from pyplot_funcs import *
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
 
 """
 Define names and locations
 """
-name = "4_loop"                   # Name and folder of data
-foldername = "n_sites_loop"
+name = "3_sites"                   # Name and folder of data
+foldername = "n_sites_lin"
 
 figfolder = "figs_stoch_imp"      # destination name and folder of figure
 figname = "loop_no_inset"
@@ -94,6 +94,11 @@ plt.tight_layout()
 
 if save:
     if local:
+        try:
+            os.makedirs(f"{foldername}")
+        except FileExistsError:
+            # directory already exists
+            pass
         plt.savefig(f"{figfolder}/{figname}.png", dpi=600, bbox_inches='tight')
     else:
         plt.savefig(f"C:\\Users\\lucp13819\\Pictures\\{figfolder}\\{figname}.png", dpi=600, bbox_inches='tight')
