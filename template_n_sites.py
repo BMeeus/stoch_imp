@@ -124,4 +124,4 @@ except FileExistsError:
 np.savez(f"{foldername}/{name}.npz", weq=weq, w1=w1)
 
 # Calculate coefficients and update .npz file
-os.system(f"C:/Users/Branko/anaconda3/python.exe calculate_coeffs.py {name} {foldername}")
+os.system(f"python.exe calculate_coeffs.py {name} {foldername}")
