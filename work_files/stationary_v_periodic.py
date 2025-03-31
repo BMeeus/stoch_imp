@@ -43,7 +43,7 @@ Wr = sp.simplify(Wr)
 
 Pad = sp.Matrix([-Wr[0, 3], -Wr[1,3], -Wr[2, 3], 1])
 
-Pad /= sum(Pad)
+Pad /= np.sum(Pad)
 
 Pad = sp.simplify(Pad)
 

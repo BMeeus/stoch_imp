@@ -3,3 +3,4 @@ test.*
 np_files/*
 misc.xml
 .venv
+.idea
