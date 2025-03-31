@@ -1,6 +1,6 @@
+import os
 import numpy as np
 import scipy.linalg as lin
-import sys
 
 
 def gram_schmidt(v_arr):
@@ -25,7 +25,7 @@ def gram_schmidt(v_arr):
         orthogonal[:, i] = v
     return orthogonal
 
-def calculate_coeffs(weq, w1):
+def calculate_coeffs(weq, w1, pathname=None):
     global Peq
     n = len(weq[0, :])                          # Infer matrix size from Weq
 
@@ -62,20 +62,12 @@ def calculate_coeffs(weq, w1):
         else:
             coeffs[:, :, k] = p1coeffs[k-1] * ((weq * vecs[:, k]).T - weq * vecs[:, k])
 
+    if pathname is not None:
+        path = pathname.split("/")
+        dir_path = "/".join(path[:-1])
 
+        os.makedirs(dir_path, exist_ok=True)
+
+        np.savez(f"{pathname}.npz", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
 
     return coeffs, vals, vecs
-
-
-if __name__ == '__main__':
-    name = sys.argv[1]  # read in name from command line argument
-    foldername = sys.argv[2]  # read in foldername from command line argument
-    out = np.load(f"{foldername}/{name}.npz")  # load numpy data
-
-    weq = out["weq"]
-    w1 = out["w1"]
-
-    coeffs, vals, vecs = calculate_coeffs(weq, w1)
-
-    # Save results
-    np.savez(f"{foldername}/{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)

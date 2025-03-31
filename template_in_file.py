@@ -137,11 +137,7 @@ plt.tight_layout()
 
 if save:
     if local:
-        try:
-            os.makedirs(f"{foldername}")
-        except FileExistsError:
-            # directory already exists
-            pass
+        os.makedirs(f"{figfolder}", exist_ok=True)
         plt.savefig(f"{figfolder}/{figname}.png", dpi=600, bbox_inches='tight')
     else:
         plt.savefig(f"C:\\Users\\lucp13819\\Pictures\\{figfolder}\\{figname}.png", dpi=600, bbox_inches='tight')

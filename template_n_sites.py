@@ -1,6 +1,8 @@
+from calculate_coeffs import calculate_coeffs
+
 import numpy as np
 import sympy as sp
-import os
+
 
 """
 Template file performing the calculation for a linear chain of n sites connected at both ends to a basin.
@@ -114,14 +116,4 @@ w1 = np.array(sp.N(sp.diff(w, mu).subs({mu: muEq})), dtype=np.float64)  # First 
 Calculate coefficients and save to npz file
 """
 
-try:
-    os.makedirs(f"{foldername}")
-except FileExistsError:
-    # directory already exists
-    pass
-
-# Save weq and w1 to be used in calculation
-np.savez(f"{foldername}/{name}.npz", weq=weq, w1=w1)
-
-# Calculate coefficients and update .npz file
-os.system(f"python.exe calculate_coeffs.py {name} {foldername}")
+calculate_coeffs(weq, w1, f"{foldername}/{name}")

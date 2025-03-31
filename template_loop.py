@@ -1,6 +1,8 @@
+from calculate_coeffs import calculate_coeffs
+
 import numpy as np
 import sympy as sp
-import os
+
 
 """
 Template file performing the calculation for a periodic of n sites with a shortcut added between site 1 and 3.
@@ -65,14 +67,4 @@ w1 = np.array(sp.N(sp.diff(w, F).subs({F: FEq})), dtype=np.float64)  # First ter
 Calculate coefficients and save to npz file
 """
 
-try:
-    os.makedirs(f"{foldername}")
-except FileExistsError:
-    # directory already exists
-    pass
-
-# Save weq and w1 to be used in calculation
-np.savez(f"{foldername}/{name}.npz", weq=weq, w1=w1)
-
-# Calculate coefficients and update .npz file
-os.system(f"python.exe calculate_coeffs.py {name} {foldername}")
+calculate_coeffs(weq, w1, f"{foldername}/{name}")
