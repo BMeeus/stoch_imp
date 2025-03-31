@@ -1,3 +1,5 @@
 test.*
 *.npz
 np_files/*
+misc.xml
+.venv
