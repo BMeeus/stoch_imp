@@ -15,7 +15,7 @@ From the coefficients, the conductances can be calculated. These can then be ana
 Below is a step-by-step guide to mounting a simulation and plotting the results. Following this one will be able to plot the statistic impedances of an arbitrary finite master equation system. This is purely a practical guide, for a mathematical explanation please consider stoch_imp_theory.pdf
 
 1. Define the transfer matrices $W_{eq}$ and $\bar{W}$ (called `w1` in the code). In the code this is done through defining $W$ and deriving $W_{eq}$ and $\bar{W}$ from there. It is important that this is done _as on paper_: the matrix element $W_{ij}$ corresponds to `w[i, j]`.
-The matrix is built using SymPy so that the derivation is easily implemented. It is not generally necessary to use SymPy or even define $W$ at all as long as the correct $W_{eq}$ and $\bar{W}$ are defined with the correct indexing. 
+The matrix is built using SymPy so that the derivation is easily implemented. It is not necessary to use SymPy or even define $W$ at all as long as the correct $W_{eq}$ and $\bar{W}$ are defined with the correct indexing. 
 > IMPORTANT: Due to the fact that python uses column first numbering, this means that the matrix comes out transposed when printed. This is accounted for in the code.
 2. Calculate the coefficients $A^k_{mn}$ by importing calculate_coeffs. The function takes $W_{eq}$ and $\bar{W}$ as arguments and returns $A^k_{mn}$, the eigenvalues $\lambda_k$ and the eigen vectors $v_k$. If the optional argument `pathname` is given, the function saves the results including $W_{eq}$ and $\bar{W}$ to a npz file with name and location specified in the path.
 3. Define the transitions for which the conductances are computed. Generally one wants to calculate the conductance for only _some_ $m, n$, because the transition does not exist, because of symmetry reasons, etc. It is then important to define which currents are taken into consideration. This can either be done by analysing $W_{eq}$ and $\bar{W}$ to find non-trivial transitions, or manually by specifying the exact transitions of interest.
@@ -38,7 +38,7 @@ This includes the functionalities used to plot the conductances. It contains two
 - add_arrow: This adds an arrow in the direction of increasing frequency.
 - complex_axes: This heuristically adds complex axes together with axis labels to the figure.
 
-### template*.py
+### template_*.py
 These files are template files to calculate the $W_{eq}$ and $\bar{W}$ matrices for different systems. They can be copied and modified as needed.
 
 **Work files** are files connected to a specific system of simulation. They are less neat and commented. These are the files where the actual simulations are done. Many are depricated due to updates in the workflow.
