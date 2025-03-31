@@ -47,8 +47,8 @@ plt.rcParams.update({
     "font.family": "mathpazo"
 })
 
-ax.plot(np.linspace(-10, 10, 100), J2_f(np.linspace(-10, 10, 100)))
-ax.plot(np.linspace(-10, 10, 100), J_f(np.linspace(-10, 10, 100)), c="k")
+ax.plot(np.linspace(-10, 10, 100), J2_f(np.linspace(-10, 10, 100)), c="k")
+ax.plot(np.linspace(-10, 10, 100), J_f(np.linspace(-10, 10, 100)))
 
 ax.axhline(0, c="k")
 ax.axvline(0, c="k")
