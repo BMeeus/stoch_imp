@@ -70,5 +70,3 @@ for name in namelist:
             coeffs[:, :, k] = p1coeffs[k-1] * ((weq * vecs[:, k]).T - weq * vecs[:, k])
 
     np.savez(f"np_files/coeff_files/coeff_{name}", coeffs=coeffs, vals=vals, vecs=vecs, weq=weq, w1=w1)
-
-# TODO: Add comments, check validity of code
