@@ -7,8 +7,8 @@ import os
 """
 Define names and locations
 """
-name = "3_sites"                   # Name and folder of data
-foldername = "n_sites_lin"
+name = "4_loop"                   # Name and folder of data
+foldername = "n_sites_loop"
 
 figfolder = "figs_stoch_imp"      # destination name and folder of figure
 figname = "loop_no_inset"
@@ -52,7 +52,7 @@ w1 = out["w1"]
 # Detect possible transitions from weq and w1
 if not currents:
     for i in range(len(weq[:, 0])):
-        for j in range(i, len(weq[:, 0])):
+        for j in range(i+1, len(weq[:, 0])):
             if weq[i, j] != 0 or weq[j, i] != 0 or w1[i, j] != 0 or w1[j, i] != 0:
                 currents.append([i, j])
 
