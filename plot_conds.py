@@ -74,11 +74,11 @@ Plot currents
 """
 
 # Define range of frequencies
-om_arr = np.linspace(0, 300, 10000)
+om_arr = np.logspace(-10, 2, 10000)
 
 for curr in currents:
     c_i, c_j = curr  # Extract transition
-    res_arr = cond(om_arr, c_i, c_j)  # calculate conductance
+    res_arr = cond(om_arr, c_i, c_j, normal=True)  # calculate conductance
     # plot result
     line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
     add_arrow(line)
