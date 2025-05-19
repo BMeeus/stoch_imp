@@ -1,5 +1,6 @@
 from pyplot_funcs import *
 
+import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,12 +17,72 @@ def ncond(om, i, j):
     c = sum([coeffs[i, j, k] * (1 if k == 0 else (vals[k] / (1j * om - vals[k]))) for k in range(len(coeffs[0, 0, :]))])
     n = sum([coeffs[i, j, k] * (1 if k == 0 else -1) for k in range(len(coeffs[0, 0, :]))])
     return c/n
+from calculate_coeffs import calculate_coeffs
+
+foldername = "n_sites_lin"
+
+
+def pprint(e):
+    sp.pretty_print(e)
+    return
+
+def laprint(e):
+    print(r"\begin{equation}")
+    print(sp.latex(e))
+    print(r"\end{equation}", end="\n\n\n")
+    return
+
+n = 50
+
+mu = sp.symbols("mu", real=True)
+
+
+mu_L = mu
+mu_R = 0
+
+for n in range(2, 51, 2):
+    for sd in [0, 0.5, 1]:
+        name = f"{n}_sites_{sd}"
+        en_arr = np.random.normal(0, sd, n+2)
+        """
+        Build matrix W_base based on sites
+        """
+
+        wbase = sp.zeros(n + 2, n + 2)
+
+        wbase[0, 1] = 1 - 1 / (1 + sp.exp(en_arr[1] - mu))
+        wbase[1, 0] = 1 / (1 + sp.exp(en_arr[1] - mu))
+
+        wbase[-2, -1] = 1 - 1 / (1 + sp.exp(en_arr[-2]))
+        wbase[-1, -2] = 1 / (1 + sp.exp(en_arr[-2]))
+
+        for i in range(1, n):
+            wbase[i, i + 1] = sp.exp(- (en_arr[i] - en_arr[i + 1]) / 2)
+            wbase[i + 1, i] = sp.exp(- (en_arr[i + 1] - en_arr[i]) / 2)
+
+        w = wbase[:-1, :-1]
+        w[-1, 0] = wbase[-1, -2]
+        w[0, -1] = wbase[-2, -1]
+
+        for col in range(n + 1):
+            w[col, col] = -sum(w[:, col])
+
+        weq = np.array(sp.N(w.subs({mu: 0})), dtype=np.float64)           # Equilibrium transfer matrix
+
+        w1 = np.array(sp.N(sp.diff(w, mu).subs({mu: 0})), dtype=np.float64)  # First term in taylor expansion
+
+
+        """
+        Calculate coefficients and save to npz file
+        """
+        print(n, sd)
+        calculate_coeffs(weq, w1, f"{foldername}/{name}")
 
 fig, ax = plt.subplots()
 
 range_arr = []
-for name in [f"{i}_sites" for i in range(2, 51, 2)]:
-    out = np.load(f"np_files/coeff_files/coeff_{name}.npz")
+for name in [f"{i}_sites_0" for i in range(2, 51, 2)]:
+    out = np.load(f"n_sites_lin/{name}.npz")
 
     vals = out["vals"]
     coeffs = out["coeffs"]
@@ -35,8 +96,8 @@ for name in [f"{i}_sites" for i in range(2, 51, 2)]:
 ax.plot(range(2, 51, 2), range_arr, marker="o", label=f"sd={0}")
 
 range_arr = []
-for name in [f"{i}_sites_sd_05" for i in range(2, 51, 2)]:
-    out = np.load(f"np_files/coeff_files/coeff_{name}.npz")
+for name in [f"{i}_sites_0.5" for i in range(2, 51, 2)]:
+    out = np.load(f"n_sites_lin/{name}.npz")
 
     vals = out["vals"]
     coeffs = out["coeffs"]
@@ -50,8 +111,8 @@ for name in [f"{i}_sites_sd_05" for i in range(2, 51, 2)]:
 ax.plot(range(2, 51, 2), range_arr, marker="o", label=f"sd=0.5")
 
 range_arr = []
-for name in [f"{i}_sites_sd_1" for i in range(2, 51, 2)]:
-    out = np.load(f"np_files/coeff_files/coeff_{name}.npz")
+for name in [f"{i}_sites_1" for i in range(2, 51, 2)]:
+    out = np.load(f"n_sites_lin/{name}.npz")
 
     vals = out["vals"]
     coeffs = out["coeffs"]

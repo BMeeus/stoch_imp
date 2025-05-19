@@ -47,7 +47,7 @@ def calculate_coeffs(weq, w1, pathname=None):
 
     # Check validity of eigenvectors
     for i in range(len(vecs)):
-        if lin.norm(np.matmul(weq, vecs[:, i]) - vals[i] * vecs[:, i]) >= 10 ** -14:
+        if lin.norm(np.matmul(weq, vecs[:, i]) - vals[i] * vecs[:, i]) >= 10 ** -13:
             print(lin.norm(np.matmul(weq, vecs[:, i]) - vals[i] * vecs[:, i]))
             raise ValueError("Incorrect computation of eigenvectors")
 

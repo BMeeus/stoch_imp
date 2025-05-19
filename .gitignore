@@ -1,6 +1,8 @@
 test.*
 *.npz
-np_files/*
+np_files
 misc.xml
 .venv
 .idea
+research
+calculator.py
