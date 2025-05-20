@@ -23,6 +23,8 @@ class TrMatrix(Mat):
             else:
                 arr = sp.zeros(arr, arr)
         super().__init__(arr)
+        _check_diag(self.mat, err=True)
+        _check_rates(self.mat, err=True)
         self.zero_index = zi
 
     def add_trans(self, i, j, r=1.0, ri=None, symm=True):
@@ -71,7 +73,7 @@ class WMatrix(TrMatrix):
     def w1(self, eq=0):
         if self.ds not in list(self.mat.free_symbols):
             raise AttributeError("Driving symbol not found in matrix")
-        return TrMatrix(sp.diff(self.mat, self.ds).subs({self.ds: eq}))
+        return Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}))
 
 
 class EqMatrix(TrMatrix):
@@ -79,7 +81,7 @@ class EqMatrix(TrMatrix):
         super().__init__(arr, zi)
 
 
-def arr_to_mat(arr, driven=False, ds=None):
+def arr_to_mat(arr):
     m = sp.Matrix(arr)
 
     if not m.is_square:
@@ -87,10 +89,6 @@ def arr_to_mat(arr, driven=False, ds=None):
 
     if m.rows == 1:
         raise ShapeError("W matrix must be at least (2, 2) dimensional")
-
-    _check_diag(m, err=True)
-    _check_rates(m, err=True)
-
     return m
 
 
