@@ -1,5 +1,6 @@
 import sympy as sp
 from sympy import NonSquareMatrixError, ShapeError
+from itertools import product
 
 
 class Mat:
@@ -7,13 +8,28 @@ class Mat:
         m = arr_to_mat(arr)
         self.mat = m
         self.dim = self.mat.cols
+        self.iter = product(range(self.mat.rows), range(self.mat.cols))
 
     def __str__(self):
         return sp.pretty(self.mat)
 
     def __setitem__(self, key, value):
-        self.mat[*key] = value
+        if type(key) == int:
+            self.mat[key] = value
+        else:
+            self.mat[*key] = value
 
+    def __iter__(self):
+        return iter(self.mat)
+
+    def __getitem__(self, item):
+        if type(item) == int:
+            return self.mat[item]
+        else:
+            return self.mat[*item]
+
+    def __sub__(self, other):
+        return Mat(self.mat - other.mat)
 
 class TrMatrix(Mat):
     def __init__(self, arr, zi=False):
@@ -27,19 +43,25 @@ class TrMatrix(Mat):
         _check_rates(self.mat, err=True)
         self.zero_index = zi
 
-    def add_trans(self, i, j, r=1.0, ri=None, symm=True):
+    def add_trans(self, i, j, r=1.0, ri=None, symm=True, simp=True):
         if not self.zero_index:
             i -= 1
             j -= 1
 
+        if simp:
+            r = sp.nsimplify(r, rational=True)
         self.mat[j, i] = r
         self.mat[i, i] -= r
 
         if symm:
             if not ri:
                 ri = r ** (-1)
+            elif simp:
+                ri = sp.nsimplify(ri, rational=True)
             self.mat[i, j] = ri
             self.mat[j, j] -= ri
+        if simp:
+            sp.simplify(self.mat)
 
     def calc_diag(self):
         for col in range(self.dim):
@@ -77,18 +99,47 @@ class WMatrix(TrMatrix):
 
 
 class EqMatrix(TrMatrix):
-    def __init__(self, arr, zi):
+    def __init__(self, arr, zi=False):
         super().__init__(arr, zi)
+
+    def peq(self):
+        spc = self.mat.eigenvects(error_when_incomplete=True)
+        try:
+            nspace = [sp for sp in spc if sp[0] == 0][0]
+        except IndexError:
+            raise ValueError("no eigenvalue 0 was found")
+
+        if nspace[1] > 1:
+            raise ValueError("multiple steady states found")
+        else:
+            p = nspace[-1][0]
+            return Mat(p/sum(p))
+
+    def check_db(self, tol=10**-15):
+        peq = self.peq()
+
+        db_mat = curr_from_arr(self, peq)
+
+        for el in self.iter:
+            if db_mat[*el] > tol:
+                return False
+        return True
+
 
 
 def arr_to_mat(arr):
     m = sp.Matrix(arr)
 
-    if not m.is_square:
-        raise NonSquareMatrixError("W matrix must be square")
+    if (m.rows == 1) ^ (m.cols == 1):
+        if m.cols > 1:
+            return m.T
+        else:
+            return m
+    elif not m.is_square:
+        raise NonSquareMatrixError("Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
+    elif m.rows == 1:
+        raise ShapeError("Matrix must be at least (2, 2) dimensional")
 
-    if m.rows == 1:
-        raise ShapeError("W matrix must be at least (2, 2) dimensional")
     return m
 
 
@@ -118,9 +169,18 @@ def _check_rates(m, err=False, verbose=False):
                                                                                             m[row, col]))
     return True
 
+def curr_from_arr(m, p):
+    m = m.mat
+    curr1 = Mat([[m[row, col] * p[row] for col in range(m.cols)] for row in range(m.rows)])
+    print(curr1)
+    curr2 = Mat([[m[row, col] * p[col] for row in range(m.cols)] for col in range(m.rows)])
+    print(curr2)
+    return curr1 - curr2
 
 if __name__ == '__main__':
-    w = WMatrix(3)
-    w.add_trans(2, 3, 1)
-    w.add_trans(1, 3, 3)
-    print(w)
+    weq = EqMatrix([[-1 , 0 , 1 ],
+                    [ 1 ,-1 , 0 ],
+                    [ 0 , 1 ,-1 ]])
+    peq = weq.peq()
+
+    print(weq.check_db())
