@@ -9,31 +9,36 @@ class Mat:
     """
     def __init__(self, arr, zi=False):
         m = arr_to_mat(arr)
-        self.mat = m
-        self.dim = self.mat.cols
-        self.iter = product(range(self.mat.rows), range(self.mat.cols))
+
+        self.mat = m                                                     # The Sympy Matrix object
+        self.dim = self.mat.rows                                         # The dimension of the associated system
+        self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
         self.zero_index = zi                                             # Whether the system starts at 0
 
     def __str__(self):
+        # This is a QoL improvement, ensures nice printing of matrix like objects
         return sp.pretty(self.mat)
 
     def __setitem__(self, key, value):
         if type(key) == int:
-            self.mat[key] = value
+            self.mat[key] = value  # Vector element assignment
         else:
-            self.mat[*key] = value
+            self.mat[*key] = value  # Matrix element assignment
 
     def __iter__(self):
         return iter(self.mat)
 
     def __getitem__(self, item):
         if type(item) == int:
-            return self.mat[item]
+            return self.mat[item]  # Vector element assignment
         else:
-            return self.mat[*item]
+            return self.mat[*item]  # Matrix element assignment
 
     def __sub__(self, other):
         return Mat(self.mat - other.mat)
+
+    def __add__(self, other):
+        return Mat(self.mat + other.mat)
 
 class TrMatrix(Mat):
     def __init__(self, arr, zi=False):
