@@ -174,6 +174,36 @@ class EqMatrix(TrMatrix):
         return True
 
 
+def gram_schmidt(v_arr, Peq=None):
+    """
+    Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
+
+    :param v_arr: array of vectors to orthogonalise
+    :param Peq: The equilibrium vector used in the definition of the inner product
+    :return: array of orthogonalised vectors
+    """
+    n = len(v_arr[0])
+    if Peq is None:
+        Peq = [1 for _ in range(n)]
+
+    if type(Peq) == Mat:
+        Peq = Peq.mat
+
+    # Orthogonalized, To Be Returned
+    orthogonal = []
+
+    # At each step, take vector
+    for i in range(len(v_arr)):
+        v = v_arr[i]
+
+        # Subtract off the "components" from current orthogonal set.
+        for j in range(i):
+            v -= sum([orthogonal[j][k]*v[k]/Peq[k] for k in range(n)]) * orthogonal[j]
+        # Normalization
+        v /= sp.sqrt(sum([v[k]*v[k]/Peq[k] for k in range(n)]))
+        orthogonal.append(v)
+    return orthogonal
+
 
 def arr_to_mat(arr):
     m = sp.Matrix(arr)
