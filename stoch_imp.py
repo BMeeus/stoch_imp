@@ -83,7 +83,7 @@ class TrMatrix(Mat):
 
 
 class WMatrix(TrMatrix):
-    def __init__(self, arr, ds=None, zi=False):
+    def __init__(self, arr, ds=None, eq=0, zi=False):
         super().__init__(arr, zi)
 
         symb_list = list(self.mat.free_symbols)
@@ -96,19 +96,36 @@ class WMatrix(TrMatrix):
                 ds = symb_list[0]
 
         self.ds = ds
+        self.weq = None
+        self.w1 = None
+        self.eq = eq
 
-    def weq(self, eq=0):
-        return EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
+    def calc_weq(self, eq=None):
+        if eq is None:
+            eq = self.eq
+        self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
+        return self.weq
 
-    def w1(self, eq=0):
+    def calc_w1(self, eq=None):
+        if eq is None:
+            eq = self.eq
         if self.ds not in list(self.mat.free_symbols):
             raise AttributeError("Driving symbol not found in matrix")
-        return Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}))
+
+        self.w1 = Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+        return self.w1
 
 
 class EqMatrix(TrMatrix):
     def __init__(self, arr, zi=False):
         super().__init__(arr, zi)
+        self.peq = None
+        self.vals = None
+        self.vecs = None
+
+    def calc_peq(self):
+        self.calc_eig()
+        return self.peq
 
     def peq(self):
         spc = self.mat.eigenvects(error_when_incomplete=True)
@@ -124,9 +141,10 @@ class EqMatrix(TrMatrix):
             return Mat(p/sum(p))
 
     def check_db(self, tol=10**-15):
-        peq = self.peq()
+        if self.peq is None:
+            self.calc_peq()
 
-        db_mat = curr_from_arr(self, peq)
+        db_mat = curr_from_arr(self, self.peq)
 
         for el in self.iter:
             if db_mat[*el] > tol:
