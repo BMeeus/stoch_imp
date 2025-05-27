@@ -127,18 +127,40 @@ class EqMatrix(TrMatrix):
         self.calc_eig()
         return self.peq
 
-    def peq(self):
-        spc = self.mat.eigenvects(error_when_incomplete=True)
-        try:
-            nspace = [sp for sp in spc if sp[0] == 0][0]
-        except IndexError:
-            raise ValueError("no eigenvalue 0 was found")
+    def calc_eig(self):
+        eig_syst = self.mat.eigenvects(error_when_incomplete=True)
 
-        if nspace[1] > 1:
+        eig_syst.sort(key=lambda x: x[0], reverse=True)
+
+        if eig_syst[0][0] != 0:
+            raise ValueError("no eigenvalue 0 was found")
+        elif eig_syst[0][1] != 1:
             raise ValueError("multiple steady states found")
-        else:
-            p = nspace[-1][0]
-            return Mat(p/sum(p))
+
+        self.peq = Mat(eig_syst[0][-1][0]/sum(eig_syst[0][-1][0]))
+        if not self.check_db():
+            raise ValueError("detailed balance not fulfilled")
+
+        vals = []
+        vecs = []
+
+        for space in eig_syst:
+            val = space[0]
+            if sp.im(val) > 10**-15:
+                raise ValueError("Complex eigenvalue found: {}".format(val))
+            for degen in range(space[1]):
+                vec = space[-1][degen]
+                if (self.mat*vec - val*vec).norm() > 10**-13:
+                    raise ValueError("Incorrect computation of eigenvectors")
+
+                vals.append(val)
+                vecs.append(vec)
+
+        vecs = gram_schmidt(vecs, self.peq)
+        self.vals = vals
+        self.vecs = vecs
+        return self.vals, self.vecs
+
 
     def check_db(self, tol=10**-15):
         if self.peq is None:
