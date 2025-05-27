@@ -4,11 +4,15 @@ from itertools import product
 
 
 class Mat:
-    def __init__(self, arr):
+    """
+    Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
+    """
+    def __init__(self, arr, zi=False):
         m = arr_to_mat(arr)
         self.mat = m
         self.dim = self.mat.cols
         self.iter = product(range(self.mat.rows), range(self.mat.cols))
+        self.zero_index = zi                                             # Whether the system starts at 0
 
     def __str__(self):
         return sp.pretty(self.mat)
@@ -38,10 +42,9 @@ class TrMatrix(Mat):
                 raise ShapeError("Transfer matrix must be at least (2, 2) dimensional")
             else:
                 arr = sp.zeros(arr, arr)
-        super().__init__(arr)
+        super().__init__(arr, zi)
         _check_diag(self.mat, err=True)
         _check_rates(self.mat, err=True)
-        self.zero_index = zi
 
     def add_trans(self, i, j, r=1.0, ri=None, symm=True, simp=True):
         if not self.zero_index:
