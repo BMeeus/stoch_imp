@@ -208,17 +208,19 @@ def gram_schmidt(v_arr, Peq=None):
 def arr_to_mat(arr):
     m = sp.Matrix(arr)
 
+    # Check if matrix is vector, transpose to col vec if necessary
     if (m.rows == 1) ^ (m.cols == 1):
         if m.cols > 1:
             return m.T
         else:
             return m
+    # If not vector must be square matrix of dim at least (2, 2)
     elif not m.is_square:
         raise NonSquareMatrixError("Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
     elif m.rows == 1:
         raise ShapeError("Matrix must be at least (2, 2) dimensional")
-
-    return m
+    else:
+        return m
 
 
 def _check_diag(m, err=False):
@@ -247,6 +249,7 @@ def _check_rates(m, err=False, verbose=False):
                                                                                             m[row, col]))
     return True
 
+
 def curr_from_arr(m, p):
     m = m.mat
     curr1 = Mat([[m[row, col] * p[row] for col in range(m.cols)] for row in range(m.rows)])
@@ -256,9 +259,4 @@ def curr_from_arr(m, p):
     return curr1 - curr2
 
 if __name__ == '__main__':
-    weq = EqMatrix([[-1 , 0 , 1 ],
-                    [ 1 ,-1 , 0 ],
-                    [ 0 , 1 ,-1 ]])
-    peq = weq.peq()
-
-    print(weq.check_db())
+    pass
