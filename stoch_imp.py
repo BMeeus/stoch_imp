@@ -1,6 +1,18 @@
 import sympy as sp
 from sympy import NonSquareMatrixError, ShapeError
 from itertools import product
+import numpy as np
+
+
+class CoeffArray:
+    def __init__(self, n):
+        self.mat = np.zeros((n, n, n))
+
+    def __getitem__(self, item):
+        return self.mat.__getitem__(item)
+
+    def __setitem__(self, key, value):
+        self.mat.__setitem__(key,value)
 
 
 class Mat:
@@ -114,7 +126,10 @@ class WMatrix(TrMatrix):
         self.ds = ds
         self.weq = None
         self.w1 = None
+        self.coeff = None
         self.eq = eq
+        self.conds = None
+
 
     def calc_weq(self, eq=None):
         if eq is None:
@@ -130,6 +145,12 @@ class WMatrix(TrMatrix):
 
         self.w1 = Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
         return self.w1
+
+    def calc_coeff(self, force=False):
+        return _calc_coeff(self, force)
+
+    def calc_cond(self, curr=None, force=False):
+        return _calc_cond(self, curr, force)
 
 
 class EqMatrix(TrMatrix):
@@ -281,6 +302,85 @@ def inner(v1, v2, Peq=None):
     return sum([v1[i]*v2[i]/Peq[i] for i in range(n)])
 
 
+def _calc_coeff(w, force=False):
+    if (w.weq is None) or force:
+        w.calc_weq()
+    weq = w.weq
+
+    if (weq.vals is None) or force:
+        weq.calc_peq()
+    peq = weq.peq
+    vals= weq.vals
+    vecs = weq.vecs
+
+    if (w.w1 is None) or force:
+        w.calc_w1()
+    w1 = w.w1
+
+    p1coeffs = [-inner(vecs[k], w1*peq, peq)/vals[k] for k in range(1, len(vals))]
+    print(p1coeffs)
+    coeffs = CoeffArray(w.dim)
+    for k in range(w.dim):
+        if k == 0:
+            coeffs[:, :, k] = _calc_curr_like(w1, peq).mat
+        else:
+            coeffs[:, :, k] = (p1coeffs[k-1] * _calc_curr_like(weq, vecs[k])).mat
+
+    w.coeff = coeffs
+    return coeffs
+
+
+def _calc_cond(w, curr=None, force=False):
+    if (w.coeff is None) or force:
+        w.calc_coeff()
+
+    if curr is None:
+        curr = []
+        for i in range(w.dim):
+            for j in range(i + 1, w.dim):
+                if w.weq[i, j] != 0 or w.weq[j, i] != 0 or w.w1[i, j] != 0 or w.w1[j, i] != 0:
+                    curr.append([i, j])
+    elif type(curr) == list:
+        if type(curr[0]) != list:
+            curr = [curr]
+        for c in curr:
+            try:
+                if len(c) != 2:
+                    raise TypeError("Currents should be given as lists of length 2, is length {}".format(len(c)))
+            except TypeError:
+                raise TypeError("Currents should be given as lists, is {}".format(type(c)))
+            finally:
+                pass
+    else:
+        raise TypeError("Current list should be given as list of lists, is {}".format(type(curr)))
+
+    om_arr = np.logspace(-10, 2, 10000)
+    res_lst = []
+    for c in curr:
+        c_i, c_j = c  # Extract transition
+        res_arr = cond(w, om_arr, c_i, c_j, normal=True)  # calculate conductance
+        res_lst.append([c, res_arr])
+    w.conds = res_lst
+    return res_lst
+
+def cond(w, om, i, j, normal=False):
+    """
+    Calculate the conductance of the transition i --> j. This can be normalised using the conductance at zero driving.
+
+    :param w: the W-matrix of which the conductivities are calculated
+    :param om: Float/np array: The driving frequency or array of frequencies
+    :param i: Int: The site of origin of the transition
+    :param j: Int: The destination site of the transition
+    :param normal: Bool: if True returns the conductance normalised using conductance at zero frequency
+
+    :return: Float/np array: The conductance of the transition i --> j.
+    """
+    c = sum([w.coeff[i, j, k] * (1 if k == 0 else (w.weq.vals[k] / (1j * om - w.weq.vals[k]))) for k in range(len(w.coeff[0, 0, :]))])
+    if normal:
+        n = sum([w.coeff[i, j, k] * (1 if k == 0 else -1) for k in range(len(w.coeff[0, 0, :]))])
+        return c / n
+    else:
+        return c
 
 if __name__ == '__main__':
     pass
