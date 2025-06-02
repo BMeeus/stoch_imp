@@ -182,7 +182,7 @@ class EqMatrix(TrMatrix):
         if self.peq is None:
             self.calc_peq()
 
-        db_mat = curr_from_arr(self, self.peq)
+        db_mat = _calc_curr_like(self, self.peq)
 
         for el in self.iter:
             if db_mat[*el] > tol:
@@ -214,9 +214,9 @@ def gram_schmidt(v_arr, Peq=None):
 
         # Subtract off the "components" from current orthogonal set.
         for j in range(i):
-            v -= sum([orthogonal[j][k]*v[k]/Peq[k] for k in range(n)]) * orthogonal[j]
+            v -= inner(orthogonal[j], v, Peq) * orthogonal[j]
         # Normalization
-        v /= sp.sqrt(sum([v[k]*v[k]/Peq[k] for k in range(n)]))
+        v /= sp.sqrt(inner(v, v, Peq))
         orthogonal.append(v)
     return orthogonal
 
@@ -266,13 +266,21 @@ def _check_rates(m, err=False, verbose=False):
     return True
 
 
-def curr_from_arr(m, p):
+def _calc_curr_like(m, p):
     m = m.mat
     curr1 = Mat([[m[row, col] * p[row] for col in range(m.cols)] for row in range(m.rows)])
-    print(curr1)
     curr2 = Mat([[m[row, col] * p[col] for row in range(m.cols)] for col in range(m.rows)])
-    print(curr2)
     return curr1 - curr2
+
+
+def inner(v1, v2, Peq=None):
+    n = len(v1)
+    if Peq is None:
+        Peq = [1 for _ in range(n)]
+
+    return sum([v1[i]*v2[i]/Peq[i] for i in range(n)])
+
+
 
 if __name__ == '__main__':
     pass
