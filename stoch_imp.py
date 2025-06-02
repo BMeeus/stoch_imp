@@ -38,7 +38,23 @@ class Mat:
         return Mat(self.mat - other.mat)
 
     def __add__(self, other):
-        return Mat(self.mat + other.mat)
+        if isinstance(other, self.__class__):
+            return Mat(self.mat + other.mat)
+        else:
+            raise TypeError("unsupported operand type(s) for +: '{}' and '{}'".format(self.__class__, type(other)))
+
+    def __mul__(self, other):
+        if isinstance(other, self.__class__):
+            return Mat(self.mat * other.mat)
+        else:
+            return Mat(self.mat*other)
+
+    def __rmul__(self, other):
+        if isinstance(other, self.__class__):
+            return Mat(other.mat * self.mat)
+        else:
+            return self.__mul__(other)
+
 
 class TrMatrix(Mat):
     def __init__(self, arr, zi=False):
