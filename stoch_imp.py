@@ -5,9 +5,18 @@ import numpy as np
 
 
 class CoeffArray:
+    """
+    Class handling the array containing the coefficients.
+    """
     def __init__(self, n):
-        self.mat = np.zeros((n, n, n))
+        """
+        Initialising an instance of CoeffArray
 
+        :param n: size of the system
+        """
+        self.mat = np.zeros((n, n, n), dtype=object)
+
+    # Let numpy handle item getting and setting
     def __getitem__(self, item):
         return self.mat.__getitem__(item)
 
@@ -23,6 +32,12 @@ class Mat:
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
     def __init__(self, arr, zi=False):
+        """
+        Initialises a Mat instance
+
+        :param arr (Array like): The Array with which the matrix is set.
+        :param zi (Bool): Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        """
         m = arr_to_mat(arr)
 
         self.mat = m                                                     # The Sympy Matrix object
@@ -72,44 +87,92 @@ class Mat:
 
 
 class TrMatrix(Mat):
+    """
+    Class handling all transition matrices. These matrices should sum ot zero along columns and have positive
+    off-diagonal elements.
+    """
     def __init__(self, arr, zi=False):
+        """
+        Initialise a new Transfer matrix
+
+        :param arr (Array like or Int): The Array with which the matrix is set. If arr is an integer, an empty
+            (arr,arr) Sympy Matrix is used
+        :param zi (Bool): Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        """
         if type(arr) == int:
-            if arr == 1:
+            if arr <= 1:
                 raise ShapeError("Transfer matrix must be at least (2, 2) dimensional")
             else:
                 arr = sp.zeros(arr, arr)
+
         super().__init__(arr, zi)
         _check_diag(self.mat, err=True)
         _check_rates(self.mat, err=True)
 
     def add_trans(self, i, j, r=1.0, ri=None, symm=True, simp=True):
+        """
+        Add a transition i --> j, with rate r.
+
+        If symm is True, a symmetric transition j --> i is added with rate 1/r. Optionallym ri can be
+        used to specify a rate for the symmetric transition.
+
+        Args:
+        :param i (Int): The starting site of the transition
+        :param j (Int): The target site of the transition
+
+        Kwargs:
+        :param r (Float): The transfer rate with which the transition should be set. Default is 1.0
+        :param ri (Float): The transfer rate used for the inverse transition. Default is 1/r
+        :param symm (Bool): If True, also adds a symmetric transition j --> i.
+        :param simp (Bool): Whether to simplify the rates before setting.
+        :return:
+        """
+
+        if i == j:
+            raise ValueError("Start and target state are equal, must be different")
+
         if not self.zero_index:
             i -= 1
             j -= 1
 
         if simp:
             r = sp.nsimplify(r, rational=True)
-        self.mat[j, i] = r
-        self.mat[i, i] -= r
 
-        if symm:
+        try:
+            if r < 0:
+                raise ValueError(f"Rate should be positive, is {r}")
+        except TypeError:
+            pass
+
+        self.mat[j, i] = r   # Set the matrix element
+        self.mat[i, i] -= r  # Update diagonal element
+
+        if symm or (ri is not None):
             if not ri:
                 ri = r ** (-1)
             elif simp:
                 ri = sp.nsimplify(ri, rational=True)
+            try:
+                if ri < 0:
+                    raise ValueError(f"Inverse rate should be positive, is {ri}")
+            except TypeError:
+                pass
             self.mat[i, j] = ri
             self.mat[j, j] -= ri
         if simp:
             sp.simplify(self.mat)
 
     def calc_diag(self):
+        """Force calculation of the diagonal elements"""
         for col in range(self.dim):
             self.mat[col, col] = - sum([self.mat[row, col] for row in range(self.dim) if row != col])
 
     def check_diag(self):
+        """Check that columns sum to 0"""
         return _check_diag(self.mat)
 
     def check_rates(self, verbose=False):
+        """Check if off-diagonal elements are positive"""
         return _check_rates(self.mat, verbose=verbose)
 
 
