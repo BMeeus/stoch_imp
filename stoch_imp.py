@@ -17,6 +17,10 @@ class CoeffArray:
     def __str__(self):
         return sp.pretty(self.mat)
 
+    def get_cond(self, i, j, normal=False):
+        om = sp.Symbol("omega", real=True, positive=True)
+        c = cond(self.mat, om, i, j, normal=normal)
+        return sp.lambdify([om], c)
 
 class Mat:
     """
@@ -158,6 +162,14 @@ class WMatrix(TrMatrix):
 
     def calc_cond(self, curr=None, force=False, verbose=True):
         return _calc_cond(self, curr, force, verbose=verbose)
+
+    def get_cond(self, i, j, normal=False, force=False, verbose=True):
+        if (self.coeff is None) or force:
+            self.calc_coeff(force=force, verbose=verbose)
+        if not self.zero_index:
+            i -= 1
+            j -= 1
+        return self.coeff.get_cond(i, j, normal)
 
 
 class EqMatrix(TrMatrix):
@@ -310,7 +322,7 @@ def _check_rates(m, err=False, verbose=False):
 def _calc_curr_like(m, p):
     m = m.mat
     curr1 = Mat([[deep_symp(m[row, col] * p[row]) for col in range(m.cols)] for row in range(m.rows)])
-    curr2 = Mat([[deep_symp(m[row, col] * p[col]) for row in range(m.cols)] for col in range(m.rows)])
+    curr2 = Mat([[deep_symp(m[row, col] * p[row]) for row in range(m.cols)] for col in range(m.rows)])
     return curr1 - curr2
 
 
@@ -384,7 +396,7 @@ def _calc_cond(w, curr=None, force=False, verbose=True):
     w.conds = res_lst
     return res_lst
 
-def cond(w, om, i, j, normal=False):
+def cond(arr, om, i, j, normal=False):
     """
     Calculate the conductance of the transition i --> j. This can be normalised using the conductance at zero driving.
 
@@ -396,13 +408,13 @@ def cond(w, om, i, j, normal=False):
 
     :return: Float/np array: The conductance of the transition i --> j.
     """
-    c = deep_symp(sum([w.coeff[i, j, k] * (1 if k == 0 else (w.weq.vals[k] / (1j * om - w.weq.vals[k]))) for k in range(len(w.coeff[0, 0, :]))]))
+    c = deep_symp(sum([arr[j, i, k] * (1 if k == 0 else (w.weq.vals[k] / (1j * om - w.weq.vals[k]))) for k in range(len(arr[0, 0, :]))]))
 
     if normal:
-        n = deep_symp(sum([w.coeff[i, j, k] * (1 if k == 0 else -1) for k in range(len(w.coeff[0, 0, :]))]))
+        n = deep_symp(sum([arr[j, i, k] * (1 if k == 0 else -1) for k in range(len(arr[0, 0, :]))]))
         return deep_symp(c / n)
     else:
-        return c
+        return deep_symp(c)
 
 if __name__ == '__main__':
     pass
