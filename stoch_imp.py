@@ -134,26 +134,30 @@ class WMatrix(TrMatrix):
         self.conds = None
 
 
-    def calc_weq(self, eq=None):
+    def calc_weq(self, eq=None, verbose=False):
         if eq is None:
             eq = self.eq
         self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
+        if verbose:
+            print("Equilibrium matrix calculated")
         return self.weq
 
-    def calc_w1(self, eq=None):
+    def calc_w1(self, eq=None, verbose=False):
         if eq is None:
             eq = self.eq
         if self.ds not in list(self.mat.free_symbols):
             raise AttributeError("Driving symbol not found in matrix")
 
         self.w1 = Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+        if verbose:
+            print("Driving matrix calculated")
         return self.w1
 
-    def calc_coeff(self, force=False):
-        return _calc_coeff(self, force)
+    def calc_coeff(self, force=False, verbose=True):
+        return _calc_coeff(self, force, verbose=verbose)
 
-    def calc_cond(self, curr=None, force=False):
-        return _calc_cond(self, curr, force)
+    def calc_cond(self, curr=None, force=False, verbose=True):
+        return _calc_cond(self, curr, force, verbose=verbose)
 
 
 class EqMatrix(TrMatrix):
@@ -163,11 +167,11 @@ class EqMatrix(TrMatrix):
         self.vals = None
         self.vecs = None
 
-    def calc_peq(self):
-        self.calc_eig()
+    def calc_peq(self, verbose=False):
+        self.calc_eig(verbose=verbose)
         return self.peq
 
-    def calc_eig(self):
+    def calc_eig(self, verbose=False):
         eig_syst = self.mat.eigenvects(error_when_incomplete=True)
 
         eig_syst.sort(key=lambda x: x[0], reverse=True)
@@ -178,6 +182,9 @@ class EqMatrix(TrMatrix):
             raise ValueError("multiple steady states found")
 
         self.peq = Mat(eig_syst[0][-1][0]/sum(eig_syst[0][-1][0]))
+        if verbose:
+            print("Equilibrium distribution calculated")
+
         if not self.check_db():
             raise ValueError("detailed balance not fulfilled")
 
@@ -199,6 +206,8 @@ class EqMatrix(TrMatrix):
         vecs = gram_schmidt(vecs, self.peq)
         self.vals = vals
         self.vecs = vecs
+        if verbose:
+            print("Eigensystem calculated")
         return self.vals, self.vecs
 
 
@@ -305,23 +314,24 @@ def inner(v1, v2, Peq=None):
     return sum([v1[i]*v2[i]/Peq[i] for i in range(n)])
 
 
-def _calc_coeff(w, force=False):
+def _calc_coeff(w, force=False, verbose=True):
     if (w.weq is None) or force:
-        w.calc_weq()
+        w.calc_weq(verbose=verbose)
+
     weq = w.weq
 
     if (weq.vals is None) or force:
-        weq.calc_peq()
+        weq.calc_eig(verbose=verbose)
     peq = weq.peq
     vals= weq.vals
     vecs = weq.vecs
 
     if (w.w1 is None) or force:
-        w.calc_w1()
+        w.calc_w1(verbose=verbose)
     w1 = w.w1
 
     p1coeffs = [-inner(vecs[k], w1*peq, peq)/vals[k] for k in range(1, len(vals))]
-    print(p1coeffs)
+
     coeffs = CoeffArray(w.dim)
     for k in range(w.dim):
         if k == 0:
@@ -333,9 +343,9 @@ def _calc_coeff(w, force=False):
     return coeffs
 
 
-def _calc_cond(w, curr=None, force=False):
+def _calc_cond(w, curr=None, force=False, verbose=True):
     if (w.coeff is None) or force:
-        w.calc_coeff()
+        w.calc_coeff(verbose=verbose)
 
     if curr is None:
         curr = []
