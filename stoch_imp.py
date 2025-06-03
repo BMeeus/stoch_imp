@@ -17,10 +17,6 @@ class CoeffArray:
     def __str__(self):
         return sp.pretty(self.mat)
 
-    def get_cond(self, i, j, normal=False):
-        om = sp.Symbol("omega", real=True, positive=True)
-        c = cond(self.mat, om, i, j, normal=normal)
-        return sp.lambdify([om], c)
 
 class Mat:
     """
@@ -160,16 +156,21 @@ class WMatrix(TrMatrix):
     def calc_coeff(self, force=False, verbose=True):
         return _calc_coeff(self, force, verbose=verbose)
 
-    def calc_cond(self, curr=None, force=False, verbose=True):
-        return _calc_cond(self, curr, force, verbose=verbose)
-
     def get_cond(self, i, j, normal=False, force=False, verbose=True):
         if (self.coeff is None) or force:
             self.calc_coeff(force=force, verbose=verbose)
         if not self.zero_index:
             i -= 1
             j -= 1
-        return self.coeff.get_cond(i, j, normal)
+
+        om = sp.Symbol("omega", real=True, positive=True)
+        c = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
+                           range(self.dim)]))
+        if normal:
+            n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
+            return sp.lambdify([om], deep_symp(c/n))
+        return sp.lambdify([om], c)
+        # todo: Write get_conds function
 
 
 class EqMatrix(TrMatrix):
@@ -312,7 +313,7 @@ def _check_rates(m, err=False, verbose=False):
                             "Transfer rate ({} -> {}) is negative ({})".format(col + 1, row + 1, m[row, col]))
                     else:
                         return False
-            except TypeError as e:
+            except TypeError:
                 if verbose:
                     print("Positivity of transfer rate ({} -> {}) undetermined ({})".format(col + 1, row + 1,
                                                                                             m[row, col]))
@@ -361,60 +362,6 @@ def _calc_coeff(w, force=False, verbose=True):
 
     w.coeff = coeffs
     return coeffs
-
-
-def _calc_cond(w, curr=None, force=False, verbose=True):
-    if (w.coeff is None) or force:
-        w.calc_coeff(verbose=verbose)
-
-    if curr is None:
-        curr = []
-        for i in range(w.dim):
-            for j in range(i + 1, w.dim):
-                if w.weq[i, j] != 0 or w.weq[j, i] != 0 or w.w1[i, j] != 0 or w.w1[j, i] != 0:
-                    curr.append([i, j])
-    elif type(curr) == list:
-        if type(curr[0]) != list:
-            curr = [curr]
-        for c in curr:
-            try:
-                if len(c) != 2:
-                    raise TypeError("Currents should be given as lists of length 2, is length {}".format(len(c)))
-            except TypeError:
-                raise TypeError("Currents should be given as lists, is {}".format(type(c)))
-            finally:
-                pass
-    else:
-        raise TypeError("Current list should be given as list of lists, is {}".format(type(curr)))
-
-    om_arr = np.logspace(-10, 2, 10000)
-    res_lst = []
-    for c in curr:
-        c_i, c_j = c  # Extract transition
-        res_arr = cond(w, om_arr, c_i, c_j, normal=True)  # calculate conductance
-        res_lst.append([c, res_arr])
-    w.conds = res_lst
-    return res_lst
-
-def cond(arr, om, i, j, normal=False):
-    """
-    Calculate the conductance of the transition i --> j. This can be normalised using the conductance at zero driving.
-
-    :param w: the W-matrix of which the conductivities are calculated
-    :param om: Float/np array: The driving frequency or array of frequencies
-    :param i: Int: The site of origin of the transition
-    :param j: Int: The destination site of the transition
-    :param normal: Bool: if True returns the conductance normalised using conductance at zero frequency
-
-    :return: Float/np array: The conductance of the transition i --> j.
-    """
-    c = deep_symp(sum([arr[j, i, k] * (1 if k == 0 else (w.weq.vals[k] / (1j * om - w.weq.vals[k]))) for k in range(len(arr[0, 0, :]))]))
-
-    if normal:
-        n = deep_symp(sum([arr[j, i, k] * (1 if k == 0 else -1) for k in range(len(arr[0, 0, :]))]))
-        return deep_symp(c / n)
-    else:
-        return deep_symp(c)
 
 if __name__ == '__main__':
     pass
