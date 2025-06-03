@@ -223,6 +223,13 @@ class EqMatrix(TrMatrix):
         return True
 
 
+def deep_symp(e):
+    e = sp.nsimplify(e, rational=True, full=True)
+    e = sp.simplify(e)
+    e = sp.nsimplify(e, rational=True, full=True)
+    return e
+
+
 def gram_schmidt(v_arr, Peq=None):
     """
     Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
@@ -250,6 +257,7 @@ def gram_schmidt(v_arr, Peq=None):
             v -= inner(orthogonal[j], v, Peq) * orthogonal[j]
         # Normalization
         v /= sp.sqrt(inner(v, v, Peq))
+        deep_symp(v)
         orthogonal.append(v)
     return orthogonal
 
@@ -301,8 +309,8 @@ def _check_rates(m, err=False, verbose=False):
 
 def _calc_curr_like(m, p):
     m = m.mat
-    curr1 = Mat([[m[row, col] * p[row] for col in range(m.cols)] for row in range(m.rows)])
-    curr2 = Mat([[m[row, col] * p[col] for row in range(m.cols)] for col in range(m.rows)])
+    curr1 = Mat([[deep_symp(m[row, col] * p[row]) for col in range(m.cols)] for row in range(m.rows)])
+    curr2 = Mat([[deep_symp(m[row, col] * p[col]) for row in range(m.cols)] for col in range(m.rows)])
     return curr1 - curr2
 
 
@@ -311,7 +319,7 @@ def inner(v1, v2, Peq=None):
     if Peq is None:
         Peq = [1 for _ in range(n)]
 
-    return sum([v1[i]*v2[i]/Peq[i] for i in range(n)])
+    return deep_symp(sum([v1[i]*v2[i]/Peq[i] for i in range(n)]))
 
 
 def _calc_coeff(w, force=False, verbose=True):
@@ -388,10 +396,11 @@ def cond(w, om, i, j, normal=False):
 
     :return: Float/np array: The conductance of the transition i --> j.
     """
-    c = sum([w.coeff[i, j, k] * (1 if k == 0 else (w.weq.vals[k] / (1j * om - w.weq.vals[k]))) for k in range(len(w.coeff[0, 0, :]))])
+    c = deep_symp(sum([w.coeff[i, j, k] * (1 if k == 0 else (w.weq.vals[k] / (1j * om - w.weq.vals[k]))) for k in range(len(w.coeff[0, 0, :]))]))
+
     if normal:
-        n = sum([w.coeff[i, j, k] * (1 if k == 0 else -1) for k in range(len(w.coeff[0, 0, :]))])
-        return c / n
+        n = deep_symp(sum([w.coeff[i, j, k] * (1 if k == 0 else -1) for k in range(len(w.coeff[0, 0, :]))]))
+        return deep_symp(c / n)
     else:
         return c
 
