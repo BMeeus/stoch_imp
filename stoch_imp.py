@@ -134,6 +134,7 @@ class WMatrix(TrMatrix):
         self.conds = None
 
 
+
     def calc_weq(self, eq=None, verbose=False):
         if eq is None:
             eq = self.eq
