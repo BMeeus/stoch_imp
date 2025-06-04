@@ -8,6 +8,7 @@ class CoeffArray:
     """
     Class handling the array containing the coefficients.
     """
+
     def __init__(self, n):
         """
         Initialising an instance of CoeffArray
@@ -21,7 +22,7 @@ class CoeffArray:
         return self.mat.__getitem__(item)
 
     def __setitem__(self, key, value):
-        self.mat.__setitem__(key,value)
+        self.mat.__setitem__(key, value)
 
     def __str__(self):
         return sp.pretty(self.mat)
@@ -31,6 +32,7 @@ class Mat:
     """
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
+
     def __init__(self, arr, zi=False):
         """
         Initialises a Mat instance
@@ -40,10 +42,10 @@ class Mat:
         """
         m = arr_to_mat(arr)
 
-        self.mat = m                                                     # The Sympy Matrix object
-        self.dim = self.mat.rows                                         # The dimension of the associated system
+        self.mat = m  # The Sympy Matrix object
+        self.dim = self.mat.rows  # The dimension of the associated system
         self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
-        self.zero_index = zi                                             # Whether the system starts at 0
+        self.zero_index = zi  # Whether the system starts at 0
 
     def __str__(self):
         # This is a QoL improvement, ensures nice printing of matrix like objects
@@ -77,7 +79,7 @@ class Mat:
         if isinstance(other, self.__class__):
             return Mat(self.mat * other.mat)
         else:
-            return Mat(self.mat*other)
+            return Mat(self.mat * other)
 
     def __rmul__(self, other):
         if isinstance(other, self.__class__):
@@ -91,6 +93,7 @@ class TrMatrix(Mat):
     Class handling all transition matrices. These matrices should sum ot zero along columns and have positive
     off-diagonal elements.
     """
+
     def __init__(self, arr, zi=False):
         """
         Initialise a new Transfer matrix
@@ -108,23 +111,21 @@ class TrMatrix(Mat):
         super().__init__(arr, zi)
         _check_diag(self.mat, err=True)
         _check_rates(self.mat, err=True)
+        return
 
-    def add_trans(self, i, j, r=1.0, ri=None, symm=True, simp=True):
+    def add_trans(self, i: int, j: int, r: float = 1.0, ri: float = None, symm: bool = True, simp: bool = True) -> None:
         """
         Add a transition i --> j, with rate r.
 
         If symm is True, a symmetric transition j --> i is added with rate 1/r. Optionallym ri can be
         used to specify a rate for the symmetric transition.
 
-        Args:
-        :param i (Int): The starting site of the transition
-        :param j (Int): The target site of the transition
-
-        Kwargs:
-        :param r (Float): The transfer rate with which the transition should be set. Default is 1.0
-        :param ri (Float): The transfer rate used for the inverse transition. Default is 1/r
-        :param symm (Bool): If True, also adds a symmetric transition j --> i.
-        :param simp (Bool): Whether to simplify the rates before setting.
+        :param i: (Int) The starting site of the transition
+        :param j: (Int) The target site of the transition
+        :param r: (Float) The transfer rate with which the transition should be set. Default is 1.0
+        :param ri: (Float) The transfer rate used for the inverse transition. Default is 1/r
+        :param symm: (Bool) If True, also adds a symmetric transition j --> i.
+        :param simp: (Bool) Whether to simplify the rates before setting.
         :return:
         """
 
@@ -144,7 +145,7 @@ class TrMatrix(Mat):
         except TypeError:
             pass
 
-        self.mat[j, i] = r   # Set the matrix element
+        self.mat[j, i] = r  # Set the matrix element
         self.mat[i, i] -= r  # Update diagonal element
 
         if symm or (ri is not None):
@@ -161,23 +162,24 @@ class TrMatrix(Mat):
             self.mat[j, j] -= ri
         if simp:
             sp.simplify(self.mat)
+        return
 
-    def calc_diag(self):
+    def calc_diag(self) -> None:
         """Force calculation of the diagonal elements"""
         for col in range(self.dim):
             self.mat[col, col] = - sum([self.mat[row, col] for row in range(self.dim) if row != col])
 
-    def check_diag(self):
+    def check_diag(self) -> bool:
         """Check that columns sum to 0"""
         return _check_diag(self.mat)
 
-    def check_rates(self, verbose=False):
+    def check_rates(self, verbose: bool = False) -> bool:
         """Check if off-diagonal elements are positive"""
         return _check_rates(self.mat, verbose=verbose)
 
 
 class WMatrix(TrMatrix):
-    def __init__(self, arr, ds=None, eq=0, zi=False):
+    def __init__(self, arr, ds: sp.Symbol = None, eq: float = 0, zi: bool = False):
         super().__init__(arr, zi)
 
         symb_list = list(self.mat.free_symbols)
@@ -196,9 +198,7 @@ class WMatrix(TrMatrix):
         self.eq = eq
         self.conds = None
 
-
-
-    def calc_weq(self, eq=None, verbose=False):
+    def calc_weq(self, eq: float = None, verbose: bool = False) -> EqMatrix:
         if eq is None:
             eq = self.eq
         self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
@@ -206,7 +206,7 @@ class WMatrix(TrMatrix):
             print("Equilibrium matrix calculated")
         return self.weq
 
-    def calc_w1(self, eq=None, verbose=False):
+    def calc_w1(self, eq: float = None, verbose: bool = False) -> Mat:
         if eq is None:
             eq = self.eq
         if self.ds not in list(self.mat.free_symbols):
@@ -217,10 +217,10 @@ class WMatrix(TrMatrix):
             print("Driving matrix calculated")
         return self.w1
 
-    def calc_coeff(self, force=False, verbose=True):
+    def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
         return _calc_coeff(self, force, verbose=verbose)
 
-    def get_cond(self, i, j, normal=False, force=False, verbose=True):
+    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True):
         if (self.coeff is None) or force:
             self.calc_coeff(force=force, verbose=verbose)
         if not self.zero_index:
@@ -228,27 +228,28 @@ class WMatrix(TrMatrix):
             j -= 1
 
         om = sp.Symbol("omega", real=True, positive=True)
-        c = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
-                           range(self.dim)]))
+        c = deep_symp(
+            sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
+                 range(self.dim)]))
         if normal:
             n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
-            return sp.lambdify([om], deep_symp(c/n))
+            return sp.lambdify([om], deep_symp(c / n))
         return sp.lambdify([om], c)
         # todo: Write get_conds function
 
 
 class EqMatrix(TrMatrix):
-    def __init__(self, arr, zi=False):
+    def __init__(self, arr, zi: bool = False):
         super().__init__(arr, zi)
         self.peq = None
         self.vals = None
         self.vecs = None
 
-    def calc_peq(self, verbose=False):
+    def calc_peq(self, verbose: bool = False) -> Mat:
         self.calc_eig(verbose=verbose)
         return self.peq
 
-    def calc_eig(self, verbose=False):
+    def calc_eig(self, verbose: bool = False) -> tuple[list, list]:
         eig_syst = self.mat.eigenvects(error_when_incomplete=True)
 
         eig_syst.sort(key=lambda x: x[0], reverse=True)
@@ -258,7 +259,7 @@ class EqMatrix(TrMatrix):
         elif eig_syst[0][1] != 1:
             raise ValueError("multiple steady states found")
 
-        self.peq = Mat(eig_syst[0][-1][0]/sum(eig_syst[0][-1][0]))
+        self.peq = Mat(eig_syst[0][-1][0] / sum(eig_syst[0][-1][0]))
         if verbose:
             print("Equilibrium distribution calculated")
 
@@ -270,11 +271,11 @@ class EqMatrix(TrMatrix):
 
         for space in eig_syst:
             val = space[0]
-            if sp.im(val) > 10**-15:
+            if sp.im(val) > 10 ** -15:
                 raise ValueError("Complex eigenvalue found: {}".format(val))
             for degen in range(space[1]):
                 vec = space[-1][degen]
-                if (self.mat*vec - val*vec).norm() > 10**-13:
+                if (self.mat * vec - val * vec).norm() > 10 ** -13:
                     raise ValueError("Incorrect computation of eigenvectors")
 
                 vals.append(val)
@@ -287,8 +288,7 @@ class EqMatrix(TrMatrix):
             print("Eigensystem calculated")
         return self.vals, self.vecs
 
-
-    def check_db(self, tol=10**-15):
+    def check_db(self, tol: bool = 10 ** -15) -> bool:
         if self.peq is None:
             self.calc_peq()
 
@@ -350,7 +350,8 @@ def arr_to_mat(arr):
             return m
     # If not vector must be square matrix of dim at least (2, 2)
     elif not m.is_square:
-        raise NonSquareMatrixError("Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
+        raise NonSquareMatrixError(
+            "Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
     elif m.rows == 1:
         raise ShapeError("Matrix must be at least (2, 2) dimensional")
     else:
@@ -396,7 +397,7 @@ def inner(v1, v2, Peq=None):
     if Peq is None:
         Peq = [1 for _ in range(n)]
 
-    return deep_symp(sum([v1[i]*v2[i]/Peq[i] for i in range(n)]))
+    return deep_symp(sum([v1[i] * v2[i] / Peq[i] for i in range(n)]))
 
 
 def _calc_coeff(w, force=False, verbose=True):
@@ -408,24 +409,25 @@ def _calc_coeff(w, force=False, verbose=True):
     if (weq.vals is None) or force:
         weq.calc_eig(verbose=verbose)
     peq = weq.peq
-    vals= weq.vals
+    vals = weq.vals
     vecs = weq.vecs
 
     if (w.w1 is None) or force:
         w.calc_w1(verbose=verbose)
     w1 = w.w1
 
-    p1coeffs = [-inner(vecs[k], w1*peq, peq)/vals[k] for k in range(1, len(vals))]
+    p1coeffs = [-inner(vecs[k], w1 * peq, peq) / vals[k] for k in range(1, len(vals))]
 
     coeffs = CoeffArray(w.dim)
     for k in range(w.dim):
         if k == 0:
             coeffs[:, :, k] = _calc_curr_like(w1, peq).mat
         else:
-            coeffs[:, :, k] = (p1coeffs[k-1] * _calc_curr_like(weq, vecs[k])).mat
+            coeffs[:, :, k] = (p1coeffs[k - 1] * _calc_curr_like(weq, vecs[k])).mat
 
     w.coeff = coeffs
     return coeffs
+
 
 if __name__ == '__main__':
     pass
