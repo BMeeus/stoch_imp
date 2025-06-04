@@ -1,4 +1,4 @@
-import stoch_imp.stoch_imp as si
+import stoch_imp as si
 import sympy as sp
 from pyplot_funcs import *
 import matplotlib.pyplot as plt

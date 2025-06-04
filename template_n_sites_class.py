@@ -1,4 +1,4 @@
-from stoch_imp.stoch_imp import *
+from stoch_imp import *
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
