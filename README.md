@@ -1,5 +1,6 @@
 # Stochastic Impedance
 
+> WARNING! THIS README IS SEVERELY DEPRECATED AND CONTAINS ALMOST NO CURRENT PRACTICES!!
 ## Overview
 These files can be used to calculate the conductances for arbitrary systems, The general workflow is as follows:
 - Define the transfer matrix $W$:
