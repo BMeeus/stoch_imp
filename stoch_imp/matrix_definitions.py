@@ -2,7 +2,7 @@ from .core_classes import (CoeffArray, Mat, TrMatrix)
 from .util import (calc_curr_like, deep_symp, gram_schmidt, inner)
 
 import sympy as sp
-
+# todo optimise imports
 class EqMatrix(TrMatrix):
     def __init__(self, arr, zi: bool = False):
         super().__init__(arr, zi)

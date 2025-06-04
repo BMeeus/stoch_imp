@@ -1,6 +1,6 @@
 import numpy as np
 import sympy as sp
-
+# todo optimize imports
 from itertools import product
 from sympy import ShapeError, NonSquareMatrixError
 
