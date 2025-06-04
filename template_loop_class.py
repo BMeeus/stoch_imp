@@ -1,4 +1,4 @@
-import stoch_imp as si
+import stoch_imp.stoch_imp as si
 import sympy as sp
 from pyplot_funcs import *
 import matplotlib.pyplot as plt
@@ -34,12 +34,10 @@ Plot currents
 # Define range of frequencies
 om_arr = np.logspace(-10, 2, 10000)
 
-for curr in [[1, 2], [3, 4], [1, 3]]:
-    c_i, c_j = curr  # Extract transition
-    cond = w.get_cond(c_i, c_j)  # calculate conductance
+for cond, ind in w.get_conds([[1, 2], [3, 4], [1, 3]]):
     res_arr = cond(om_arr)
     # plot result
-    line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
+    line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
     add_arrow(line)
 
 # Add axes

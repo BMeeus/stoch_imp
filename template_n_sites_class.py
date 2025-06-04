@@ -1,4 +1,4 @@
-from stoch_imp import *
+from stoch_imp.stoch_imp import *
 import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,12 +26,18 @@ plt.rcParams.update({
 # Define range of frequencies
 om_arr = np.logspace(-10, 2, 10000)
 
-for curr in [[i, (i+1)%(n+1)] for i in range(n+1)]:
-    c_i, c_j = curr  # Extract transition
-    cond = w.get_cond(c_i, c_j)  # calculate conductance
+# for curr in [[i, (i+1)%(n+1)] for i in range(n+1)]:
+#     c_i, c_j = curr  # Extract transition
+#     cond = w.get_cond(c_i, c_j)  # calculate conductance
+#     res_arr = cond(om_arr)
+#     # plot result
+#     line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
+#     add_arrow(line)
+
+for cond, ind in w.get_conds():
     res_arr = cond(om_arr)
-    # plot result
-    line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
+        # plot result
+    line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
     add_arrow(line)
 
 # Add axes
