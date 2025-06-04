@@ -1,9 +1,10 @@
-from .core_classes import (Mat)
+from sympy import (nsimplify, ShapeError, simplify, sqrt, Matrix, Expr, Set, Basic)
+from sympy.logic.boolalg import Boolean
 
-from sympy import (nsimplify, ShapeError, simplify, sqrt)
+from .core_classes import Mat
 
 
-def calc_curr_like(m: Mat, p) -> Mat:
+def calc_curr_like(m: Mat, p: Mat | Matrix) -> Mat:
     """
     Calculate expressions of current-like form
 
@@ -30,7 +31,7 @@ def deep_symp(e):
     return e
 
 
-def gram_schmidt(v_arr, Peq=None):
+def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[Matrix]:
     """
     Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
 
@@ -38,14 +39,10 @@ def gram_schmidt(v_arr, Peq=None):
     :param Peq: The equilibrium vector used in the definition of the inner product
     :return: array of orthogonalised vectors
     """
-    n = len(v_arr[0])
-    if Peq is None:
-        Peq = [1 for _ in range(n)]
+    # if type(Peq) == Mat:
+    #     Peq = Peq.mat
 
-    if type(Peq) == Mat:
-        Peq = Peq.mat
-
-    # Orthogonalized, To Be Returned
+    # Orthogonalised, To Be Returned
     orthogonal = []
 
     # At each step, take vector
@@ -62,9 +59,21 @@ def gram_schmidt(v_arr, Peq=None):
     return orthogonal
 
 
-def inner(v1, v2, Peq=None):
-    n = len(v1)
-    if Peq is None:
-        Peq = [1 for _ in range(n)]
+def inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> Expr | Boolean | Set | Basic:
+    """
+    Calculate inner product between two vectors, weighted by the Equilibrium distribution.
+    If Peq is not given, the standard inner product is returned.
 
-    return deep_symp(sum([v1[i] * v2[i] / Peq[i] for i in range(n)]))
+    :param v1: First vector
+    :param v2: Second vector
+    :param Peq: Equilibrium distribution of the system
+    :return:
+    """
+    if len(v1) != len(v2):
+        raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 ({})".format(len(v1), len(v2)))
+    if Peq is None:
+        Peq = [1 for _ in range(len(v1))]
+    elif len(Peq) != len(v1) or len(Peq) != len(v2):
+        raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 is ({}), Peq is ({})".format(len(v1), len(v2), len(Peq)))
+
+    return deep_symp(sum([v1[i] * v2[i] / Peq[i] for i in range(len(v1))]))
