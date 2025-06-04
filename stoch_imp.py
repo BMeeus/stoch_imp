@@ -119,7 +119,7 @@ class TrMatrix(Mat):
         """
         Add a transition i --> j, with rate r.
 
-        If symm is True, a symmetric transition j --> i is added with rate 1/r. Optionallym ri can be
+        If symm is True, a symmetric transition j --> i is added with rate 1/r. Optionally, ri can be
         used to specify a rate for the symmetric transition.
 
         :param i: (Int) The starting site of the transition
@@ -303,9 +303,9 @@ class WMatrix(TrMatrix):
 
 
 def deep_symp(e):
+    """Simplify an arbitrary expression, both numerically and symbolically"""
     e = sp.nsimplify(e, rational=True, full=True)
     e = sp.simplify(e)
-    e = sp.nsimplify(e, rational=True, full=True)
     return e
 
 
@@ -342,6 +342,7 @@ def gram_schmidt(v_arr, Peq=None):
 
 
 def arr_to_mat(arr):
+    """Cast array-like object to sympy mat and check shape requirements"""
     m = sp.Matrix(arr)
 
     # Check if matrix is vector, transpose to col vec if necessary
@@ -361,6 +362,7 @@ def arr_to_mat(arr):
 
 
 def _check_diag(m, err=False):
+    """Check if columns sum to 0"""
     for col in range(m.cols):
         if sum(m.col(col)) != 0:
             if err:
@@ -371,6 +373,7 @@ def _check_diag(m, err=False):
 
 
 def _check_rates(m, err=False, verbose=False):
+    """Check if off-diagonal elements are 0"""
     for col in range(m.cols):
         for row in range(m.rows):
             try:
@@ -387,10 +390,23 @@ def _check_rates(m, err=False, verbose=False):
     return True
 
 
-def _calc_curr_like(m, p):
-    m = m.mat
-    curr1 = Mat([[deep_symp(m[row, col] * p[row]) for col in range(m.cols)] for row in range(m.rows)])
-    curr2 = Mat([[deep_symp(m[row, col] * p[row]) for row in range(m.cols)] for col in range(m.rows)])
+def _calc_curr_like(m: Mat, p) -> Mat:
+    """
+    Calculate expressions of current-like form
+
+    J_mn = W_mn P_n - W_nm P_m
+
+    for matrix m and vector p
+    :param m: The matrix to be used
+    :param p: The vector to be used
+    :return: The matrix containing the current-like values
+    """
+
+    if len(p) != m.dim:
+        raise ShapeError(f"Matrix and vector do not have same shape: ({m.dim}, {m.dim}), ({p.dim})")
+
+    curr1 = Mat([[deep_symp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
+    curr2 = Mat([[deep_symp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
     return curr1 - curr2
 
 
