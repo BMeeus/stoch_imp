@@ -1,7 +1,8 @@
 from .core_classes import (CoeffArray, Mat, TrMatrix)
 from .util import (calc_curr_like, deep_symp, gram_schmidt, inner)
 
-import sympy as sp
+from sympy import (diff, im, lambdify, Symbol)
+
 
 class EqMatrix(TrMatrix):
     def __init__(self, arr, zi: bool = False):
@@ -36,7 +37,7 @@ class EqMatrix(TrMatrix):
 
         for space in eig_syst:
             val = space[0]
-            if sp.im(val) > 10 ** -15:
+            if im(val) > 10 ** -15:
                 raise ValueError("Complex eigenvalue found: {}".format(val))
             for degen in range(space[1]):
                 vec = space[-1][degen]
@@ -66,7 +67,7 @@ class EqMatrix(TrMatrix):
 
 
 class WMatrix(TrMatrix):
-    def __init__(self, arr, ds: sp.Symbol = None, eq: float = 0, zi: bool = False):
+    def __init__(self, arr, ds: Symbol = None, eq: float = 0, zi: bool = False):
         super().__init__(arr, zi)
 
         symb_list = list(self.mat.free_symbols)
@@ -99,7 +100,7 @@ class WMatrix(TrMatrix):
         if self.ds not in list(self.mat.free_symbols):
             raise AttributeError("Driving symbol not found in matrix")
 
-        self.w1 = Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+        self.w1 = Mat(diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
         if verbose:
             print("Driving matrix calculated")
         return self.w1
@@ -114,14 +115,14 @@ class WMatrix(TrMatrix):
             i -= 1
             j -= 1
 
-        om = sp.Symbol("omega", real=True, positive=True)
+        om = Symbol("omega", real=True, positive=True)
         c = deep_symp(
             sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
                  range(self.dim)]))
         if normal:
             n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
-            return sp.lambdify([om], deep_symp(c / n))
-        return sp.lambdify([om], c)
+            return lambdify([om], deep_symp(c / n))
+        return lambdify([om], c)
 
     def get_conds(self, conds: tuple[int, int] | list[list[int]] | None = None,
                   normal: bool = False,
