@@ -87,6 +87,8 @@ class Mat:
         else:
             return self.__mul__(other)
 
+    def __len__(self):
+        return self.mat.__len__()
 
 class TrMatrix(Mat):
     """
