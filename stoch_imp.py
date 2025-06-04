@@ -180,66 +180,6 @@ class TrMatrix(Mat):
         return _check_rates(self.mat, verbose=verbose)
 
 
-class WMatrix(TrMatrix):
-    def __init__(self, arr, ds: sp.Symbol = None, eq: float = 0, zi: bool = False):
-        super().__init__(arr, zi)
-
-        symb_list = list(self.mat.free_symbols)
-        if ds is None:
-            if not symb_list:
-                raise AttributeError("No driving symbol found or given")
-            elif len(symb_list) > 1:
-                raise ValueError("Ambiguity in driving symbol, please provide a specific symbol")
-            else:
-                ds = symb_list[0]
-
-        self.ds = ds
-        self.weq = None
-        self.w1 = None
-        self.coeff = None
-        self.eq = eq
-        self.conds = None
-
-    def calc_weq(self, eq: float = None, verbose: bool = False) -> EqMatrix:
-        if eq is None:
-            eq = self.eq
-        self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
-        if verbose:
-            print("Equilibrium matrix calculated")
-        return self.weq
-
-    def calc_w1(self, eq: float = None, verbose: bool = False) -> Mat:
-        if eq is None:
-            eq = self.eq
-        if self.ds not in list(self.mat.free_symbols):
-            raise AttributeError("Driving symbol not found in matrix")
-
-        self.w1 = Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
-        if verbose:
-            print("Driving matrix calculated")
-        return self.w1
-
-    def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
-        return _calc_coeff(self, force, verbose=verbose)
-
-    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True):
-        if (self.coeff is None) or force:
-            self.calc_coeff(force=force, verbose=verbose)
-        if not self.zero_index:
-            i -= 1
-            j -= 1
-
-        om = sp.Symbol("omega", real=True, positive=True)
-        c = deep_symp(
-            sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
-                 range(self.dim)]))
-        if normal:
-            n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
-            return sp.lambdify([om], deep_symp(c / n))
-        return sp.lambdify([om], c)
-        # todo: Write get_conds function
-
-
 class EqMatrix(TrMatrix):
     def __init__(self, arr, zi: bool = False):
         super().__init__(arr, zi)
@@ -300,6 +240,66 @@ class EqMatrix(TrMatrix):
             if db_mat[*el] > tol:
                 return False
         return True
+
+
+class WMatrix(TrMatrix):
+    def __init__(self, arr, ds: sp.Symbol = None, eq: float = 0, zi: bool = False):
+        super().__init__(arr, zi)
+
+        symb_list = list(self.mat.free_symbols)
+        if ds is None:
+            if not symb_list:
+                raise AttributeError("No driving symbol found or given")
+            elif len(symb_list) > 1:
+                raise ValueError("Ambiguity in driving symbol, please provide a specific symbol")
+            else:
+                ds = symb_list[0]
+
+        self.ds = ds
+        self.weq = None
+        self.w1 = None
+        self.coeff = None
+        self.eq = eq
+        self.conds = None
+
+    def calc_weq(self, eq: float = None, verbose: bool = False) -> EqMatrix:
+        if eq is None:
+            eq = self.eq
+        self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
+        if verbose:
+            print("Equilibrium matrix calculated")
+        return self.weq
+
+    def calc_w1(self, eq: float = None, verbose: bool = False) -> Mat:
+        if eq is None:
+            eq = self.eq
+        if self.ds not in list(self.mat.free_symbols):
+            raise AttributeError("Driving symbol not found in matrix")
+
+        self.w1 = Mat(sp.diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+        if verbose:
+            print("Driving matrix calculated")
+        return self.w1
+
+    def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
+        return _calc_coeff(self, force, verbose=verbose)
+
+    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True):
+        if (self.coeff is None) or force:
+            self.calc_coeff(force=force, verbose=verbose)
+        if not self.zero_index:
+            i -= 1
+            j -= 1
+
+        om = sp.Symbol("omega", real=True, positive=True)
+        c = deep_symp(
+            sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
+                 range(self.dim)]))
+        if normal:
+            n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
+            return sp.lambdify([om], deep_symp(c / n))
+        return sp.lambdify([om], c)
+        # todo: Write get_conds function
 
 
 def deep_symp(e):
