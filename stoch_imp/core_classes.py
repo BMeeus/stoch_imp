@@ -1,8 +1,8 @@
-import numpy as np
-import sympy as sp
+# import sympy as sp
 
 from itertools import product
-from sympy import ShapeError, NonSquareMatrixError
+from numpy import zeros
+from sympy import (Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
 
 class CoeffArray:
     """
@@ -15,7 +15,7 @@ class CoeffArray:
 
         :param n: size of the system
         """
-        self.mat = np.zeros((n, n, n), dtype=object)
+        self.mat = zeros((n, n, n), dtype=object)
 
     # Let numpy handle item getting and setting
     def __getitem__(self, item):
@@ -25,7 +25,7 @@ class CoeffArray:
         self.mat.__setitem__(key, value)
 
     def __str__(self):
-        return sp.pretty(self.mat)
+        return pretty(self.mat)
 
 
 class Mat:
@@ -49,7 +49,7 @@ class Mat:
 
     def __str__(self):
         # This is a QoL improvement, ensures nice printing of matrix like objects
-        return sp.pretty(self.mat)
+        return pretty(self.mat)
 
     def __setitem__(self, key, value):
         if type(key) == int:
@@ -109,7 +109,7 @@ class TrMatrix(Mat):
             if arr <= 1:
                 raise ShapeError("Transfer matrix must be at least (2, 2) dimensional")
             else:
-                arr = sp.zeros(arr, arr)
+                arr = zeros(arr, arr)
 
         super().__init__(arr, zi)
         check_diag(self.mat, err=True)
@@ -140,7 +140,7 @@ class TrMatrix(Mat):
             j -= 1
 
         if simp:
-            r = sp.nsimplify(r, rational=True)
+            r = nsimplify(r, rational=True)
 
         try:
             if r < 0:
@@ -155,7 +155,7 @@ class TrMatrix(Mat):
             if not ri:
                 ri = r ** (-1)
             elif simp:
-                ri = sp.nsimplify(ri, rational=True)
+                ri = nsimplify(ri, rational=True)
             try:
                 if ri < 0:
                     raise ValueError(f"Inverse rate should be positive, is {ri}")
@@ -164,7 +164,7 @@ class TrMatrix(Mat):
             self.mat[i, j] = ri
             self.mat[j, j] -= ri
         if simp:
-            sp.simplify(self.mat)
+            simplify(self.mat)
         return
 
     def calc_diag(self) -> None:
@@ -183,7 +183,7 @@ class TrMatrix(Mat):
 
 def arr_to_mat(arr):
     """Cast array-like object to sympy mat and check shape requirements"""
-    m = sp.Matrix(arr)
+    m = Matrix(arr)
 
     # Check if matrix is vector, transpose to col vec if necessary
     if (m.rows == 1) ^ (m.cols == 1):
