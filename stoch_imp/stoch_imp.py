@@ -1,7 +1,7 @@
 import sympy as sp
-from sympy import NonSquareMatrixError, ShapeError
-from itertools import product
+from sympy import ShapeError, NonSquareMatrixError
 import numpy as np
+from itertools import product
 
 
 class CoeffArray:
@@ -90,6 +90,7 @@ class Mat:
     def __len__(self):
         return self.mat.__len__()
 
+
 class TrMatrix(Mat):
     """
     Class handling all transition matrices. These matrices should sum ot zero along columns and have positive
@@ -111,8 +112,8 @@ class TrMatrix(Mat):
                 arr = sp.zeros(arr, arr)
 
         super().__init__(arr, zi)
-        _check_diag(self.mat, err=True)
-        _check_rates(self.mat, err=True)
+        check_diag(self.mat, err=True)
+        check_rates(self.mat, err=True)
         return
 
     def add_trans(self, i: int, j: int, r: float = 1.0, ri: float = None, symm: bool = True, simp: bool = True) -> None:
@@ -173,11 +174,11 @@ class TrMatrix(Mat):
 
     def check_diag(self) -> bool:
         """Check that columns sum to 0"""
-        return _check_diag(self.mat)
+        return check_diag(self.mat)
 
     def check_rates(self, verbose: bool = False) -> bool:
         """Check if off-diagonal elements are positive"""
-        return _check_rates(self.mat, verbose=verbose)
+        return check_rates(self.mat, verbose=verbose)
 
 
 class EqMatrix(TrMatrix):
@@ -234,7 +235,7 @@ class EqMatrix(TrMatrix):
         if self.peq is None:
             self.calc_peq()
 
-        db_mat = _calc_curr_like(self, self.peq)
+        db_mat = calc_curr_like(self, self.peq)
 
         for el in self.iter:
             if db_mat[*el] > tol:
@@ -282,7 +283,7 @@ class WMatrix(TrMatrix):
         return self.w1
 
     def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
-        return _calc_coeff(self, force, verbose=verbose)
+        return calc_coeff(self, force, verbose=verbose)
 
     def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True):
         if (self.coeff is None) or force:
@@ -299,7 +300,122 @@ class WMatrix(TrMatrix):
             n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
             return sp.lambdify([om], deep_symp(c / n))
         return sp.lambdify([om], c)
-        # todo: Write get_conds function
+
+    def get_conds(self, conds: tuple[int, int] | list[list[int]] | None = None,
+                  normal: bool = False,
+                  force: bool = False,
+                  verbose: bool = True) -> list[tuple[callable, list[int]]]:
+
+        if conds is None:
+            self.calc_weq()
+            self.calc_w1()
+            conds = []
+            for i in range(self.dim):
+                for j in range(i+1, self.dim):
+                    if self.weq[i, j] != 0 or self.weq[j, i] != 0 or self.w1[i, j] != 0 or self.w1[j, i] != 0:
+                        conds.append([i, j])
+        elif type(conds[0]) == int:
+            conds = [conds]
+        return [(self.get_cond(*cond, normal=normal, force=force, verbose=verbose), cond) for cond in conds]
+
+
+
+def arr_to_mat(arr):
+    """Cast array-like object to sympy mat and check shape requirements"""
+    m = sp.Matrix(arr)
+
+    # Check if matrix is vector, transpose to col vec if necessary
+    if (m.rows == 1) ^ (m.cols == 1):
+        if m.cols > 1:
+            return m.T
+        else:
+            return m
+    # If not vector must be square matrix of dim at least (2, 2)
+    elif not m.is_square:
+        raise NonSquareMatrixError(
+            "Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
+    elif m.rows == 1:
+        raise ShapeError("Matrix must be at least (2, 2) dimensional")
+    else:
+        return m
+
+
+def calc_coeff(w, force=False, verbose=True):
+    if (w.weq is None) or force:
+        w.calc_weq(verbose=verbose)
+
+    weq = w.weq
+
+    if (weq.vals is None) or force:
+        weq.calc_eig(verbose=verbose)
+    peq = weq.peq
+    vals = weq.vals
+    vecs = weq.vecs
+
+    if (w.w1 is None) or force:
+        w.calc_w1(verbose=verbose)
+    w1 = w.w1
+
+    p1coeffs = [-inner(vecs[k], w1 * peq, peq) / vals[k] for k in range(1, len(vals))]
+
+    coeffs = CoeffArray(w.dim)
+    for k in range(w.dim):
+        if k == 0:
+            coeffs[:, :, k] = calc_curr_like(w1, peq).mat
+        else:
+            coeffs[:, :, k] = (p1coeffs[k - 1] * calc_curr_like(weq, vecs[k])).mat
+
+    w.coeff = coeffs
+    return coeffs
+
+
+def calc_curr_like(m: Mat, p) -> Mat:
+    """
+    Calculate expressions of current-like form
+
+    J_mn = W_mn P_n - W_nm P_m
+
+    for matrix m and vector p
+    :param m: The matrix to be used
+    :param p: The vector to be used
+    :return: The matrix containing the current-like values
+    """
+
+    if len(p) != m.dim:
+        raise ShapeError("Matrix and vector do not have same shape: ({}, {}), ({})".format(m.dim, m.dim, p.dim))
+
+    curr1 = Mat([[deep_symp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
+    curr2 = Mat([[deep_symp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
+    return curr1 - curr2
+
+
+def check_diag(m, err=False):
+    """Check if columns sum to 0"""
+    for col in range(m.cols):
+        if sum(m.col(col)) != 0:
+            if err:
+                raise ValueError("Column {} does not sum to 0 (sum = {})".format(col, sum(m.col(col))))
+            else:
+                return False
+    return True
+
+
+def check_rates(m, err=False, verbose=False):
+    """Check if off-diagonal elements are 0"""
+    for col in range(m.cols):
+        for row in range(m.rows):
+            try:
+                if row != col and m[row, col] < 0:
+                    if err:
+                        raise ValueError(
+                            "Transfer rate ({} -> {}) is negative ({})".format(col + 1, row + 1, m[row, col]))
+                    else:
+                        return False
+            except TypeError:
+                if verbose:
+                    print("Positivity of transfer rate ({} -> {}) undetermined ({})".format(col + 1, row + 1,
+                                                                                            m[row, col]))
+    return True
 
 
 def deep_symp(e):
@@ -341,75 +457,6 @@ def gram_schmidt(v_arr, Peq=None):
     return orthogonal
 
 
-def arr_to_mat(arr):
-    """Cast array-like object to sympy mat and check shape requirements"""
-    m = sp.Matrix(arr)
-
-    # Check if matrix is vector, transpose to col vec if necessary
-    if (m.rows == 1) ^ (m.cols == 1):
-        if m.cols > 1:
-            return m.T
-        else:
-            return m
-    # If not vector must be square matrix of dim at least (2, 2)
-    elif not m.is_square:
-        raise NonSquareMatrixError(
-            "Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
-    elif m.rows == 1:
-        raise ShapeError("Matrix must be at least (2, 2) dimensional")
-    else:
-        return m
-
-
-def _check_diag(m, err=False):
-    """Check if columns sum to 0"""
-    for col in range(m.cols):
-        if sum(m.col(col)) != 0:
-            if err:
-                raise ValueError("Column {} does not sum to 0 (sum = {})".format(col, sum(m.col(col))))
-            else:
-                return False
-    return True
-
-
-def _check_rates(m, err=False, verbose=False):
-    """Check if off-diagonal elements are 0"""
-    for col in range(m.cols):
-        for row in range(m.rows):
-            try:
-                if row != col and m[row, col] < 0:
-                    if err:
-                        raise ValueError(
-                            "Transfer rate ({} -> {}) is negative ({})".format(col + 1, row + 1, m[row, col]))
-                    else:
-                        return False
-            except TypeError:
-                if verbose:
-                    print("Positivity of transfer rate ({} -> {}) undetermined ({})".format(col + 1, row + 1,
-                                                                                            m[row, col]))
-    return True
-
-
-def _calc_curr_like(m: Mat, p) -> Mat:
-    """
-    Calculate expressions of current-like form
-
-    J_mn = W_mn P_n - W_nm P_m
-
-    for matrix m and vector p
-    :param m: The matrix to be used
-    :param p: The vector to be used
-    :return: The matrix containing the current-like values
-    """
-
-    if len(p) != m.dim:
-        raise ShapeError(f"Matrix and vector do not have same shape: ({m.dim}, {m.dim}), ({p.dim})")
-
-    curr1 = Mat([[deep_symp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
-    curr2 = Mat([[deep_symp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
-    return curr1 - curr2
-
-
 def inner(v1, v2, Peq=None):
     n = len(v1)
     if Peq is None:
@@ -418,34 +465,3 @@ def inner(v1, v2, Peq=None):
     return deep_symp(sum([v1[i] * v2[i] / Peq[i] for i in range(n)]))
 
 
-def _calc_coeff(w, force=False, verbose=True):
-    if (w.weq is None) or force:
-        w.calc_weq(verbose=verbose)
-
-    weq = w.weq
-
-    if (weq.vals is None) or force:
-        weq.calc_eig(verbose=verbose)
-    peq = weq.peq
-    vals = weq.vals
-    vecs = weq.vecs
-
-    if (w.w1 is None) or force:
-        w.calc_w1(verbose=verbose)
-    w1 = w.w1
-
-    p1coeffs = [-inner(vecs[k], w1 * peq, peq) / vals[k] for k in range(1, len(vals))]
-
-    coeffs = CoeffArray(w.dim)
-    for k in range(w.dim):
-        if k == 0:
-            coeffs[:, :, k] = _calc_curr_like(w1, peq).mat
-        else:
-            coeffs[:, :, k] = (p1coeffs[k - 1] * _calc_curr_like(weq, vecs[k])).mat
-
-    w.coeff = coeffs
-    return coeffs
-
-
-if __name__ == '__main__':
-    pass
