@@ -34,7 +34,7 @@ Plot currents
 # Define range of frequencies
 om_arr = np.logspace(-10, 2, 10000)
 
-for cond, ind in w.get_conds([[1, 2], [3, 4], [1, 3]]):
+for ind, cond in w.get_conds([(1, 2), (3, 4), (1, 3)]):
     res_arr = cond(om_arr)
     # plot result
     line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
