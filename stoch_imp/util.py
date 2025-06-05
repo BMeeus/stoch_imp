@@ -39,9 +39,6 @@ def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[M
     :param Peq: The equilibrium vector used in the definition of the inner product
     :return: array of orthogonalised vectors
     """
-    # if type(Peq) == Mat:
-    #     Peq = Peq.mat
-
     # Orthogonalised, To Be Returned
     orthogonal = []
 
