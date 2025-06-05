@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from itertools import product
 
-from numpy import zeros
+from numpy import zeros as np_zeros
 from sympy import (Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
 
 
@@ -17,7 +17,7 @@ class CoeffArray:
 
         :param n: size of the system
         """
-        self.mat = zeros((n, n, n), dtype=object)
+        self.mat = np_zeros((n, n, n), dtype=object)
 
     # Let numpy handle item getting and setting
     def __getitem__(self, item):
@@ -117,8 +117,8 @@ class TrMatrix(Mat):
 
         super().__init__(arr, zi)
 
-        check_diag(self.mat, err=True)
-        check_rates(self.mat, err=True)
+        check_diag(self, err=True)
+        check_rates(self, err=True)
         return
 
     def add_trans(self, i: int, j: int, r: float = 1.0, ri: float = None, symm: bool = True, simp: bool = True) -> None:
