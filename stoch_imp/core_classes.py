@@ -3,7 +3,7 @@ from __future__ import annotations
 from itertools import product
 
 from numpy import zeros as np_zeros
-from sympy import (Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
+from sympy import (Expr, Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
 
 
 class CoeffArray:
@@ -121,7 +121,11 @@ class TrMatrix(Mat):
         check_rates(self, err=True)
         return
 
-    def add_trans(self, i: int, j: int, r: float = 1.0, ri: float = None, symm: bool = True, simp: bool = True) -> None:
+    def add_trans(self, i: int, j: int,
+                  r: float | Expr = 1.0,
+                  ri: float | Expr | None = None,
+                  symm: bool = True,
+                  simp: bool = True) -> None:
         """
         Add a transition i --> j, with rate r.
 
