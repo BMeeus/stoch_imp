@@ -94,6 +94,20 @@ class Mat:
     def __len__(self):
         return self.mat.__len__()
 
+    def __getattr__(self, name):
+        # Delegate attribute access to self.mat if it exists there
+        return getattr(self.mat, name)
+
+    def __dir__(self):
+        # Combine Mat's own attrs + mat's attrs for better autocomplete/introspection
+        return list(set(super().__dir__())) + dir(self.mat)
+
+    def __matrix__(self):
+        return self.mat
+
+    def simp(self):
+        simplify(self.mat)
+        return
 
 class TrMatrix(Mat):
     """
