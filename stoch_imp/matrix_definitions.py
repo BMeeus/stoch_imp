@@ -245,8 +245,9 @@ class WMatrix(TrMatrix):
             # Iterate over lower triangle of matrix, if any relevant element is non-zero, adds the indices to conds
             for i in range(self.dim):
                 for j in range(i+1, self.dim):
-                    if self.weq[i, j] != 0 or self.weq[j, i] != 0 or self.w1[i, j] != 0 or self.w1[j, i] != 0:
-                        conds.append([i, j])
+                    if any(elem != 0 for elem in (self.weq[i, j], self.weq[j, i], self.w1[i, j], self.w1[j, i])):
+                        conds.append((i, j))
+
         elif type(conds[0]) == int:
             conds = [conds]
 
