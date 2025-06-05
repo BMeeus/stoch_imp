@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 from sympy import (diff, im, lambdify, Symbol, Matrix, pretty)
 
 from .core_classes import (CoeffArray, Mat, TrMatrix)
@@ -185,7 +183,7 @@ class WMatrix(TrMatrix):
         """Calculate the coefficients A^k_mn for the WMatrix"""
         return _calc_coeff(self, force, verbose=verbose)
 
-    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> Callable:
+    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> callable:
         """
         Calculate the conductivity of transition i --> j, and return it as a callable function. The conductivity can be
         normalised so that it starts at 1.
@@ -209,36 +207,51 @@ class WMatrix(TrMatrix):
 
         om = Symbol("omega", real=True, positive=True)
 
-        # A more clear form of this formula can be found in the accompagniying pdf.
+        # A more clear form of this formula can be found in the accompanying pdf.
         c = deep_symp(
             sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
                  range(self.dim)]))
         if normal:
+            # This is just the above formula for zero driving.
             n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
             return lambdify([om], deep_symp(c / n))
         return lambdify([om], c)
 
-    def get_conds(self, conds: tuple[int, int] | list[list[int]] | None = None,
+    def get_conds(self, conds: tuple[int, int] | list[tuple[int, int]] | None = None,
                   normal: bool = False,
                   force: bool = False,
-                  verbose: bool = True) -> list[tuple[callable, list[int]]]:
+                  verbose: bool = True) -> list[tuple[tuple[int, int], callable]]:
+        """
+        A helper function to calculate the conductivities for multiple transitions at a time. If no transitions are
+        given, a simple heuristic is used to find all transitions. Returns a list of tuples containing the indices of the
+        transition and the callable function returned by get_cond.
+
+        :param conds: A list of transitions i --> j, given in the form (i, j). If no transitions are given, the
+        transitions are sought by looking for non-zero elements of the Equilibrium and Driving matrix. Note that this
+        heuristic does not take into account the direction of the transition, so results may be mirrored.
+        :param normal: (Bool) If True, the conductivity is normalised such that it starts at 1.
+        :param force: (Bool) If False, previously stored results will be used for the calculations. If True, all
+        matrices and eigenspaces will be recalculated.
+        :param verbose: (Bool) If True, prints progress statements
+        :return: Returns a list of tuples (ind, cond) which contains the indices of the transition and the associated
+        conductivity function.
+        """
 
         if conds is None:
+            # Make sure weq and w1 are calculated
             self.calc_weq()
             self.calc_w1()
             conds = []
+            # Iterate over lower triangle of matrix, if any relevant element is non-zero, adds the indices to conds
             for i in range(self.dim):
                 for j in range(i+1, self.dim):
                     if self.weq[i, j] != 0 or self.weq[j, i] != 0 or self.w1[i, j] != 0 or self.w1[j, i] != 0:
                         conds.append([i, j])
         elif type(conds[0]) == int:
             conds = [conds]
-        return [(self.get_cond(*cond, normal=normal, force=force, verbose=verbose), cond) for cond in conds]
 
+        return [(cond, self.get_cond(*cond, normal=normal, force=force, verbose=verbose)) for cond in conds]
 
-def _calc_coeff(w, force=False, verbose=True):
-    if (w.weq is None) or force:
-        w.calc_weq(verbose=verbose)
 
 def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:
     """
@@ -267,6 +280,7 @@ def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffA
     w.calc_w1(force=force, verbose=verbose)
     w1 = w.w1
 
+    # Calculate expansion coefficients of p1 in eigenvector basis
     p1coeffs = [-inner(vecs[k], w1 * peq, peq) / vals[k] for k in range(1, len(vals))]
 
     coeffs = CoeffArray(w.dim)
