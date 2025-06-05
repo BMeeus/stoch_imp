@@ -1,4 +1,6 @@
-from sympy import (diff, im, lambdify, Symbol, Matrix)
+from collections.abc import Callable
+
+from sympy import (diff, im, lambdify, Symbol, Matrix, pretty)
 
 from .core_classes import (CoeffArray, Mat, TrMatrix)
 from .util import (calc_curr_like, deep_symp, gram_schmidt, inner)
@@ -105,52 +107,92 @@ class WMatrix(TrMatrix):
         """
         super().__init__(arr, zi)
 
-        symb_list = list(self.mat.free_symbols)
+        # If only one free symbol is present, it is assumed this is the driving.
         if ds is None:
+            symb_list = list(self.mat.free_symbols)
             if not symb_list:
                 raise AttributeError("No driving symbol found or given")
             elif len(symb_list) > 1:
                 raise ValueError("Ambiguity in driving symbol, please provide a specific symbol")
             else:
                 ds = symb_list[0]
+                print(f"Driving symbol set to {pretty(ds)}")
 
         self.ds = ds
         self.weq = None
         self.w1 = None
         self.coeff = None
         self.eq = eq
-        self.conds = None
 
     def calc_weq(self, eq: float = None, verbose: bool = False) -> EqMatrix:
+        """
+        Calculate the Equilibrium Matrix for the WMatrix by substituting in the equilibrium value.
+
+        :param eq: (float) The equilibrium value to be substituted. Default is the value attributed to the WMatrix.
+        :param verbose:  (bool) If True, prints progress statements
+        :return: (EqMatrix) The equilibrium matrix associated to the system
+        """
         if eq is None:
             eq = self.eq
+
         self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
+
         if verbose:
             print("Equilibrium matrix calculated")
+
         return self.weq
 
     def calc_w1(self, eq: float = None, verbose: bool = False) -> Mat:
+        """
+        Calculate the first Taylor expansion coefficient of the WMatrix.
+
+        :param eq: (Float) The equilibrium value to be substituted. Default is the value attributed to the WMatrix.
+        :param verbose: (Bool) If True, prints progress statements
+        :return: (Mat) The first Taylor expansion coefficient
+        """
+
         if eq is None:
             eq = self.eq
+
         if self.ds not in list(self.mat.free_symbols):
             raise AttributeError("Driving symbol not found in matrix")
 
         self.w1 = Mat(diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+
         if verbose:
             print("Driving matrix calculated")
+
         return self.w1
 
     def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
-        return calc_coeff(self, force, verbose=verbose)
+        """Calculate the coefficients A^k_mn for the WMatrix"""
+        return _calc_coeff(self, force, verbose=verbose)
 
-    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True):
+    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> Callable:
+        """
+        Calculate the conductivity of transition i --> j, and return it as a callable function. The conductivity can be
+        normalised so that it starts at 1.
+
+        :param i: (Int) The start state of the transition
+        :param j: (Int) The end state of the transition
+        :param normal: (Bool) If True, the conductivity is normalised such that it starts at 1.
+        :param force: (Bool) If False, previously stored results will be used for the calculations. If True, all
+        matrices and eigenspaces will be recalculated.
+        :param verbose: (Bool) If True, prints progress statements
+        :return: (Callable) A function taking the driving frequency as input and outputting the conductivity of the
+        transition
+        """
+
         if (self.coeff is None) or force:
             self.calc_coeff(force=force, verbose=verbose)
+
         if not self.zero_index:
             i -= 1
             j -= 1
 
         om = Symbol("omega", real=True, positive=True)
+
+        # A more clear form of this formula can be found in the accompagniying pdf.
         c = deep_symp(
             sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
                  range(self.dim)]))
@@ -177,7 +219,7 @@ class WMatrix(TrMatrix):
         return [(self.get_cond(*cond, normal=normal, force=force, verbose=verbose), cond) for cond in conds]
 
 
-def calc_coeff(w, force=False, verbose=True):
+def _calc_coeff(w, force=False, verbose=True):
     if (w.weq is None) or force:
         w.calc_weq(verbose=verbose)
 
