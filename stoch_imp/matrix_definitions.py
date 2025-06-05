@@ -10,9 +10,9 @@ class EqMatrix(TrMatrix):
         """
         Initiate an instance of EqMatrix using an Array or int for an empty matrix.
 
-        :param arr (Array like or Int): The Array with which the matrix is set. If arr is an integer, an empty
+        :param arr: (array like or int) The Array with which the matrix is set. If arr is an integer, an empty
             (arr,arr) Sympy Matrix is used
-        :param zi (Bool): Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param zi: (bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
         """
         super().__init__(arr, zi)
         self.peq = None
@@ -29,13 +29,15 @@ class EqMatrix(TrMatrix):
         """
         Calculate the eigensystem of the matrix. As a byproduct, peq is also calculated but not returned.
 
-        :param tol: (float) The tolerance with which comparisons to zero are done
-        :param force: (bool) If True, the calculation is performed even if there is already a calculated
-        Eigensystem
+        :param tol: (float) The tolerance with which comparisons to zero are done.
+        :param force: (bool) If True, the calculation is performed even if there is already a calculated Eigensystem
         :param verbose: (bool) If True, prints progress statements
-        :return vals: The eigenvalues of the system, sorted in descending order and repeated according to multiplicity.
-        :return vecs: The eigenvectors of the system, sorted such that the index of the vector matches the associated
-        eigenvalue in vals.
+        :return: (vals, vecs):
+            vals ( list(Expr | float, ...) ): The eigenvalues of the system, sorted in descending order and repeated
+            according to multiplicity.
+            vecs ( list(Matrix, ...) ): The eigenvectors of the system, sorted such that the index of the vector matches
+            the associated
+            eigenvalue in vals.
         """
         if (self.vals is not None) and (self.vecs is not None) and (not force):
             return self.vals, self.vecs
@@ -103,11 +105,11 @@ class WMatrix(TrMatrix):
         Initialise an instance of the WMatrix class. It is important that a driving symbol is given. If it is not given,
         an attempt is made to find one. If this is not successful or the result is ambiguous, an error is thrown.
 
-        :param arr (Array like or Int): The Array with which the matrix is set. If arr is an integer, an empty
+        :param arr: (Array like or Int) The Array with which the matrix is set. If arr is an integer, an empty
             (arr,arr) Sympy Matrix is used.
-        :param ds (Symbol): The symbol containing the driving of the system. If it is not given, one will try to be inferred.
-        :param eq (float): The equilibrium value of the driving. Default is 0.
-        :param zi (Bool): Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param ds: (Symbol) The symbol containing the driving of the system. If it is not given, one will try to be inferred.
+        :param eq: (float) The equilibrium value of the driving. Default is 0.
+        :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
         """
         super().__init__(arr, zi)
 
@@ -134,7 +136,7 @@ class WMatrix(TrMatrix):
 
         :param eq: (float) The equilibrium value to be substituted. Default is the value attributed to the WMatrix.
         :param force: (bool) If True, the calculation is performed even if there is already a calculated
-        Equilibrium matrix
+            Equilibrium matrix
         :param verbose:  (bool) If True, prints progress statements
         :return: (EqMatrix) The equilibrium matrix associated to the system
         """
@@ -154,13 +156,13 @@ class WMatrix(TrMatrix):
 
     def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> Mat:
         """
-        Calculate the first Taylor expansion coefficient of the WMatrix.
+        Calculate driving matrix (the first Taylor expansion coefficient of the WMatrix).
 
         :param eq: (Float) The equilibrium value to be substituted. Default is the value attributed to the WMatrix.
         :param force: (bool) If True, the calculation is performed even if there is already a calculated
-        Driving matrix
+            Driving matrix
         :param verbose: (Bool) If True, prints progress statements
-        :return: (Mat) The first Taylor expansion coefficient
+        :return: (Mat) The Driving Matrix
         """
 
         if (self.w1 is not None) and (not force):
@@ -192,10 +194,10 @@ class WMatrix(TrMatrix):
         :param j: (Int) The end state of the transition
         :param normal: (Bool) If True, the conductivity is normalised such that it starts at 1.
         :param force: (Bool) If False, previously stored results will be used for the calculations. If True, all
-        matrices and eigenspaces will be recalculated.
+            matrices and eigenspaces will be recalculated.
         :param verbose: (Bool) If True, prints progress statements
         :return: (Callable) A function taking the driving frequency as input and outputting the conductivity of the
-        transition
+            transition
         """
 
         if (self.coeff is None) or force:
@@ -226,15 +228,16 @@ class WMatrix(TrMatrix):
         given, a simple heuristic is used to find all transitions. Returns a list of tuples containing the indices of the
         transition and the callable function returned by get_cond.
 
-        :param conds: A list of transitions i --> j, given in the form (i, j). If no transitions are given, the
-        transitions are sought by looking for non-zero elements of the Equilibrium and Driving matrix. Note that this
-        heuristic does not take into account the direction of the transition, so results may be mirrored.
+        :param conds: ( [(int, int), ... ] )A list of transitions i --> j, given in the form (i, j). If no transitions
+            are given, the transitions are sought by looking for non-zero elements of the Equilibrium and Driving matrix.
+            Note that this heuristic does not take into account the direction of the transition, so results may be
+            mirrored.
         :param normal: (Bool) If True, the conductivity is normalised such that it starts at 1.
         :param force: (Bool) If False, previously stored results will be used for the calculations. If True, all
-        matrices and eigenspaces will be recalculated.
+            matrices and eigenspaces will be recalculated.
         :param verbose: (Bool) If True, prints progress statements
         :return: Returns a list of tuples (ind, cond) which contains the indices of the transition and the associated
-        conductivity function.
+            conductivity function.
         """
 
         if conds is None:
@@ -260,12 +263,12 @@ def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffA
     the accompanying pdf file.
 
     :param w: (WMatrix) The WMatrix of which the coefficients are calculated. The only requirement is that it is filled
-    in.
+        in.
     :param force: (Bool) If False, previously stored results will be used for the calculations. If True, all
-    matrices and eigenspaces will be recalculated.
+        matrices and eigenspaces will be recalculated.
     :param verbose: (Bool) If True, prints progress statements
     :return: (CoeffArray) A 3-dimensional array containing the coefficients A^k_mn, indexed as [n, m, k]. This ensures
-    'on paper' layout of the matrix A^k_mn when printing [:, :, k].
+        'on paper' layout of the matrix A^k_mn when printing [:, :, k].
     """
     # Ensure weq is calculated
     w.calc_weq(force=force, verbose=verbose)

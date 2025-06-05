@@ -40,8 +40,8 @@ class Mat:
         """
         Initialises a Mat instance
 
-        :param arr (Array like): The Array with which the matrix is set.
-        :param zi (Bool): Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param arr: (Array like) The Array with which the matrix is set.
+        :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
         """
         m = arr_to_mat(arr)
 
@@ -105,9 +105,9 @@ class TrMatrix(Mat):
         """
         Initialise a new Transfer matrix
 
-        :param arr (Array like or Int): The Array with which the matrix is set. If arr is an integer, an empty
+        :param arr: (Array like or Int) The Array with which the matrix is set. If arr is an integer, an empty
             (arr,arr) Sympy Matrix is used
-        :param zi (Bool): Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
         """
         if type(arr) == int:
             if arr <= 1:
@@ -194,7 +194,7 @@ class TrMatrix(Mat):
 
 
 def arr_to_mat(arr):
-    """Cast array-like object to sympy mat and check shape requirements"""
+    """Cast array-like object to sympy matrix and check shape requirements"""
     m = Matrix(arr)
 
     # Check if matrix is vector, transpose to col vec if necessary

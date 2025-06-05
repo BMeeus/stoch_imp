@@ -1,5 +1,5 @@
-from sympy import (nsimplify, ShapeError, simplify, sqrt, Matrix, Expr, Set, Basic)
-from sympy.logic.boolalg import Boolean
+from sympy import (nsimplify, ShapeError, simplify, sqrt, Matrix, Expr)
+
 
 from .core_classes import Mat
 
@@ -10,9 +10,10 @@ def calc_curr_like(m: Mat, p: Mat | Matrix) -> Mat:
 
     J_mn = W_mn P_n - W_nm P_m
 
-    for matrix m and vector p
-    :param m: The matrix to be used
-    :param p: The vector to be used
+    for matrix m and vector p.
+
+    :param m: (Mat) The matrix to be used
+    :param p:(Mat | Matrix) The vector to be used
     :return: The matrix containing the current-like values
     """
 
@@ -56,15 +57,15 @@ def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[M
     return orthogonal
 
 
-def inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> Expr | Boolean | Set | Basic:
+def inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> float| Expr:
     """
     Calculate inner product between two vectors, weighted by the Equilibrium distribution.
     If Peq is not given, the standard inner product is returned.
 
-    :param v1: First vector
-    :param v2: Second vector
-    :param Peq: Equilibrium distribution of the system
-    :return:
+    :param v1: (Mat | Matrix) First vector
+    :param v2: (Mat | Matrix) Second vector
+    :param Peq: (Mat | Matrix | None) Equilibrium distribution of the system
+    :return: (float | Expr) The inner product of the vectors
     """
     if len(v1) != len(v2):
         raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 ({})".format(len(v1), len(v2)))
