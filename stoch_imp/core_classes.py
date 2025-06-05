@@ -36,12 +36,13 @@ class Mat:
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
 
-    def __init__(self, arr, zi: bool = False) -> None:
+    def __init__(self, arr, zi: bool = False, num: bool = False) -> None:
         """
         Initialises a Mat instance
 
         :param arr: (Array like) The Array with which the matrix is set.
         :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param num: (Bool) Whether the matrix is numeric or symbolic.
         """
         m = arr_to_mat(arr)
 
@@ -49,47 +50,54 @@ class Mat:
         self.dim = self.mat.rows  # The dimension of the associated system
         self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
         self.zero_index = zi  # Whether the system starts at 0
+        self.is_numeric = num
+        self.is_symbolic = not num
 
     def __str__(self):
         # This is a QoL improvement, ensures nice printing of matrix like objects
         return pretty(self.mat)
 
     def __setitem__(self, key, value) -> None:
-        if type(key) == int:
-            self.mat[key] = value  # Vector element assignment
-        else:
-            self.mat[*key] = value  # Matrix element assignment
+        self.mat.__setitem__(key, value)
         return
 
     def __iter__(self):
         return self.mat.__iter__()
 
     def __getitem__(self, item):
-        if type(item) == int:
-            return self.mat[item]  # Vector element assignment
-        else:
-            return self.mat[*item]  # Matrix element assignment
+        return self.mat.__getitem__(item)
 
     def __sub__(self, other) -> Mat:
-        return Mat(self.mat - other.mat)
+        if isinstance(other, self.__class__):
+            return Mat(self.mat - other.mat, zi=self.zero_index, num=self.is_numeric)
+        else:
+            return Mat(self.mat - other, zi=self.zero_index, num=self.is_numeric)
+
+    def __rsub__(self, other) -> Mat:
+        if isinstance(other, self.__class__):
+            return Mat(other.mat - self.mat, zi=self.zero_index, num=self.is_numeric)
+        else:
+            return Mat(other - self.mat, zi=self.zero_index, num=self.is_numeric)
 
     def __add__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(self.mat + other.mat)
+            return Mat(self.mat + other.mat, zi=self.zero_index, num=self.is_numeric)
         else:
-            raise TypeError("unsupported operand type(s) for +: '{}' and '{}'".format(self.__class__, type(other)))
+            return Mat(self.mat + other, zi=self.zero_index, num=self.is_numeric)
+
+    __radd__ = __add__
 
     def __mul__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(self.mat * other.mat)
+            return Mat(self.mat * other.mat, zi=self.zero_index, num=self.is_numeric)
         else:
-            return Mat(self.mat * other)
+            return Mat(self.mat * other, zi=self.zero_index, num=self.is_numeric)
 
     def __rmul__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(other.mat * self.mat)
+            return Mat(other.mat * self.mat, zi=self.zero_index, num=self.is_numeric)
         else:
-            return self.__mul__(other)
+            return Mat(other * self.mat, zi=self.zero_index, num=self.is_numeric)
 
     def __len__(self):
         return self.mat.__len__()
@@ -101,7 +109,7 @@ class TrMatrix(Mat):
     off-diagonal elements.
     """
 
-    def __init__(self, arr, zi: bool = False) -> None:
+    def __init__(self, arr, zi: bool = False, num: bool = False) -> None:
         """
         Initialise a new Transfer matrix
 
@@ -115,7 +123,7 @@ class TrMatrix(Mat):
             else:
                 arr = zeros(arr, arr)
 
-        super().__init__(arr, zi)
+        super().__init__(arr, zi=zi, num=num)
 
         check_diag(self, err=True)
         check_rates(self, err=True)
@@ -140,8 +148,11 @@ class TrMatrix(Mat):
         :param simp: (Bool) Whether to simplify the rates before setting.
         """
 
+        if self.is_numeric and Expr in (type(r), type(ri)):
+            raise TypeError("Expressions can only be set to symbolic matrices. Convert to float.")
+
         if i == j:
-            raise ValueError("Start and target state are equal, must be different")
+            raise ValueError("Start and target state are equal, must be different.")
 
         if not self.zero_index:
             i -= 1
