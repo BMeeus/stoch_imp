@@ -1,8 +1,8 @@
-from stoch_imp import *
-import sympy as sp
-import numpy as np
 import matplotlib.pyplot as plt
-from pyplot_funcs import *
+import numpy as np
+import sympy as sp
+
+from stoch_imp import *
 
 n = 3
 mu = sp.Symbol("mu", real=True)
@@ -34,7 +34,7 @@ om_arr = np.logspace(-10, 2, 10000)
 #     line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
 #     add_arrow(line)
 
-for cond, ind in w.get_conds():
+for ind, cond in w.get_conds():
     res_arr = cond(om_arr)
         # plot result
     line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
