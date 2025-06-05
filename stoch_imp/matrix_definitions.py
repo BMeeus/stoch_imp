@@ -21,21 +21,27 @@ class EqMatrix(TrMatrix):
         self.vals = None
         self.vecs = None
 
-    def calc_peq(self, verbose: bool = False) -> Mat:
+    def calc_peq(self, force: bool = False, verbose: bool = False) -> Mat:
         """Calculate the Equilibrium distribution"""
-        self.calc_eig(verbose=verbose)
+        if (self.peq is None) or force:
+            self.calc_eig(force=force, verbose=verbose)
         return self.peq
 
-    def calc_eig(self, tol: float = 10**(-15), verbose: bool = False) -> tuple[list, list[Matrix]]:
+    def calc_eig(self, tol: float = 10**(-15), force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
         """
         Calculate the eigensystem of the matrix. As a byproduct, peq is also calculated but not returned.
 
         :param tol: (float) The tolerance with which comparisons to zero are done
+        :param force: (bool) If True, the calculation is performed even if there is already a calculated
+        Eigensystem
         :param verbose: (bool) If True, prints progress statements
         :return vals: The eigenvalues of the system, sorted in descending order and repeated according to multiplicity.
         :return vecs: The eigenvectors of the system, sorted such that the index of the vector matches the associated
         eigenvalue in vals.
         """
+        if (self.vals is not None) and (self.vecs is not None) and (not force):
+            return self.vals, self.vecs
+
         eig_syst = self.mat.eigenvects(error_when_incomplete=True)
 
         # sort the system in descending order of eigenvalue
@@ -124,14 +130,20 @@ class WMatrix(TrMatrix):
         self.coeff = None
         self.eq = eq
 
-    def calc_weq(self, eq: float = None, verbose: bool = False) -> EqMatrix:
+    def calc_weq(self, eq: float = None, force: bool = False, verbose: bool = False) -> EqMatrix:
         """
         Calculate the Equilibrium Matrix for the WMatrix by substituting in the equilibrium value.
 
         :param eq: (float) The equilibrium value to be substituted. Default is the value attributed to the WMatrix.
+        :param force: (bool) If True, the calculation is performed even if there is already a calculated
+        Equilibrium matrix
         :param verbose:  (bool) If True, prints progress statements
         :return: (EqMatrix) The equilibrium matrix associated to the system
         """
+
+        if (self.weq is not None) and (not force):
+            return self.weq
+
         if eq is None:
             eq = self.eq
 
@@ -142,14 +154,19 @@ class WMatrix(TrMatrix):
 
         return self.weq
 
-    def calc_w1(self, eq: float = None, verbose: bool = False) -> Mat:
+    def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> Mat:
         """
         Calculate the first Taylor expansion coefficient of the WMatrix.
 
         :param eq: (Float) The equilibrium value to be substituted. Default is the value attributed to the WMatrix.
+        :param force: (bool) If True, the calculation is performed even if there is already a calculated
+        Driving matrix
         :param verbose: (Bool) If True, prints progress statements
         :return: (Mat) The first Taylor expansion coefficient
         """
+
+        if (self.w1 is not None) and (not force):
+            return self.w1
 
         if eq is None:
             eq = self.eq
@@ -223,16 +240,31 @@ def _calc_coeff(w, force=False, verbose=True):
     if (w.weq is None) or force:
         w.calc_weq(verbose=verbose)
 
+def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:
+    """
+    Calculates the coefficients A^k_mn for a WMatrix w. An explanation and mathematical justification can be found in
+    the accompanying pdf file.
+
+    :param w: (WMatrix) The WMatrix of which the coefficients are calculated. The only requirement is that it is filled
+    in.
+    :param force: (Bool) If False, previously stored results will be used for the calculations. If True, all
+    matrices and eigenspaces will be recalculated.
+    :param verbose: (Bool) If True, prints progress statements
+    :return: (CoeffArray) A 3-dimensional array containing the coefficients A^k_mn, indexed as [n, m, k]. This ensures
+    'on paper' layout of the matrix A^k_mn when printing [:, :, k].
+    """
+    # Ensure weq is calculated
+    w.calc_weq(force=force, verbose=verbose)
     weq = w.weq
 
-    if (weq.vals is None) or force:
-        weq.calc_eig(verbose=verbose)
+    # Ensure Eigensystem is calculated
+    weq.calc_eig(force=force, verbose=verbose)
     peq = weq.peq
     vals = weq.vals
     vecs = weq.vecs
 
-    if (w.w1 is None) or force:
-        w.calc_w1(verbose=verbose)
+    # Ensure w1 is calculated
+    w.calc_w1(force=force, verbose=verbose)
     w1 = w.w1
 
     p1coeffs = [-inner(vecs[k], w1 * peq, peq) / vals[k] for k in range(1, len(vals))]
