@@ -36,13 +36,12 @@ class Mat:
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
 
-    def __init__(self, arr, zi: bool = False, num: bool = False) -> None:
+    def __init__(self, arr, zi: bool = False) -> None:
         """
         Initialises a Mat instance
 
         :param arr: (Array like) The Array with which the matrix is set.
         :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
-        :param num: (Bool) Whether the matrix is numeric or symbolic.
         """
         m = arr_to_mat(arr)
 
@@ -50,8 +49,6 @@ class Mat:
         self.dim = self.mat.rows  # The dimension of the associated system
         self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
         self.zero_index = zi  # Whether the system starts at 0
-        self.is_numeric = num
-        self.is_symbolic = not num
 
     def __str__(self):
         # This is a QoL improvement, ensures nice printing of matrix like objects
@@ -69,35 +66,35 @@ class Mat:
 
     def __sub__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(self.mat - other.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(self.mat - other.mat, zi=self.zero_index)
         else:
-            return Mat(self.mat - other, zi=self.zero_index, num=self.is_numeric)
+            return Mat(self.mat - other, zi=self.zero_index)
 
     def __rsub__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(other.mat - self.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(other.mat - self.mat, zi=self.zero_index)
         else:
-            return Mat(other - self.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(other - self.mat, zi=self.zero_index)
 
     def __add__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(self.mat + other.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(self.mat + other.mat, zi=self.zero_index)
         else:
-            return Mat(self.mat + other, zi=self.zero_index, num=self.is_numeric)
+            return Mat(self.mat + other, zi=self.zero_index)
 
     __radd__ = __add__
 
     def __mul__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(self.mat * other.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(self.mat * other.mat, zi=self.zero_index)
         else:
-            return Mat(self.mat * other, zi=self.zero_index, num=self.is_numeric)
+            return Mat(self.mat * other, zi=self.zero_index)
 
     def __rmul__(self, other) -> Mat:
         if isinstance(other, self.__class__):
-            return Mat(other.mat * self.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(other.mat * self.mat, zi=self.zero_index)
         else:
-            return Mat(other * self.mat, zi=self.zero_index, num=self.is_numeric)
+            return Mat(other * self.mat, zi=self.zero_index)
 
     def __len__(self):
         return self.mat.__len__()
@@ -110,9 +107,6 @@ class Mat:
         # Combine Mat's own attrs + mat's attrs for better autocomplete/introspection
         return list(set(super().__dir__())) + dir(self.mat)
 
-    def __matrix__(self):
-        return self.mat
-
     def simp(self):
         simplify(self.mat)
         return
@@ -123,7 +117,7 @@ class TrMatrix(Mat):
     off-diagonal elements.
     """
 
-    def __init__(self, arr, zi: bool = False, num: bool = False) -> None:
+    def __init__(self, arr, zi: bool = False) -> None:
         """
         Initialise a new Transfer matrix
 
@@ -137,7 +131,7 @@ class TrMatrix(Mat):
             else:
                 arr = zeros(arr, arr)
 
-        super().__init__(arr, zi=zi, num=num)
+        super().__init__(arr, zi=zi)
 
         check_diag(self, err=True)
         check_rates(self, err=True)
@@ -162,9 +156,6 @@ class TrMatrix(Mat):
         :param simp: (Bool) Whether to simplify the rates before setting.
         """
 
-        if self.is_numeric and Expr in (type(r), type(ri)):
-            raise TypeError("Expressions can only be set to symbolic matrices. Convert to float.")
-
         if i == j:
             raise ValueError("Start and target state are equal, must be different.")
 
@@ -182,8 +173,8 @@ class TrMatrix(Mat):
         except TypeError:
             pass
 
-        self.mat[j, i] = r  # Set the matrix element
-        self.mat[i, i] -= r  # Update diagonal element
+        self[j, i] = r  # Set the matrix element
+        self[i, i] -= r  # Update diagonal element
 
         if symm or (ri is not None):
             if not ri:
@@ -197,8 +188,8 @@ class TrMatrix(Mat):
                     raise ValueError(f"Inverse rate should be positive, is {ri}")
             except TypeError:
                 pass
-            self.mat[i, j] = ri
-            self.mat[j, j] -= ri
+            self[i, j] = ri
+            self[j, j] -= ri
 
         if simp:
             simplify(self.mat)
@@ -207,15 +198,30 @@ class TrMatrix(Mat):
     def calc_diag(self) -> None:
         """Force calculation of the diagonal elements"""
         for col in range(self.dim):
-            self.mat[col, col] = - sum([self.mat[row, col] for row in range(self.dim) if row != col])
+            self[col, col] = - sum([self[row, col] for row in range(self.dim) if row != col])
 
     def check_diag(self) -> bool:
         """Check that columns sum to 0"""
-        return check_diag(self.mat)
+        return check_diag(self)
 
     def check_rates(self, verbose: bool = False) -> bool:
         """Check if off-diagonal elements are positive"""
-        return check_rates(self.mat, verbose=verbose)
+        return check_rates(self, verbose=verbose)
+
+
+class SymbolicMatrix:
+    def __init__(self):
+        self.is_symbolic = True
+        self.is_numeric = False
+
+
+class NumericMatrix:
+    def __init__(self):
+        self.is_symbolic = False
+        self.is_numeric = True
+        self.tol = 10**(-15)
+
+
 
 
 def arr_to_mat(arr):
