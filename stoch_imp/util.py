@@ -57,21 +57,37 @@ def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[M
     return orthogonal
 
 
-def inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> float| Expr:
+def inner(v1: Matrix | np.ndarray, v2: Matrix | np.ndarray, Peq: Mat | None = None) -> float| Expr:
     """
     Calculate inner product between two vectors, weighted by the Equilibrium distribution.
     If Peq is not given, the standard inner product is returned.
 
-    :param v1: (Mat | Matrix) First vector
-    :param v2: (Mat | Matrix) Second vector
-    :param Peq: (Mat | Matrix | None) Equilibrium distribution of the system
+    :param v1: (Mat | Matrix | ndarray) First vector
+    :param v2: (Mat | Matrix| ndarray) Second vector
+    :param Peq: (Mat | Matrix| ndarray | None) Equilibrium distribution of the system
     :return: (float | Expr) The inner product of the vectors
     """
     if len(v1) != len(v2):
         raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 ({})".format(len(v1), len(v2)))
+
+    if (Peq is None and type(v1) == np.ndarray) or Peq.is_numeric:
+        return _num_inner(v1, v2, Peq)
+    else:
+        return _sym_inner(v1, v2, Peq)
+
+
+def _sym_inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> float| Expr:
     if Peq is None:
         Peq = [1 for _ in range(len(v1))]
     elif len(Peq) != len(v1) or len(Peq) != len(v2):
         raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 is ({}), Peq is ({})".format(len(v1), len(v2), len(Peq)))
 
     return deep_simp(sum([v1[i] * v2[i] / Peq[i] for i in range(len(v1))]))
+
+def _num_inner(v1: Mat | np.ndarray, v2: Mat | np.ndarray, Peq: Mat | np.ndarray | None) -> float:
+    if Peq is None:
+        Peq = np.array([1 for _ in range(len(v1))])
+    elif len(Peq) != len(v1) or len(Peq) != len(v2):
+        raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 is ({}), Peq is ({})".format(len(v1), len(v2), len(Peq)))
+
+    return sum(v1*v2/Peq)

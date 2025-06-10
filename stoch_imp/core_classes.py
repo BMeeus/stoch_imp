@@ -50,6 +50,8 @@ class Mat:
         self.dim = self.mat.rows  # The dimension of the associated system
         self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
         self.zero_index = zi  # Whether the system starts at 0
+        self.is_numeric = False
+        self.is_symbolic = True
 
     def __str__(self):
         # This is a QoL improvement, ensures nice printing of matrix like objects
