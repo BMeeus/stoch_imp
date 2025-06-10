@@ -58,9 +58,6 @@ class Mat:
         self.mat.__setitem__(key, value)
         return
 
-    def __iter__(self):
-        return self.mat.__iter__()
-
     def __getitem__(self, item):
         return self.mat.__getitem__(item)
 
@@ -69,20 +66,6 @@ class Mat:
             return Mat(self.mat - other.mat, zi=self.zero_index)
         else:
             return Mat(self.mat - other, zi=self.zero_index)
-
-    def __rsub__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(other.mat - self.mat, zi=self.zero_index)
-        else:
-            return Mat(other - self.mat, zi=self.zero_index)
-
-    def __add__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(self.mat + other.mat, zi=self.zero_index)
-        else:
-            return Mat(self.mat + other, zi=self.zero_index)
-
-    __radd__ = __add__
 
     def __mul__(self, other) -> Mat:
         if isinstance(other, self.__class__):
@@ -221,9 +204,6 @@ class NumericMatrix:
         self.is_numeric = True
         self.tol = 10**(-15)
 
-
-
-
 def arr_to_mat(arr):
     """Cast array-like object to sympy matrix and check shape requirements"""
     m = Matrix(arr)
@@ -244,10 +224,10 @@ def arr_to_mat(arr):
         return m
 
 
-def check_diag(m: Mat, err: bool = False) -> bool:
+def check_diag(m: Mat, tol: float | None = 10**(-15), err: bool = False) -> bool:
     """Check if columns sum to 0"""
     for col in range(m.dim):
-        if sum(m[:, col]) != 0:
+        if sum(m[:, col]) > tol:
             if err:
                 raise ValueError("Column {} does not sum to 0 (sum = {})".format(col, sum(m[:,col])))
             else:
@@ -258,7 +238,7 @@ def check_diag(m: Mat, err: bool = False) -> bool:
 def check_rates(m: Mat, err: bool = False, verbose: bool = False) -> bool:
     """Check if off-diagonal elements are 0"""
     for col, row in m.iter:
-            # Try checking positivity. This can fail for elements containing symbols.
+        # Try checking positivity. This can fail for elements containing symbols.
         try:
             if row != col and m[row, col] < 0:
                 if err:
