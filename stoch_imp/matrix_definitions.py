@@ -1,7 +1,7 @@
 from sympy import (diff, im, lambdify, Symbol, Matrix, pretty)
 
 from .core_classes import (CoeffArray, Mat, TrMatrix)
-from .util import (calc_curr_like, deep_symp, gram_schmidt, inner)
+from .util import (calc_curr_like, deep_simp, gram_schmidt, inner)
 
 
 class EqMatrix(TrMatrix):
@@ -210,13 +210,13 @@ class WMatrix(TrMatrix):
         om = Symbol("omega", real=True, positive=True)
 
         # A more clear form of this formula can be found in the accompanying pdf.
-        c = deep_symp(
+        c = deep_simp(
             sum([self.coeff[j, i, k] * (1 if k == 0 else (self.weq.vals[k] / (1j * om - self.weq.vals[k]))) for k in
                  range(self.dim)]))
         if normal:
             # This is just the above formula for zero driving.
-            n = deep_symp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
-            return lambdify([om], deep_symp(c / n))
+            n = deep_simp(sum([self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim)]))
+            return lambdify([om], deep_simp(c / n))
         return lambdify([om], c)
 
     def get_conds(self, conds: tuple[int, int] | list[tuple[int, int]] | None = None,
