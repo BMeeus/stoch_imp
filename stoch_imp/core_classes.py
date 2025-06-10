@@ -82,6 +82,9 @@ class Mat:
         else:
             return Mat(other * self.mat, zi=self.zero_index)
 
+    def __truediv__(self, other):
+        return self.mat.__truediv__(other)
+
     def __len__(self):
         return self.mat.__len__()
 

@@ -27,7 +27,7 @@ class EqMatrix(TrMatrix):
             self.calc_eig(force=force, verbose=verbose)
         return self.peq
 
-    def calc_eig(self, tol: float = 10**(-15), force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
+    def calc_eig(self, tol: float = 10**(-14), force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
         """
         Calculate the eigensystem of the matrix. As a byproduct, peq is also calculated but not returned.
 
@@ -47,26 +47,26 @@ class EqMatrix(TrMatrix):
         eig_syst = self.eigenvects(error_when_incomplete=True)
 
         # sort the system in descending order of eigenvalue
-        eig_syst.sort(key=lambda x: x[0], reverse=True)
+        eig_syst.sort(key=lambda x: re(x[0]), reverse=True)
 
-        if eig_syst[0][0] != 0:
+        if re(eig_syst[0][0]) > tol:
             raise ValueError("no eigenvalue 0 was found")
         elif eig_syst[0][1] != 1:
             raise ValueError("multiple steady states found")
 
         # Calculate Equilibrium Distribution from first eigenvector
-        self.peq = Mat(eig_syst[0][-1][0] / sum(eig_syst[0][-1][0]))
+        self.peq = Mat(re(eig_syst[0][-1][0] / sum(eig_syst[0][-1][0])))
         if verbose:
             print("Equilibrium distribution calculated")
 
         if not self.check_db(tol=tol):
             raise ValueError("detailed balance not fulfilled")
 
-        vals = []
-        vecs = []
+        vals = [0]
+        vecs = [self.peq]
 
         # unzip eigenspaces and check if real and well-calculated
-        for space in eig_syst:
+        for space in eig_syst[1:]:
             val = space[0]
             if im(val) > tol:
                 raise ValueError("Complex eigenvalue found: {}".format(val))
@@ -75,7 +75,7 @@ class EqMatrix(TrMatrix):
                 if (self * vec - val * vec).norm() > tol:
                     raise ValueError("Incorrect computation of eigenvectors")
 
-                vals.append(val)
+                vals.append(re(val))
                 vecs.append(vec)
 
         # orthonormalize eigenvectors

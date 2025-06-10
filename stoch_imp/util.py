@@ -24,7 +24,7 @@ def calc_curr_like(m: Mat, p: Mat | Matrix) -> Mat:
 
 def deep_simp(e):
     """Simplify an arbitrary expression, both numerically and symbolically"""
-    e = nsimplify(e, rational=True, full=True)
+    # e = nsimplify(e, rational=True, full=True)
     e = simplify(e)
     return e
 
