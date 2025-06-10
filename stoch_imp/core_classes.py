@@ -31,76 +31,27 @@ class CoeffArray:
         return pretty(self.mat)
 
 
-class Mat:
+class Mat(Matrix):
     """
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
 
-    def __init__(self, arr, zi: bool = False, num: bool = False) -> None:
+    def __init__(self, arr, zi: bool = False) -> None:
         """
         Initialises a Mat instance
 
         :param arr: (Array like) The Array with which the matrix is set.
         :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
-        :param num: (Bool) Whether the matrix is numeric or symbolic.
         """
-        m = arr_to_mat(arr)
+        super().__init__(arr)
 
-        self.mat = m  # The Sympy Matrix object
-        self.dim = self.mat.rows  # The dimension of the associated system
-        self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
+        self.dim = self.rows  # The dimension of the associated system
+        self.iter = product(range(self.rows), range(self.cols))  # An iterator going over both rows and cols
         self.zero_index = zi  # Whether the system starts at 0
-        self.is_numeric = num
-        self.is_symbolic = not num
 
     def __str__(self):
         # This is a QoL improvement, ensures nice printing of matrix like objects
-        return pretty(self.mat)
-
-    def __setitem__(self, key, value) -> None:
-        self.mat.__setitem__(key, value)
-        return
-
-    def __iter__(self):
-        return self.mat.__iter__()
-
-    def __getitem__(self, item):
-        return self.mat.__getitem__(item)
-
-    def __sub__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(self.mat - other.mat, zi=self.zero_index, num=self.is_numeric)
-        else:
-            return Mat(self.mat - other, zi=self.zero_index, num=self.is_numeric)
-
-    def __rsub__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(other.mat - self.mat, zi=self.zero_index, num=self.is_numeric)
-        else:
-            return Mat(other - self.mat, zi=self.zero_index, num=self.is_numeric)
-
-    def __add__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(self.mat + other.mat, zi=self.zero_index, num=self.is_numeric)
-        else:
-            return Mat(self.mat + other, zi=self.zero_index, num=self.is_numeric)
-
-    __radd__ = __add__
-
-    def __mul__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(self.mat * other.mat, zi=self.zero_index, num=self.is_numeric)
-        else:
-            return Mat(self.mat * other, zi=self.zero_index, num=self.is_numeric)
-
-    def __rmul__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(other.mat * self.mat, zi=self.zero_index, num=self.is_numeric)
-        else:
-            return Mat(other * self.mat, zi=self.zero_index, num=self.is_numeric)
-
-    def __len__(self):
-        return self.mat.__len__()
+        return pretty(self)
 
     def __getattr__(self, name):
         # Delegate attribute access to self.mat if it exists there
@@ -131,13 +82,14 @@ class TrMatrix(Mat):
             (arr,arr) Sympy Matrix is used
         :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
         """
+        print("Kiekeboe")
         if type(arr) == int:
             if arr <= 1:
                 raise ShapeError("Transfer matrix must be at least (2, 2) dimensional")
             else:
-                arr = zeros(arr, arr)
+                arr = [[0 for _ in range(arr)] for _ in range(arr)]
 
-        super().__init__(arr, zi=zi, num=num)
+        super().__init__(arr, zi=zi)
 
         check_diag(self, err=True)
         check_rates(self, err=True)
@@ -162,9 +114,6 @@ class TrMatrix(Mat):
         :param simp: (Bool) Whether to simplify the rates before setting.
         """
 
-        if self.is_numeric and Expr in (type(r), type(ri)):
-            raise TypeError("Expressions can only be set to symbolic matrices. Convert to float.")
-
         if i == j:
             raise ValueError("Start and target state are equal, must be different.")
 
@@ -182,8 +131,8 @@ class TrMatrix(Mat):
         except TypeError:
             pass
 
-        self.mat[j, i] = r  # Set the matrix element
-        self.mat[i, i] -= r  # Update diagonal element
+        self[j, i] = r  # Set the matrix element
+        self[i, i] -= r  # Update diagonal element
 
         if symm or (ri is not None):
             if not ri:
@@ -197,25 +146,25 @@ class TrMatrix(Mat):
                     raise ValueError(f"Inverse rate should be positive, is {ri}")
             except TypeError:
                 pass
-            self.mat[i, j] = ri
-            self.mat[j, j] -= ri
+            self[i, j] = ri
+            self[j, j] -= ri
 
         if simp:
-            simplify(self.mat)
+            simplify(self)
         return
 
     def calc_diag(self) -> None:
         """Force calculation of the diagonal elements"""
         for col in range(self.dim):
-            self.mat[col, col] = - sum([self.mat[row, col] for row in range(self.dim) if row != col])
+            self[col, col] = - sum([self[row, col] for row in range(self.dim) if row != col])
 
     def check_diag(self) -> bool:
         """Check that columns sum to 0"""
-        return check_diag(self.mat)
+        return check_diag(self)
 
     def check_rates(self, verbose: bool = False) -> bool:
         """Check if off-diagonal elements are positive"""
-        return check_rates(self.mat, verbose=verbose)
+        return check_rates(self, verbose=verbose)
 
 
 class SymbolicMatrix:
