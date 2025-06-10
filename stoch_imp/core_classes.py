@@ -204,6 +204,21 @@ class TrMatrix(Mat):
         return check_rates(self.mat, verbose=verbose)
 
 
+class SymbolicMatrix:
+    def __init__(self):
+        self.is_symbolic = True
+        self.is_numeric = False
+
+
+class NumericMatrix:
+    def __init__(self):
+        self.is_symbolic = False
+        self.is_numeric = True
+        self.tol = 10**(-15)
+
+
+
+
 def arr_to_mat(arr):
     """Cast array-like object to sympy matrix and check shape requirements"""
     m = Matrix(arr)
