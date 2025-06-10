@@ -1,4 +1,6 @@
-from sympy import (diff, im, lambdify, Symbol, Matrix, pretty)
+from sympy import (diff, im, lambdify, Symbol, Matrix, pretty, re)
+import sympy as sp
+import numpy as np
 
 from .core_classes import (CoeffArray, Mat, TrMatrix)
 from .util import (calc_curr_like, deep_simp, gram_schmidt, inner)
@@ -97,6 +99,15 @@ class EqMatrix(TrMatrix):
                 return False
         return True
 
+    def to_num(self):
+        self.calc_peq()
+        self.mat = np.array(sp.N(self.mat))
+        self.peq.to_num()
+        self.vals = np.array([sp.N(val) for val in self.vals])
+        self.vecs = np.hstack([sp.N(vec) for vec in self.vecs])
+
+        self.is_symbolic = False
+        self.is_numeric = True
 
 class WMatrix(TrMatrix):
     """Class handling driven transition matrices"""
@@ -255,6 +266,17 @@ class WMatrix(TrMatrix):
             conds = [conds]
 
         return [(cond, self.get_cond(*cond, normal=normal, force=force, verbose=verbose)) for cond in conds]
+
+    def to_num(self, force=False):
+        if self.weq is not None:
+            self.weq.to_num()
+        if self.w1 is not None:
+            self.w1.to_num()
+        if self.coeff is not None:
+            self.coeff = sp.N(self.coeff)
+
+        self.is_symbolic = False
+        self.is_numeric = True
 
 
 def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:

@@ -1,5 +1,5 @@
 from sympy import (nsimplify, ShapeError, simplify, sqrt, Matrix, Expr)
-
+import numpy as np
 
 from .core_classes import Mat
 

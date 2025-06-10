@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from itertools import product
 
+import numpy as np
 from numpy import zeros as np_zeros
-from sympy import (Expr, Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
+from sympy import (Expr, Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros, N)
 
 
 class CoeffArray:
@@ -93,6 +94,9 @@ class Mat:
     def simp(self):
         simplify(self.mat)
         return
+
+    def to_num(self):
+        self.mat = np.array(N(self.mat))
 
 class TrMatrix(Mat):
     """
