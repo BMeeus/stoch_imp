@@ -42,7 +42,7 @@ class EqMatrix(TrMatrix):
         if (self.vals is not None) and (self.vecs is not None) and (not force):
             return self.vals, self.vecs
 
-        eig_syst = self.eigenvects(error_when_incomplete=True)
+        eig_syst = self.mat.eigenvects(error_when_incomplete=True)
 
         # sort the system in descending order of eigenvalue
         eig_syst.sort(key=lambda x: x[0], reverse=True)
@@ -70,7 +70,7 @@ class EqMatrix(TrMatrix):
                 raise ValueError("Complex eigenvalue found: {}".format(val))
             for degen in range(space[1]):
                 vec = space[-1][degen]
-                if (self * vec - val * vec).norm() > tol:
+                if (self.mat * vec - val * vec).norm() > tol:
                     raise ValueError("Incorrect computation of eigenvectors")
 
                 vals.append(val)
@@ -115,7 +115,7 @@ class WMatrix(TrMatrix):
 
         # If only one free symbol is present, it is assumed this is the driving.
         if ds is None:
-            symb_list = list(self.free_symbols)
+            symb_list = list(self.mat.free_symbols)
             if not symb_list:
                 raise AttributeError("No driving symbol found or given")
             elif len(symb_list) > 1:
@@ -147,7 +147,7 @@ class WMatrix(TrMatrix):
         if eq is None:
             eq = self.eq
 
-        self.weq = EqMatrix(self.subs({self.ds: eq}), zi=self.zero_index)
+        self.weq = EqMatrix(self.mat.subs({self.ds: eq}), zi=self.zero_index)
 
         if verbose:
             print("Equilibrium matrix calculated")
@@ -171,10 +171,10 @@ class WMatrix(TrMatrix):
         if eq is None:
             eq = self.eq
 
-        if self.ds not in list(self.free_symbols):
+        if self.ds not in list(self.mat.free_symbols):
             raise AttributeError("Driving symbol not found in matrix")
 
-        self.w1 = Mat(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+        self.w1 = Mat(diff(self.mat, self.ds).subs({self.ds: eq}), zi=self.zero_index)
 
         if verbose:
             print("Driving matrix calculated")
@@ -290,9 +290,9 @@ def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffA
     coeffs = CoeffArray(w.dim)
     for k in range(w.dim):
         if k == 0:
-            coeffs[:, :, k] = calc_curr_like(w1, peq)
+            coeffs[:, :, k] = calc_curr_like(w1, peq).mat
         else:
-            coeffs[:, :, k] = (p1coeffs[k - 1] * calc_curr_like(weq, vecs[k]))
+            coeffs[:, :, k] = (p1coeffs[k - 1] * calc_curr_like(weq, vecs[k])).mat
 
     w.coeff = coeffs
     return coeffs

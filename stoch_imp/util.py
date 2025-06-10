@@ -32,7 +32,7 @@ def deep_symp(e):
     return e
 
 
-def gram_schmidt(v_arr: list[Matrix], Peq: Matrix | None = None) -> list[Matrix]:
+def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[Matrix]:
     """
     Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
 
@@ -57,7 +57,7 @@ def gram_schmidt(v_arr: list[Matrix], Peq: Matrix | None = None) -> list[Matrix]
     return orthogonal
 
 
-def inner(v1: Matrix, v2: Matrix, Peq: Matrix | None = None) -> float| Expr:
+def inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> float| Expr:
     """
     Calculate inner product between two vectors, weighted by the Equilibrium distribution.
     If Peq is not given, the standard inner product is returned.
