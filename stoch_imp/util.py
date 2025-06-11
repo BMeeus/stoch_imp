@@ -19,6 +19,9 @@ def calc_curr_like(m: Mat, p: Union[ConstantMatrix, Matrix, np.ndarray]) -> Cons
 
 def deep_simp(e: Any) -> Any:
     """Simplify an arbitrary symbolic expression."""
+    if hasattr(e, 'mat'):
+        e.mat = simplify(nsimplify(e.mat, full=True))
+        return e.mat
     return simplify(nsimplify(e, full=True))
 
 
