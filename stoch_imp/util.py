@@ -16,13 +16,10 @@ def calc_curr_like(m: Mat, p: Mat | Matrix) -> Mat:
     :param p:(Mat | Matrix) The vector to be used
     :return: The matrix containing the current-like values
     """
-
-    if len(p) != m.dim:
-        raise ShapeError("Matrix and vector do not have same shape: ({}, {}), ({})".format(m.dim, m.dim, p.dim))
-
-    curr1 = Mat([[deep_simp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
-    curr2 = Mat([[deep_simp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
-    return curr1 - curr2
+    if m.is_symbolic:
+        return _sym_curr(m, p)
+    else:
+        return _num_curr(m, p)
 
 
 def deep_simp(e):
@@ -32,7 +29,7 @@ def deep_simp(e):
     return e
 
 
-def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[Matrix]:
+def gram_schmidt(v_arr: list[Matrix] | np.ndarray, Peq: Mat | Matrix | np.ndarray | None = None) -> list[Matrix] | np.ndarray:
     """
     Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
 
@@ -40,21 +37,10 @@ def gram_schmidt(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[M
     :param Peq: The equilibrium vector used in the definition of the inner product
     :return: array of orthogonalised vectors
     """
-    # Orthogonalised, To Be Returned
-    orthogonal = []
-
-    # At each step, take vector
-    for i in range(len(v_arr)):
-        v = v_arr[i]
-
-        # Subtract off the "components" from current orthogonal set.
-        for j in range(i):
-            v -= inner(orthogonal[j], v, Peq) * orthogonal[j]
-        # Normalization
-        v /= sqrt(inner(v, v, Peq))
-        deep_simp(v)
-        orthogonal.append(v)
-    return orthogonal
+    if type(v_arr) == list:
+        return _sym_gs(v_arr, Peq)
+    else:
+        return _num_gs(v_arr, Peq)
 
 
 def inner(v1: Matrix | np.ndarray, v2: Matrix | np.ndarray, Peq: Mat | None = None) -> float| Expr:
@@ -75,7 +61,6 @@ def inner(v1: Matrix | np.ndarray, v2: Matrix | np.ndarray, Peq: Mat | None = No
     else:
         return _sym_inner(v1, v2, Peq)
 
-
 def _sym_inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> float| Expr:
     if Peq is None:
         Peq = [1 for _ in range(len(v1))]
@@ -91,3 +76,56 @@ def _num_inner(v1: Mat | np.ndarray, v2: Mat | np.ndarray, Peq: Mat | np.ndarray
         raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 is ({}), Peq is ({})".format(len(v1), len(v2), len(Peq)))
 
     return sum(v1*v2/Peq)
+
+def _sym_gs(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[Matrix]:
+    # Orthogonalised, To Be Returned
+    orthogonal = []
+
+    # At each step, take vector
+    for i in range(len(v_arr)):
+        v = v_arr[i]
+
+        # Subtract off the "components" from current orthogonal set.
+        for j in range(i):
+            v -= inner(orthogonal[j], v, Peq) * orthogonal[j]
+        # Normalization
+        v /= sqrt(inner(v, v, Peq))
+        deep_simp(v)
+        orthogonal.append(v)
+    return orthogonal
+
+def _num_gs(v_arr, Peq):
+    """
+    Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
+
+    :param v_arr: array of vectors to orthogonalise
+    :return: array of orthogonalised vectors
+    """
+    # Orthogonalized, To Be Returned
+    orthogonal = np.zeros(v_arr.shape)
+
+    # At each step, take vector
+    for i in range(len(v_arr)):
+        v = v_arr[:, i]
+
+        # Subtract off the "components" from current orthogonal set.
+        for j in range(i):
+            v -= sum(orthogonal[:, j] * v / Peq) * orthogonal[:, j]
+        # Normalization
+        v /= np.sqrt(sum(v * v / Peq))
+        orthogonal[:, i] = v
+    return orthogonal
+
+def _sym_curr(m: Mat, p: Mat | Matrix) -> Mat:
+    if len(p) != m.dim:
+        raise ShapeError("Matrix and vector do not have same dimension: ({}, {}), ({})".format(m.dim, m.dim, p.dim))
+
+    curr1 = Mat([[deep_simp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
+    curr2 = Mat([[deep_simp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
+    return curr1 - curr2
+
+def _num_curr(m, p):
+    if len(p) != m.dim:
+        raise ShapeError("Matrix and vector do not have same dimension: ({}, {}), ({})".format(m.dim, m.dim, p.dim))
+
+    return m*p - (m*p).T
