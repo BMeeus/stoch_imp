@@ -200,10 +200,8 @@ class ConstantMatrix(ConstantObject, Mat):
         return ConstantMatrix(self.mat / other)
 
     def to_num(self):
-        if not hasattr(self, 'mat'):
-            raise AttributeError("Current instance has no attribute Mat")
-
         self.nmat = np.array(N(self.mat))
+
 
 def arr_to_mat(arr):
     """
