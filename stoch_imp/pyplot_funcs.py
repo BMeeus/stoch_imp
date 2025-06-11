@@ -1,6 +1,6 @@
-from numpy import (absolute, argmin, array)
 from matplotlib.lines import Line2D
 from matplotlib.pyplot import Axes
+from numpy import (absolute, argmin, array)
 
 
 def add_arrow(line: Line2D,
@@ -27,7 +27,7 @@ def add_arrow(line: Line2D,
         return
 
     if position is None:
-        position = (xdata[0]+xdata[-1])/2  # find approximate middle of data
+        position = (xdata[0] + xdata[-1]) / 2  # find approximate middle of data
     # find the closest index
     start_ind = argmin(absolute(xdata - position))
     if direction in ('right', 'r', '>', '->'):
@@ -37,11 +37,11 @@ def add_arrow(line: Line2D,
 
     # Add arrow note with empty string
     line.axes.annotate('',
-        xytext=(xdata[start_ind], ydata[start_ind]),
-        xy=(xdata[end_ind], ydata[end_ind]),
-        arrowprops=dict(arrowstyle="-|>", color=color),
-        size=size
-    )
+                       xytext=(xdata[start_ind], ydata[start_ind]),
+                       xy=(xdata[end_ind], ydata[end_ind]),
+                       arrowprops=dict(arrowstyle="-|>", color=color),
+                       size=size
+                       )
     return
 
 
@@ -69,12 +69,12 @@ def complex_axes(ax: Axes,
     :return: None
     """
 
-    ax.set_aspect('equal')              # Force x and y to have ratio 1:1
-    ax.grid(grid, which='both')         # Enable grid
-    ax.axvline(x=0, color=color)        # Plot y-axis
-    ax.axhline(y=0, color=color)        # Plot x-xis
+    ax.set_aspect('equal')  # Force x and y to have ratio 1:1
+    ax.grid(grid, which='both')  # Enable grid
+    ax.axvline(x=0, color=color)  # Plot y-axis
+    ax.axhline(y=0, color=color)  # Plot x-xis
 
-    x_min, x_max = ax.get_xlim()        # Get ranges for heuristic placement of text
+    x_min, x_max = ax.get_xlim()  # Get ranges for heuristic placement of text
     x_range = x_max - x_min
     if x_min < 0 < x_max:
         x_min = 0
