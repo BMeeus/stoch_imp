@@ -25,7 +25,7 @@ def deep_simp(e: Any) -> Any:
 def gram_schmidt(
         v_arr: Union[list[Matrix], np.ndarray, list[Mat]],
         Peq: Union[Mat, Matrix, np.ndarray, None] = None
-        ) -> Union[list[Matrix], np.ndarray]:
+) -> Union[list[Matrix], np.ndarray]:
     """
     Orthogonalize a set of vectors using Gram-Schmidt procedure.
 
@@ -40,7 +40,7 @@ def inner(
         v1: Union[Matrix, np.ndarray, Mat],
         v2: Union[Matrix, np.ndarray, Mat],
         Peq: Union[Mat, Matrix, np.ndarray, None] = None
-        ) -> Union[float, Expr]:
+) -> Union[float, Expr]:
     """
     Compute inner product between two vectors, optionally weighted by Peq.
 
