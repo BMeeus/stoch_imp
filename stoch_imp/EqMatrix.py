@@ -1,23 +1,24 @@
 from typing import Optional
 
-import numpy as np
-import sympy as sp
-from sympy import Matrix, re
+from numpy import (array, hstack)
+from sympy import N, Matrix, re
 
-from .core_classes import Mat, TrMatrix
+from .core_classes import ConstantMatrix, TrMatrix, ConstantObject
 from .util import calc_curr_like, deep_simp, gram_schmidt
 
 
-class EqMatrix(TrMatrix):
+class EqMatrix(ConstantObject, TrMatrix):
     """Class handling all Equilibrium Transfer Matrices."""
 
     def __init__(self, arr, zi: bool = False) -> None:
         super().__init__(arr, zi)
-        self.peq: Optional[Mat] = None
+        self.peq: Optional[ConstantMatrix] = None
         self.vals: Optional[list[float]] = None
+        self.nvals = None
         self.vecs: Optional[list[Matrix]] = None
+        self.nvecs = None
 
-    def calc_peq(self, force: bool = False, verbose: bool = False) -> Mat:
+    def calc_peq(self, force: bool = False, verbose: bool = False) -> ConstantMatrix:
         """Calculate the Equilibrium distribution."""
         if self.peq is None or force:
             self.calc_eig(force=force, verbose=verbose)
@@ -38,7 +39,7 @@ class EqMatrix(TrMatrix):
 
         eigvec_0 = eig_syst[0][-1][0]
         peq_vec = eigvec_0 / sum(eigvec_0)
-        self.peq = Mat(peq_vec.as_real_imag()[0])
+        self.peq = ConstantMatrix(peq_vec.as_real_imag()[0])
         if verbose:
             print("Equilibrium distribution calculated")
 
@@ -56,7 +57,7 @@ class EqMatrix(TrMatrix):
                 vec_re, _ = vec.as_real_imag()
                 res = deep_simp(self.mat * vec_re) - deep_simp(val_re * vec_re)
                 try:
-                    if sp.N(res.norm()) > tol:
+                    if N(res.norm()) > tol:
                         raise ValueError("Incorrect computation of eigenvectors")
                 except TypeError:
                     if res.norm().is_zero:
@@ -78,10 +79,10 @@ class EqMatrix(TrMatrix):
 
     def to_num(self):
         self.calc_peq()
-        self.mat = np.array(sp.N(self.mat))
+        self.nmat = array(N(self.mat))
         if hasattr(self.peq, "to_num") and callable(self.peq.to_num):
             self.peq.to_num()
-        self.vals = np.array([sp.N(val) for val in self.vals])
-        self.vecs = np.hstack([sp.N(vec) for vec in self.vecs])
+        self.nvals = array([N(val) for val in self.vals])
+        self.nvecs = hstack([N(vec) for vec in self.vecs])
         self.is_symbolic = False
         self.is_numeric = True

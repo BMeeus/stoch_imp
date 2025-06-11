@@ -3,15 +3,15 @@ from typing import Union, Any
 import numpy as np
 from sympy import nsimplify, simplify, sqrt, Matrix, Expr, ShapeError
 
-from .core_classes import Mat
+from .core_classes import Mat, ConstantMatrix
 
 
-def calc_curr_like(m: Mat, p: Union[Mat, Matrix, np.ndarray]) -> Mat:
+def calc_curr_like(m: Mat, p: Union[ConstantMatrix, Matrix, np.ndarray]) -> ConstantMatrix:
     """
     Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.
 
     :param m: (Mat) The matrix to be used (must be square).
-    :param p: (Mat | Matrix) The vector to be used (length must match m).
+    :param p: (ConstantMatrix | Matrix) The vector to be used (length must match m).
     :return: Matrix of current-like values.
     """
     return _sym_curr(m, p) if m.is_symbolic else _num_curr(m, p)
@@ -23,8 +23,8 @@ def deep_simp(e: Any) -> Any:
 
 
 def gram_schmidt(
-        v_arr: Union[list[Matrix], np.ndarray, list[Mat]],
-        Peq: Union[Mat, Matrix, np.ndarray, None] = None
+        v_arr: Union[list[Matrix], np.ndarray, list[ConstantMatrix]],
+        Peq: Union[ConstantMatrix, Matrix, np.ndarray, None] = None
 ) -> Union[list[Matrix], np.ndarray]:
     """
     Orthogonalize a set of vectors using Gram-Schmidt procedure.
@@ -37,9 +37,9 @@ def gram_schmidt(
 
 
 def inner(
-        v1: Union[Matrix, np.ndarray, Mat],
-        v2: Union[Matrix, np.ndarray, Mat],
-        Peq: Union[Mat, Matrix, np.ndarray, None] = None
+        v1: Union[Matrix, np.ndarray, ConstantMatrix],
+        v2: Union[Matrix, np.ndarray, ConstantMatrix],
+        Peq: Union[ConstantMatrix, Matrix, np.ndarray, None] = None
 ) -> Union[float, Expr]:
     """
     Compute inner product between two vectors, optionally weighted by Peq.
@@ -52,7 +52,7 @@ def inner(
     if len(v1) != len(v2):
         raise ShapeError(f"Vectors are of different shapes: v1 ({len(v1)}), v2 ({len(v2)})")
 
-    if (Peq is None and isinstance(v1, np.ndarray)) or (isinstance(Peq, Mat) and Peq.is_numeric):
+    if (Peq is None and isinstance(v1, np.ndarray)) or (isinstance(Peq, ConstantMatrix) and Peq.is_numeric):
         return _num_inner(v1, v2, Peq)
     else:
         return _sym_inner(v1, v2, Peq)
@@ -106,17 +106,17 @@ def _num_gs(v_arr: np.ndarray, Peq: Union[np.ndarray, None]) -> np.ndarray:
     return orthogonal
 
 
-def _sym_curr(m: Mat, p: Union[Mat, Matrix]) -> Mat:
+def _sym_curr(m: Mat, p: Union[ConstantMatrix, Matrix]) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
 
-    curr1 = Mat([[deep_simp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
-    curr2 = Mat([[deep_simp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
+    curr1 = ConstantMatrix([[deep_simp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
+    curr2 = ConstantMatrix([[deep_simp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
     return curr1 - curr2
 
 
-def _num_curr(m: Mat, p: np.ndarray) -> Mat:
+def _num_curr(m: Mat, p: np.ndarray) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
 
-    return m * p - (m * p).T
+    return ConstantMatrix(m * p - (m * p).T)

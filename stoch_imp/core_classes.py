@@ -41,8 +41,6 @@ class Mat:
         self.dim = m.rows  # System size inferred from row count
         self.iter = product(range(m.rows), range(m.cols))  # Iterator over all (row, col) pairs
         self.zero_index = zi  # True if system uses 0-based indexing
-        self.is_numeric = False
-        self.is_symbolic = True
 
     def __str__(self):
         # Pretty-print matrix using sympy's printer
@@ -87,10 +85,6 @@ class Mat:
     def simp(self):
         # In-place symbolic simplification
         simplify(self.mat)
-
-    def to_num(self):
-        # Convert symbolic matrix to NumPy array with evaluated numerics
-        self.mat = np.array(N(self.mat))
 
 
 class TrMatrix(Mat):
@@ -174,6 +168,42 @@ class TrMatrix(Mat):
         """Check if all off-diagonal rates are non-negative."""
         return check_rates(self, verbose=verbose)
 
+
+class ConstantObject:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)  # forwards all unused arguments
+        # self.mat = None
+        self.nmat = None
+        self.is_symbolic = True
+        self.is_numeric = False
+        self.tolerance = 10**-15
+
+
+class ConstantMatrix(ConstantObject, Mat):
+    def __init__(self, arr, zi=False):
+        super().__init__(arr, zi)
+
+    def __sub__(self, other) -> Mat:
+        # Support subtraction with another Mat or scalar
+        return ConstantMatrix(self.mat - getattr(other, 'mat', other), zi=self.zero_index)
+
+    def __mul__(self, other) -> Mat:
+        # Matrix multiplication (supports Mat or scalar)
+        return ConstantMatrix(self.mat * getattr(other, 'mat', other), zi=self.zero_index)
+
+    def __rmul__(self, other) -> Mat:
+        # Right multiplication (e.g., scalar * Mat)
+        return ConstantMatrix(getattr(other, 'mat', other) * self.mat, zi=self.zero_index)
+
+    def __truediv__(self, other):
+        # Scalar division
+        return ConstantMatrix(self.mat / other)
+
+    def to_num(self):
+        if not hasattr(self, 'mat'):
+            raise AttributeError("Current instance has no attribute Mat")
+
+        self.nmat = np.array(N(self.mat))
 
 def arr_to_mat(arr):
     """

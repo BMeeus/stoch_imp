@@ -5,7 +5,7 @@ import sympy as sp
 from sympy import diff, lambdify, Symbol, pretty
 
 from .EqMatrix import EqMatrix
-from .core_classes import CoeffArray, Mat, TrMatrix
+from .core_classes import CoeffArray, TrMatrix, ConstantMatrix
 from .util import calc_curr_like, deep_simp, inner
 
 
@@ -26,7 +26,7 @@ class WMatrix(TrMatrix):
         self.ds: Symbol = ds
         self.eq: float = eq
         self.weq: Optional[EqMatrix] = None
-        self.w1: Optional[Mat] = None
+        self.w1: Optional[ConstantMatrix] = None
         self.coeff: Optional[CoeffArray] = None
 
     def calc_weq(self, eq: float = None, force: bool = False, verbose: bool = False) -> EqMatrix:
@@ -37,13 +37,13 @@ class WMatrix(TrMatrix):
             print("Equilibrium matrix calculated")
         return self.weq
 
-    def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> Mat:
+    def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> ConstantMatrix:
         if self.w1 is not None and not force:
             return self.w1
         eq = eq if eq is not None else self.eq
         if self.ds not in self.free_symbols:
             raise AttributeError("Driving symbol not found in matrix")
-        self.w1 = Mat(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+        self.w1 = ConstantMatrix(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index)
         if verbose:
             print("Driving matrix calculated")
         return self.w1
