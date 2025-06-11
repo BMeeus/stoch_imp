@@ -1,131 +1,122 @@
-from sympy import (nsimplify, ShapeError, simplify, sqrt, Matrix, Expr)
+from typing import Union, Any
+
 import numpy as np
+from sympy import nsimplify, simplify, sqrt, Matrix, Expr, ShapeError
 
 from .core_classes import Mat
 
 
-def calc_curr_like(m: Mat, p: Mat | Matrix) -> Mat:
+def calc_curr_like(m: Mat, p: Union[Mat, Matrix, np.ndarray]) -> Mat:
     """
-    Calculate expressions of current-like form
+    Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.
 
-    J_mn = W_mn P_n - W_nm P_m
-
-    for matrix m and vector p.
-
-    :param m: (Mat) The matrix to be used
-    :param p:(Mat | Matrix) The vector to be used
-    :return: The matrix containing the current-like values
+    :param m: (Mat) The matrix to be used (must be square).
+    :param p: (Mat | Matrix) The vector to be used (length must match m).
+    :return: Matrix of current-like values.
     """
-    if m.is_symbolic:
-        return _sym_curr(m, p)
-    else:
-        return _num_curr(m, p)
+    return _sym_curr(m, p) if m.is_symbolic else _num_curr(m, p)
 
 
-def deep_simp(e):
-    """Simplify an arbitrary expression, both numerically and symbolically"""
-    # e = nsimplify(e, rational=True, full=True)
-    e = simplify(e)
-    return e
+def deep_simp(e: Any) -> Any:
+    """Simplify an arbitrary symbolic expression."""
+    return simplify(nsimplify(e, full=True))
 
 
-def gram_schmidt(v_arr: list[Matrix] | np.ndarray, Peq: Mat | Matrix | np.ndarray | None = None) -> list[Matrix] | np.ndarray:
+def gram_schmidt(
+        v_arr: Union[list[Matrix], np.ndarray, list[Mat]],
+        Peq: Union[Mat, Matrix, np.ndarray, None] = None
+        ) -> Union[list[Matrix], np.ndarray]:
     """
-    Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
+    Orthogonalize a set of vectors using Gram-Schmidt procedure.
 
-    :param v_arr: array of vectors to orthogonalise
-    :param Peq: The equilibrium vector used in the definition of the inner product
-    :return: array of orthogonalised vectors
+    :param v_arr: List of symbolic vectors or NumPy array (columns = vectors).
+    :param Peq: Equilibrium distribution for weighted inner product.
+    :return: Orthogonalized vectors.
     """
-    if type(v_arr) == list:
-        return _sym_gs(v_arr, Peq)
-    else:
-        return _num_gs(v_arr, Peq)
+    return _sym_gs(v_arr, Peq) if isinstance(v_arr, list) else _num_gs(v_arr, Peq)
 
 
-def inner(v1: Matrix | np.ndarray, v2: Matrix | np.ndarray, Peq: Mat | None = None) -> float| Expr:
+def inner(
+        v1: Union[Matrix, np.ndarray, Mat],
+        v2: Union[Matrix, np.ndarray, Mat],
+        Peq: Union[Mat, Matrix, np.ndarray, None] = None
+        ) -> Union[float, Expr]:
     """
-    Calculate inner product between two vectors, weighted by the Equilibrium distribution.
-    If Peq is not given, the standard inner product is returned.
+    Compute inner product between two vectors, optionally weighted by Peq.
 
-    :param v1: (Mat | Matrix | ndarray) First vector
-    :param v2: (Mat | Matrix| ndarray) Second vector
-    :param Peq: (Mat | Matrix| ndarray | None) Equilibrium distribution of the system
-    :return: (float | Expr) The inner product of the vectors
+    :param v1: First vector.
+    :param v2: Second vector.
+    :param Peq: Optional equilibrium vector.
+    :return: Scalar inner product.
     """
     if len(v1) != len(v2):
-        raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 ({})".format(len(v1), len(v2)))
+        raise ShapeError(f"Vectors are of different shapes: v1 ({len(v1)}), v2 ({len(v2)})")
 
-    if (Peq is None and type(v1) == np.ndarray) or Peq.is_numeric:
+    if (Peq is None and isinstance(v1, np.ndarray)) or (isinstance(Peq, Mat) and Peq.is_numeric):
         return _num_inner(v1, v2, Peq)
     else:
         return _sym_inner(v1, v2, Peq)
 
-def _sym_inner(v1: Mat | Matrix, v2: Mat | Matrix, Peq: Mat | Matrix | None = None) -> float| Expr:
+
+def _sym_inner(v1: Matrix, v2: Matrix, Peq: Union[Matrix, None]) -> Expr:
     if Peq is None:
-        Peq = [1 for _ in range(len(v1))]
-    elif len(Peq) != len(v1) or len(Peq) != len(v2):
-        raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 is ({}), Peq is ({})".format(len(v1), len(v2), len(Peq)))
+        Peq = Matrix.ones(len(v1), 1)
+    elif len(Peq) != len(v1):
+        raise ShapeError(f"Inconsistent shapes: v1 ({len(v1)}), Peq ({len(Peq)})")
 
-    return deep_simp(sum([v1[i] * v2[i] / Peq[i] for i in range(len(v1))]))
+    return deep_simp(sum(v1[i] * v2[i] / Peq[i] for i in range(len(v1))))
 
-def _num_inner(v1: Mat | np.ndarray, v2: Mat | np.ndarray, Peq: Mat | np.ndarray | None) -> float:
+
+def _num_inner(v1: np.ndarray, v2: np.ndarray, Peq: Union[np.ndarray, None]) -> float:
     if Peq is None:
-        Peq = np.array([1 for _ in range(len(v1))])
-    elif len(Peq) != len(v1) or len(Peq) != len(v2):
-        raise ShapeError("Vectors are of different shapes: v1 is ({}), v2 is ({}), Peq is ({})".format(len(v1), len(v2), len(Peq)))
+        Peq = np.ones_like(v1)
 
-    return sum(v1*v2/Peq)
+    if len(Peq) != len(v1):
+        raise ShapeError(f"Inconsistent shapes: v1 ({len(v1)}), Peq ({len(Peq)})")
 
-def _sym_gs(v_arr: list[Matrix], Peq: Mat | Matrix | None = None) -> list[Matrix]:
-    # Orthogonalised, To Be Returned
-    orthogonal = []
+    return np.sum(v1 * v2 / Peq)
 
-    # At each step, take vector
-    for i in range(len(v_arr)):
-        v = v_arr[i]
 
-        # Subtract off the "components" from current orthogonal set.
+def _sym_gs(v_arr: list[Matrix], Peq: Union[Matrix, None]) -> list[Matrix]:
+    orthogonal: list[Matrix] = []
+
+    for i, v in enumerate(v_arr):
         for j in range(i):
-            v -= inner(orthogonal[j], v, Peq) * orthogonal[j]
-        # Normalization
+            proj = inner(orthogonal[j], v, Peq)
+            v -= proj * orthogonal[j]
         v /= sqrt(inner(v, v, Peq))
-        deep_simp(v)
-        orthogonal.append(v)
+        orthogonal.append(deep_simp(v))
     return orthogonal
 
-def _num_gs(v_arr, Peq):
-    """
-    Orthogonalise a set of vectors given as the columns of an array using Gram-Schmidt procedure.
 
-    :param v_arr: array of vectors to orthogonalise
-    :return: array of orthogonalised vectors
-    """
-    # Orthogonalized, To Be Returned
-    orthogonal = np.zeros(v_arr.shape)
+def _num_gs(v_arr: np.ndarray, Peq: Union[np.ndarray, None]) -> np.ndarray:
+    n = v_arr.shape[1]
+    orthogonal = np.zeros_like(v_arr)
 
-    # At each step, take vector
-    for i in range(len(v_arr)):
-        v = v_arr[:, i]
+    if Peq is None:
+        Peq = np.ones(v_arr.shape[0])
 
-        # Subtract off the "components" from current orthogonal set.
+    for i in range(n):
+        v = v_arr[:, i].copy()
         for j in range(i):
-            v -= sum(orthogonal[:, j] * v / Peq) * orthogonal[:, j]
-        # Normalization
-        v /= np.sqrt(sum(v * v / Peq))
+            proj = np.sum(orthogonal[:, j] * v / Peq)
+            v -= proj * orthogonal[:, j]
+        v /= np.sqrt(np.sum(v * v / Peq))
         orthogonal[:, i] = v
     return orthogonal
 
-def _sym_curr(m: Mat, p: Mat | Matrix) -> Mat:
+
+def _sym_curr(m: Mat, p: Union[Mat, Matrix]) -> Mat:
     if len(p) != m.dim:
-        raise ShapeError("Matrix and vector do not have same dimension: ({}, {}), ({})".format(m.dim, m.dim, p.dim))
+        raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
 
     curr1 = Mat([[deep_simp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
     curr2 = Mat([[deep_simp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
     return curr1 - curr2
 
-def _num_curr(m, p):
-    if len(p) != m.dim:
-        raise ShapeError("Matrix and vector do not have same dimension: ({}, {}), ({})".format(m.dim, m.dim, p.dim))
 
-    return m*p - (m*p).T
+def _num_curr(m: Mat, p: np.ndarray) -> Mat:
+    if len(p) != m.dim:
+        raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
+
+    return m * p - (m * p).T
