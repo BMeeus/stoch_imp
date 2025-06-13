@@ -1,9 +1,10 @@
-from typing import Optional
+from typing import Optional, Union
 
-from numpy import (array, hstack)
+from numpy import array, hstack, real, flip, argsort, matmul, ndarray, float64
 from sympy import N, Matrix, re
+from scipy.linalg import eig, norm
 
-from .core_classes import ConstantMatrix, TrMatrix, ConstantObject
+from .core_classes import ConstantMatrix, TrMatrix, ConstantObject, arr_to_mat
 from .util import calc_curr_like, deep_simp, gram_schmidt
 
 
@@ -13,10 +14,12 @@ class EqMatrix(ConstantObject, TrMatrix):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.peq: Optional[ConstantMatrix] = None
+
         self.vals: Optional[list[float]] = None
-        self.nvals = None
+        self.nvals: Optional[ndarray] = None
+
         self.vecs: Optional[list[Matrix]] = None
-        self.nvecs = None
+        self.nvecs: Optional[ndarray] = None
 
     def calc_peq(self, force: bool = False, verbose: bool = False) -> ConstantMatrix:
         """Calculate the Equilibrium distribution."""
@@ -27,9 +30,40 @@ class EqMatrix(ConstantObject, TrMatrix):
     def calc_eig(self, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
         if self.vals is not None and self.vecs is not None and not force:
             return self.vals, self.vecs
+    def to_num(self):
+        if not self.is_symbolic:
+            pass
+        elif len(self.mat.free_symbols) != 0:
+            raise TypeError("Can not convert expression containing symbols to numeric")
+        else:
+            self.nmat = array(N(self.mat), dtype=float64)
 
-        eig_syst = self.eigenvects(error_when_incomplete=True)
-        eig_syst.sort(key=lambda x: re(x[0]), reverse=True)
+            if self.peq is not None:
+                self.peq.to_num()
+                self.nvals = array([N(val) for val in self.vals])
+                self.nvecs = hstack([N(vec) for vec in self.vecs])
+
+            self.is_symbolic = False
+
+    def to_sym(self):
+        if self.is_symbolic:
+            pass
+            self.mat = arr_to_mat(self.nmat)
+
+            if self.peq is not None:
+                self.peq.to_sym()
+                self.vals = list(self.nvals)
+                self.vecs = [Matrix(self.nvecs[:, i]) for i in self.dim]
+
+            self.is_symbolic = True
+
+
+def _sym_calc_eig(weq, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
+    if weq.vals is not None and weq.vecs is not None and not force:
+        return weq.vals, weq.vecs
+
+    eig_syst = weq.eigenvects(error_when_incomplete=True)
+    eig_syst.sort(key=lambda x: re(x[0]), reverse=True)
 
         lead_val = eig_syst[0][0]
         if re(lead_val) > tol:

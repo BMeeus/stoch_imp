@@ -203,7 +203,20 @@ class ConstantMatrix(ConstantObject, Mat):
         return ConstantMatrix(self.mat / other)
 
     def to_num(self):
-        self.nmat = np.array(N(self.mat))
+        if not self.is_symbolic:
+            pass
+        elif len(self.mat.free_symbols) != 0:
+            raise TypeError("Can not convert expression containing symbols to numeric")
+        else:
+            self.nmat = np.array(N(self.mat), dtype=np.float64)
+            self.is_symbolic = False
+
+    def to_sym(self):
+        if self.is_symbolic:
+            pass
+        else:
+            self.mat = arr_to_mat(self.nmat)
+            self.is_symbolic = True
 
 
 def arr_to_mat(arr):

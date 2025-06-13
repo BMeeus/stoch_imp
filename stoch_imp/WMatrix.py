@@ -85,16 +85,27 @@ class WMatrix(TrMatrix):
             conds = [conds]
         return [(cond, self.get_cond(*cond, normal=normal, force=force, verbose=verbose)) for cond in conds]
 
-    def to_num(self, force: bool = False):
-        if self.weq is not None:
-            self.weq.to_num()
-        if self.w1 is not None:
-            self.w1.to_num()
-        if self.coeff is not None:
-            self.coeff = sp.N(self.coeff)
-        self.is_symbolic = False
-        self.is_numeric = True
+    def to_num(self):
+        if not self.is_symbolic:
+            pass
+        else:
+            if self.weq is not None:
+                self.weq.to_num()
+            if self.w1 is not None:
+                self.w1.to_num()
+            if self.coeff is not None:
+                self.coeff = sp.N(self.coeff)
+            self.is_symbolic = False
 
+    def to_sym(self):
+        if self.is_symbolic:
+            pass
+        else:
+            if self.weq is not None:
+                self.weq.to_sym()
+            if self.w1 is not None:
+                self.w1.to_sym()
+            self.is_symbolic = True
 
 def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:
     w.calc_weq(force=force, verbose=verbose)

@@ -55,7 +55,7 @@ def inner(
     if len(v1) != len(v2):
         raise ShapeError(f"Vectors are of different shapes: v1 ({len(v1)}), v2 ({len(v2)})")
 
-    if (Peq is None and isinstance(v1, np.ndarray)) or (isinstance(Peq, ConstantMatrix) and Peq.is_numeric):
+    if (Peq is None and isinstance(v1, np.ndarray)) or (isinstance(Peq, ConstantMatrix) and not Peq.is_symbolic):
         return _num_inner(v1, v2, Peq)
     else:
         return _sym_inner(v1, v2, Peq)
