@@ -1,17 +1,23 @@
-from typing import Optional, Union
+from typing import (Optional, Union)
 
-from numpy import array, hstack, real, flip, argsort, matmul, ndarray, float64
-from sympy import N, Matrix, re
-from scipy.linalg import eig, norm
+from numpy import (array, argsort, flip, float64, hstack, matmul, ndarray, real)
+from scipy.linalg import (eig, norm)
+from sympy import (N, Matrix, re)
 
-from .core_classes import ConstantMatrix, TrMatrix, ConstantObject, arr_to_mat
-from .util import calc_curr_like, deep_simp, gram_schmidt
+from .core_classes import (ConstantMatrix, TrMatrix, ConstantObject, arr_to_mat)
+from .util import (calc_curr_like, deep_simp, gram_schmidt)
 
 
 class EqMatrix(ConstantObject, TrMatrix):
     """Class handling all Equilibrium Transfer Matrices."""
 
     def __init__(self, *args, **kwargs) -> None:
+        """
+        Initialize the EqMatrix object.
+
+        :param args: (tuple) Positional arguments for parent constructors
+        :param kwargs: (dict) Keyword arguments for parent constructors
+        """
         super().__init__(*args, **kwargs)
         self.peq: Optional[ConstantMatrix] = None
 
@@ -22,24 +28,49 @@ class EqMatrix(ConstantObject, TrMatrix):
         self.nvecs: Optional[ndarray] = None
 
     def calc_peq(self, force: bool = False, verbose: bool = False) -> ConstantMatrix:
-        """Calculate the Equilibrium distribution."""
+        """
+        Calculate the Equilibrium distribution.
+
+        :param force: (bool) Force recalculation
+        :param verbose: (bool) Print verbose output
+
+        :return: (ConstantMatrix) Equilibrium distribution matrix
+        """
         if self.peq is None or force:
             self.calc_eig(force=force, verbose=verbose)
         return self.peq
 
-    def calc_eig(self, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]:
+    def calc_eig(self, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> Union[
+        tuple[list, list[Matrix]], tuple[ndarray, ndarray]]:
+        """
+        Calculate eigenvalues and eigenvectors.
+
+        :param tol: (float) Tolerance level for eigenvalue validation
+        :param force: (bool) Force recalculation
+        :param verbose: (bool) Print verbose output
+
+        :return: (Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]) Eigenvalues and eigenvectors
+        """
         if self.is_symbolic:
             return _sym_calc_eig(self, tol=tol, force=force, verbose=verbose)
         else:
             return _num_calc_eig(self, tol=tol, force=force, verbose=verbose)
 
     def check_db(self, tol: float = 1e-15) -> bool:
+        """
+        Check detailed balance condition.
+
+        :param tol: (float) Tolerance level for checking detailed balance
+
+        :return: (bool) True if detailed balance is fulfilled
+        """
         if self.peq is None:
             self.calc_peq()
         db_mat = calc_curr_like(self, self.peq)
         return all(db_mat[*el] <= tol for el in self.iter)
 
     def to_num(self):
+        """Convert symbolic matrices to numeric format."""
         if not self.is_symbolic:
             pass
         elif len(self.mat.free_symbols) != 0:
@@ -55,6 +86,7 @@ class EqMatrix(ConstantObject, TrMatrix):
             self.is_symbolic = False
 
     def to_sym(self):
+        """Convert numeric matrices back to symbolic format."""
         if self.is_symbolic:
             pass
         else:
@@ -69,6 +101,16 @@ class EqMatrix(ConstantObject, TrMatrix):
 
 
 def _sym_calc_eig(weq, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
+    """
+    Compute symbolic eigenvalues and eigenvectors.
+
+    :param weq: (EqMatrix) Equilibrium matrix object
+    :param tol: (float) Tolerance for validation
+    :param force: (bool) Force recalculation
+    :param verbose: (bool) Print verbose output
+
+    :return: (tuple[list, list[Matrix]]) Eigenvalues and eigenvectors
+    """
     if weq.vals is not None and weq.vecs is not None and not force:
         return weq.vals, weq.vecs
 
@@ -114,17 +156,29 @@ def _sym_calc_eig(weq, tol: float = 1e-14, force: bool = False, verbose: bool = 
         print("Eigensystem calculated")
     return weq.vals, weq.vecs
 
+
 def _num_calc_eig(weq, tol=1e-15, force=False, verbose=False):
+    """
+    Compute numeric eigenvalues and eigenvectors.
+
+    :param weq: (EqMatrix) Equilibrium matrix object
+    :param tol: (float) Tolerance for validation
+    :param force: (bool) Force recalculation
+    :param verbose: (bool) Print verbose output
+
+    :return: (tuple[ndarray, ndarray]) Eigenvalues and eigenvectors
+    """
     if weq.nvals is not None and weq.nvecs is not None and not force:
         return weq.nvals, weq.nvecs
 
+    # noinspection PyTupleAssignmentBalance
     vals, vecs = eig(weq.nmat)
     nvals = real(vals)
     nvecs = real(vecs)
-    if any(im > tol for im in vals-nvals):
+    if any(im > tol for im in vals - nvals):
         raise ValueError(f"Complex eigenvalue found: {vals}")
 
-    ind_arr = flip(argsort(nvals))  # Sort eigenvalues in descending order and rearrange eigenvecs according
+    ind_arr = flip(argsort(nvals))  # Sort eigenvalues in descending order and rearrange eigenvecs accordingly
 
     nvals = nvals[ind_arr]
     nvecs = nvecs[:, ind_arr]
@@ -134,9 +188,8 @@ def _num_calc_eig(weq, tol=1e-15, force=False, verbose=False):
     if nvals[1] == nvals[0]:
         raise ValueError("multiple steady states found")
 
-
     nvals[0] = 0
-    nvecs[:, 0] /= sum(nvecs[:, 0])  # first eigenvector is Peq, normalize and rename
+    nvecs[:, 0] /= sum(nvecs[:, 0])  # First eigenvector is Peq, normalize and rename
     weq.peq = ConstantMatrix(nvecs[:, 0], zi=weq.zero_index, sym=False)
     if not weq.check_db(tol=tol):
         raise ValueError("detailed balance not fulfilled")
