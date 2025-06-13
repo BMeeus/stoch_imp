@@ -1,7 +1,7 @@
 from typing import Callable, Optional, Union
 
-import numpy as np
-import sympy as sp
+from numpy import matmul, ndarray
+from numpy import sum as np_sum
 from sympy import diff, lambdify, Symbol, pretty
 
 from .EqMatrix import EqMatrix
@@ -13,6 +13,14 @@ class WMatrix(TrMatrix):
     """Class handling driven transition matrices."""
 
     def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, **kwargs):
+        """
+        Initialize a WMatrix instance.
+
+        :param args: Additional positional arguments for TrMatrix
+        :param ds: (Optional[Symbol]) Driving symbol for differentiation
+        :param eq: (float) Equilibrium point
+        :param kwargs: Additional keyword arguments for TrMatrix
+        """
         super().__init__(*args, **kwargs)
         if ds is None:
             symbols = list(self.free_symbols)
@@ -30,6 +38,15 @@ class WMatrix(TrMatrix):
         self.coeff: Optional[CoeffArray] = None
 
     def calc_weq(self, eq: float = None, force: bool = False, verbose: bool = False) -> EqMatrix:
+        """
+        Calculate the equilibrium matrix.
+
+        :param eq: (float) Equilibrium value
+        :param force: (bool) Force recalculation even if already computed
+        :param verbose: (bool) Print verbose output
+
+        :return: (EqMatrix) the equilibrium matrix.
+        """
         if self.weq is not None and not force:
             return self.weq
 
@@ -40,6 +57,15 @@ class WMatrix(TrMatrix):
         return self.weq
 
     def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> ConstantMatrix:
+        """
+        Calculate the first-order driving matrix.
+
+        :param eq: (float) Equilibrium value
+        :param force: (bool) Force recalculation
+        :param verbose: (bool) Print verbose output
+
+        :return: (ConstantMatrix) the first-order driving matrix.
+        """
         if self.w1 is not None and not force:
             return self.w1
 
@@ -55,10 +81,30 @@ class WMatrix(TrMatrix):
         return self.w1
 
     def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
+        """
+        Calculate coefficient array.
+
+        :param force: (bool) Force recalculation
+        :param verbose: (bool) Print verbose output
+
+        :return: (CoeffArray) Array containing the coefficients indexed such that the k-th coefficient for transition
+            i --> j is CoeffArray[i, j, k].
+        """
         return _calc_coeff(self, force, verbose=verbose)
 
-    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True)\
-            -> Callable[[float | np.ndarray], float]:
+    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> Callable[
+        [float | ndarray], float]:
+        """
+        Return a callable for the frequency-dependent conductivity.
+
+        :param i: (int) Index i
+        :param j: (int) Index j
+        :param normal: (bool) Normalize result
+        :param force: (bool) Force recalculation
+        :param verbose: (bool) Print verbose output
+
+        :return: (Callable[[float | ndarray], float])
+        """
         if self.coeff is None or force:
             self.calc_coeff(force=force, verbose=verbose)
 
@@ -90,7 +136,18 @@ class WMatrix(TrMatrix):
                   normal: bool = False,
                   force: bool = False,
                   verbose: bool = True) -> list[tuple[tuple[int, int], Callable[[float], float]]]:
+        """
+        Return a list of conductivity callables for specified index pairs.
 
+        :param conds: (Union[tuple[int, int], list[tuple[int, int]], None]) Index pairs (i, j) encoding the transition
+            i --> j.
+        :param normal: (bool) Normalize results
+        :param force: (bool) Force recalculation
+        :param verbose: (bool) Print verbose output
+
+        :return: (list[tuple[tuple[int, int], Callable[[float], float]]]) list containing tuples (ind, cond), with cond
+            the conductivity of the transition i --> j.
+        """
         if conds is None:
             self.calc_weq()
             self.calc_w1()
@@ -103,6 +160,7 @@ class WMatrix(TrMatrix):
         return [(cond, self.get_cond(*cond, normal=normal, force=force, verbose=verbose)) for cond in conds]
 
     def to_num(self):
+        """Convert internal data to numeric form."""
         if not self.is_symbolic:
             pass
         else:
@@ -115,6 +173,7 @@ class WMatrix(TrMatrix):
             self.is_symbolic = False
 
     def to_sym(self):
+        """Convert internal data to symbolic form."""
         if self.is_symbolic:
             pass
         else:
@@ -124,15 +183,32 @@ class WMatrix(TrMatrix):
                 self.w1.to_sym()
             self.is_symbolic = True
 
+
 def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:
+    """
+    Wrapper to calculate coefficients based on symbolic/numeric status.
+
+    :param w: (WMatrix) Matrix instance
+    :param force: (bool) Force recalculation
+    :param verbose: (bool) Print verbose output
+
+    :return: (CoeffArray) Coefficients
+    """
     w.calc_weq(force=force, verbose=verbose)
     w.weq.calc_eig(force=force, verbose=verbose)
     w.calc_w1(force=force, verbose=verbose)
 
-
     return _sym_calc_coeff(w) if w.is_symbolic else _num_calc_coeff(w)
 
+
 def _sym_calc_coeff(w: WMatrix) -> CoeffArray:
+    """
+    Calculate symbolic coefficients for conductivity expansion.
+
+    :param w: (WMatrix) Matrix instance
+
+    :return: (CoeffArray) Coefficients
+    """
     weq = w.weq
     peq, vals, vecs = weq.peq, weq.vals, weq.vecs
 
@@ -150,12 +226,19 @@ def _sym_calc_coeff(w: WMatrix) -> CoeffArray:
 
 
 def _num_calc_coeff(w: WMatrix) -> CoeffArray:
+    """
+    Calculate numeric coefficients for conductivity expansion.
+
+    :param w: (WMatrix) Matrix instance
+
+    :return: (CoeffArray)
+    """
     weq = w.weq
     w1 = w.w1
     Peq, nvals, nvecs = weq.peq, weq.nvals, weq.nvecs
 
     # Calculate Coeffs of Pad expanded in eigenvects
-    p1coeffs = np.sum(nvecs[:, 1:].T * np.matmul(w1.nmat, Peq.nmat) / Peq.nmat, axis=1) / nvals[1:]
+    p1coeffs = np_sum(nvecs[:, 1:].T * matmul(w1.nmat, Peq.nmat) / Peq.nmat, axis=1) / nvals[1:]
 
     # Calculate coefficients and store in array
     coeffs = CoeffArray(w.dim)
