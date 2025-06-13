@@ -70,13 +70,19 @@ def _sym_inner(v1: Matrix, v2: Matrix, Peq: Union[Matrix, None]) -> Expr:
     return deep_simp(sum(v1[i] * v2[i] / Peq[i] for i in range(len(v1))))
 
 
-def _num_inner(v1: np.ndarray, v2: np.ndarray, Peq: Union[np.ndarray, None]) -> float:
+def _num_inner(v1: Union[Mat, np.ndarray], v2: Union[Mat, np.ndarray], Peq: Union[Mat, np.ndarray, None]) -> float:
     if Peq is None:
         Peq = np.ones_like(v1)
 
     if len(Peq) != len(v1):
         raise ShapeError(f"Inconsistent shapes: v1 ({len(v1)}), Peq ({len(Peq)})")
 
+    if hasattr(v1, 'nmat'):
+        v1 = v1.nmat
+    if hasattr(v2, 'nmat'):
+        v2 = v2.nmat
+    if hasattr(Peq, "nmat"):
+        Peq = Peq.nmat
     return np.sum(v1 * v2 / Peq)
 
 
@@ -118,8 +124,10 @@ def _sym_curr(m: Mat, p: Union[ConstantMatrix, Matrix]) -> ConstantMatrix:
     return curr1 - curr2
 
 
-def _num_curr(m: Mat, p: np.ndarray) -> ConstantMatrix:
+def _num_curr(m: Mat, p: Union[np.ndarray, ConstantMatrix]) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
-
+    m = m.nmat
+    if hasattr(p, "nmat"):
+        p = p.nmat
     return ConstantMatrix(m * p - (m * p).T)

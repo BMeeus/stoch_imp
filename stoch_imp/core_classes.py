@@ -177,9 +177,9 @@ class ConstantObject:
         if "sym" not in kwargs.keys() or kwargs["sym"]:
             self.nmat = None
         else:
-            if not isinstance(args[0], np.ndarray):
+            if not isinstance(nmat, np.ndarray):
                 raise TypeError("Trying to set nmat with type other than ndarray")
-            self.nmat = args[0]
+            self.nmat = nmat
 
 
 class ConstantMatrix(ConstantObject, Mat):
