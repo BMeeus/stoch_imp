@@ -12,8 +12,8 @@ from .util import calc_curr_like, deep_simp, inner
 class WMatrix(TrMatrix):
     """Class handling driven transition matrices."""
 
-    def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, zi: bool = False, **kwargs):
-        super().__init__(*args, zi=zi, **kwargs)
+    def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, **kwargs):
+        super().__init__(*args, **kwargs)
         if ds is None:
             symbols = list(self.free_symbols)
             if not symbols:
@@ -32,7 +32,9 @@ class WMatrix(TrMatrix):
     def calc_weq(self, eq: float = None, force: bool = False, verbose: bool = False) -> EqMatrix:
         if self.weq is not None and not force:
             return self.weq
-        self.weq = EqMatrix(self.subs({self.ds: eq or self.eq}), zi=self.zero_index)
+
+        self.weq = EqMatrix(self.subs({self.ds: eq or self.eq}), zi=self.zero_index, sym=self.is_symbolic)
+
         if verbose:
             print("Equilibrium matrix calculated")
         return self.weq
@@ -40,10 +42,14 @@ class WMatrix(TrMatrix):
     def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> ConstantMatrix:
         if self.w1 is not None and not force:
             return self.w1
+
         eq = eq if eq is not None else self.eq
+
         if self.ds not in self.free_symbols:
             raise AttributeError("Driving symbol not found in matrix")
-        self.w1 = ConstantMatrix(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index)
+
+        self.w1 = ConstantMatrix(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index, sym=self.is_symbolic)
+
         if verbose:
             print("Driving matrix calculated")
         return self.w1
@@ -51,38 +57,49 @@ class WMatrix(TrMatrix):
     def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
         return _calc_coeff(self, force, verbose=verbose)
 
-    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> Callable[
-        [float | np.ndarray], float]:
+    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True)\
+            -> Callable[[float | np.ndarray], float]:
         if self.coeff is None or force:
             self.calc_coeff(force=force, verbose=verbose)
+
         if not self.zero_index:
             i -= 1
             j -= 1
+
         omega = Symbol("omega", real=True, positive=True)
         coeff = self.coeff
-        vals = self.weq.vals
-        numerator = deep_simp(sum(
+        vals = self.weq.vals if self.is_symbolic else self.weq.nvals
+
+        cond = sum(
             coeff[j, i, k] * (1 if k == 0 else (vals[k] / (1j * omega - vals[k])))
-            for k in range(self.dim)))
+            for k in range(self.dim))
+
+        if self.is_symbolic:
+            cond = deep_simp(cond)
         if normal:
-            denominator = deep_simp(sum(
+            norm_val = sum(
                 coeff[j, i, k] * (1 if k == 0 else -1)
-                for k in range(self.dim)))
-            return lambdify([omega], deep_simp(numerator / denominator))
-        return lambdify([omega], numerator)
+                for k in range(self.dim))
+            if self.is_symbolic:
+                norm_val = deep_simp(norm_val)
+            return lambdify([omega], deep_simp(cond / norm_val))
+        return lambdify([omega], cond)
 
     def get_conds(self,
                   conds: Union[tuple[int, int], list[tuple[int, int]], None] = None,
                   normal: bool = False,
                   force: bool = False,
                   verbose: bool = True) -> list[tuple[tuple[int, int], Callable[[float], float]]]:
+
         if conds is None:
             self.calc_weq()
             self.calc_w1()
             conds = [(i, j) for i in range(self.dim) for j in range(i + 1, self.dim)
                      if any(elem != 0 for elem in (self.weq[i, j], self.weq[j, i], self.w1[i, j], self.w1[j, i]))]
+
         elif isinstance(conds[0], int):
             conds = [conds]
+
         return [(cond, self.get_cond(*cond, normal=normal, force=force, verbose=verbose)) for cond in conds]
 
     def to_num(self):
@@ -94,7 +111,7 @@ class WMatrix(TrMatrix):
             if self.w1 is not None:
                 self.w1.to_num()
             if self.coeff is not None:
-                self.coeff = sp.N(self.coeff)
+                self.coeff.to_num()
             self.is_symbolic = False
 
     def to_sym(self):
@@ -109,11 +126,16 @@ class WMatrix(TrMatrix):
 
 def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:
     w.calc_weq(force=force, verbose=verbose)
+    w.weq.calc_eig(force=force, verbose=verbose)
+    w.calc_w1(force=force, verbose=verbose)
+
+
+    return _sym_calc_coeff(w) if w.is_symbolic else _num_calc_coeff(w)
+
+def _sym_calc_coeff(w: WMatrix) -> CoeffArray:
     weq = w.weq
-    weq.calc_eig(force=force, verbose=verbose)
     peq, vals, vecs = weq.peq, weq.vals, weq.vecs
 
-    w.calc_w1(force=force, verbose=verbose)
     w1 = w.w1
 
     p1coeffs = [-inner(vecs[k], w1 * peq, peq) / vals[k] for k in range(1, len(vals))]
@@ -123,5 +145,22 @@ def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffA
     for k in range(1, w.dim):
         coeffs[:, :, k] = p1coeffs[k - 1] * calc_curr_like(weq, vecs[k])
 
+    w.coeff = coeffs
+    return coeffs
+
+
+def _num_calc_coeff(w: WMatrix) -> CoeffArray:
+    weq = w.weq
+    w1 = w.w1
+    Peq, nvals, nvecs = weq.peq, weq.nvals, weq.nvecs
+
+    # Calculate Coeffs of Pad expanded in eigenvects
+    p1coeffs = np.sum(nvecs[:, 1:].T * np.matmul(w1.nmat, Peq.nmat) / Peq.nmat, axis=1) / nvals[1:]
+
+    # Calculate coefficients and store in array
+    coeffs = CoeffArray(w.dim)
+    coeffs[:, :, 0] = calc_curr_like(w1, Peq)
+    for k in range(1, w.dim):
+        coeffs[:, :, k] = p1coeffs[k - 1] * calc_curr_like(weq, nvecs[k])
     w.coeff = coeffs
     return coeffs

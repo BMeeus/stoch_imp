@@ -127,7 +127,9 @@ def _sym_curr(m: Mat, p: Union[ConstantMatrix, Matrix]) -> ConstantMatrix:
 def _num_curr(m: Mat, p: Union[np.ndarray, ConstantMatrix]) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
+
     m = m.nmat
+
     if hasattr(p, "nmat"):
         p = p.nmat
     return ConstantMatrix(m * p - (m * p).T)

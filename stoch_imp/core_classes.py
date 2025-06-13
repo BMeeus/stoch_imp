@@ -16,6 +16,7 @@ class CoeffArray:
     def __init__(self, n):
         # Initialize a 3D numpy array of objects with shape (n, n, n)
         self.mat = np_zeros((n, n, n), dtype=object)
+        self.iter = product(range(n), range(n), range(n))
 
     def __getitem__(self, item):
         # Use native NumPy indexing
@@ -28,6 +29,10 @@ class CoeffArray:
     def __str__(self):
         # Pretty-print the full array using SymPy formatting
         return pretty(self.mat)
+
+    def to_num(self):
+        for i, j, k in self.iter:
+            self.mat[i, j, k] = N(self.mat[i, j, k])
 
 
 class Mat:
@@ -176,25 +181,27 @@ class ConstantObject:
         super().__init__(nmat, *args, **kwargs)  # forwards all unused arguments
         if "sym" not in kwargs.keys() or kwargs["sym"]:
             self.nmat = None
+        elif isinstance(nmat, np.ndarray):
+                self.nmat = nmat.astype(np.float64)
+        elif hasattr(nmat, "free_symbols") and len(nmat.free_symbols) > 0:
+            raise TypeError("Can not convert expression containing symbols to numeric")
         else:
-            if not isinstance(nmat, np.ndarray):
-                raise TypeError("Trying to set nmat with type other than ndarray")
-            self.nmat = nmat
+            self.nmat = np.array(N(nmat)).astype(np.float64)
 
 
 class ConstantMatrix(ConstantObject, Mat):
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def __sub__(self, other) -> Mat:
+    def __sub__(self, other) -> ConstantMatrix:
         # Support subtraction with another Mat or scalar
         return ConstantMatrix(self.mat - getattr(other, 'mat', other), zi=self.zero_index, sym=self.is_symbolic)
 
-    def __mul__(self, other) -> Mat:
+    def __mul__(self, other) -> ConstantMatrix:
         # Matrix multiplication (supports Mat or scalar)
         return ConstantMatrix(self.mat * getattr(other, 'mat', other), zi=self.zero_index, sym=self.is_symbolic)
 
-    def __rmul__(self, other) -> Mat:
+    def __rmul__(self, other) -> ConstantMatrix:
         # Right multiplication (e.g., scalar * Mat)
         return ConstantMatrix(getattr(other, 'mat', other) * self.mat, zi=self.zero_index, sym=self.is_symbolic)
 
