@@ -10,8 +10,8 @@ from .util import calc_curr_like, deep_simp, gram_schmidt
 class EqMatrix(ConstantObject, TrMatrix):
     """Class handling all Equilibrium Transfer Matrices."""
 
-    def __init__(self, arr, zi: bool = False) -> None:
-        super().__init__(arr, zi)
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
         self.peq: Optional[ConstantMatrix] = None
         self.vals: Optional[list[float]] = None
         self.nvals = None

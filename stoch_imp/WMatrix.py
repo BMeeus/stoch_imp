@@ -12,8 +12,8 @@ from .util import calc_curr_like, deep_simp, inner
 class WMatrix(TrMatrix):
     """Class handling driven transition matrices."""
 
-    def __init__(self, arr, ds: Optional[Symbol] = None, eq: float = 0, zi: bool = False):
-        super().__init__(arr, zi)
+    def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, zi: bool = False, **kwargs):
+        super().__init__(*args, zi=zi, **kwargs)
         if ds is None:
             symbols = list(self.free_symbols)
             if not symbols:

@@ -35,12 +35,14 @@ class Mat:
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
 
-    def __init__(self, arr, zi: bool = False) -> None:
+    def __init__(self, arr, *args, **kwargs) -> None:
         m = arr_to_mat(arr)  # Convert array-like to sympy.Matrix
         self.mat = m
         self.dim = m.rows  # System size inferred from row count
         self.iter = product(range(m.rows), range(m.cols))  # Iterator over all (row, col) pairs
-        self.zero_index = zi  # True if system uses 0-based indexing
+        self.zero_index = kwargs.pop("zi") if "zi" in kwargs.keys() else False  # True if system uses 0-based indexing
+        self.is_symbolic = kwargs.pop("sym")if "sym" in kwargs.keys() else True
+
 
     def __str__(self):
         # Pretty-print matrix using sympy's printer
@@ -93,13 +95,13 @@ class TrMatrix(Mat):
     off-diagonal elements.
     """
 
-    def __init__(self, arr, zi: bool = False) -> None:
+    def __init__(self, arr, *args, **kwargs) -> None:
         if isinstance(arr, int):
             if arr <= 1:
                 raise ShapeError("Transfer matrix must be at least (2, 2) dimensional")
             arr = zeros(arr, arr)
 
-        super().__init__(arr, zi=zi)
+        super().__init__(arr, *args, **kwargs)
         check_diag(self, err=True)  # Validate initial conditions
         check_rates(self, err=True)
 
@@ -170,30 +172,31 @@ class TrMatrix(Mat):
 
 
 class ConstantObject:
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)  # forwards all unused arguments
-        # self.mat = None
-        self.nmat = None
-        self.is_symbolic = True
-        self.is_numeric = False
-        self.tolerance = 10**-15
+    def __init__(self, nmat, *args, **kwargs):
+        super().__init__(nmat, *args, **kwargs)  # forwards all unused arguments
+        if "sym" not in kwargs.keys() or kwargs["sym"]:
+            self.nmat = None
+        else:
+            if not isinstance(args[0], np.ndarray):
+                raise TypeError("Trying to set nmat with type other than ndarray")
+            self.nmat = args[0]
 
 
 class ConstantMatrix(ConstantObject, Mat):
-    def __init__(self, arr, zi=False):
-        super().__init__(arr, zi)
+    def __init__(self,*args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def __sub__(self, other) -> Mat:
         # Support subtraction with another Mat or scalar
-        return ConstantMatrix(self.mat - getattr(other, 'mat', other), zi=self.zero_index)
+        return ConstantMatrix(self.mat - getattr(other, 'mat', other), zi=self.zero_index, sym=self.is_symbolic)
 
     def __mul__(self, other) -> Mat:
         # Matrix multiplication (supports Mat or scalar)
-        return ConstantMatrix(self.mat * getattr(other, 'mat', other), zi=self.zero_index)
+        return ConstantMatrix(self.mat * getattr(other, 'mat', other), zi=self.zero_index, sym=self.is_symbolic)
 
     def __rmul__(self, other) -> Mat:
         # Right multiplication (e.g., scalar * Mat)
-        return ConstantMatrix(getattr(other, 'mat', other) * self.mat, zi=self.zero_index)
+        return ConstantMatrix(getattr(other, 'mat', other) * self.mat, zi=self.zero_index, sym=self.is_symbolic)
 
     def __truediv__(self, other):
         # Scalar division
