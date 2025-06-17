@@ -196,7 +196,7 @@ def _num_calc_eig(weq, tol=1e-15, force=False, verbose=False):
     if verbose:
         print("Equilibrium distribution calculated")
 
-    nvecs = gram_schmidt(nvecs)
+    nvecs = gram_schmidt(nvecs, nvecs[:, 0])
 
     for i in range(len(vecs)):
         res = norm(matmul(weq.nmat, vecs[:, i]) - vals[i] * vecs[:, i])

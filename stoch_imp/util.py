@@ -57,7 +57,9 @@ def inner(
     if len(v1) != len(v2):
         raise ShapeError(f"Vectors are of different shapes: v1 ({len(v1)}), v2 ({len(v2)})")
 
-    if (Peq is None and isinstance(v1, ndarray)) or (isinstance(Peq, ConstantMatrix) and not Peq.is_symbolic):
+    if ((Peq is None and isinstance(v1, ndarray))
+            or (isinstance(Peq, ConstantMatrix) and not Peq.is_symbolic)
+            or (isinstance(Peq, ndarray))):
         return _num_inner(v1, v2, Peq)
     else:
         return _sym_inner(v1, v2, Peq)
@@ -140,9 +142,9 @@ def _num_gs(v_arr: ndarray, Peq: Union[ndarray, None]) -> ndarray:
     for i in range(n):
         v = v_arr[:, i].copy()
         for j in range(i):
-            proj = np_sum(orthogonal[:, j] * v / Peq)
+            proj = np_sum(inner(orthogonal[:, j], v, Peq))
             v -= proj * orthogonal[:, j]
-        v /= np_sqrt(np_sum(v * v / Peq))
+        v /= np_sqrt(inner(v, v, Peq))
         orthogonal[:, i] = v
     return orthogonal
 
@@ -158,8 +160,8 @@ def _sym_curr(m: Mat, p: Union[ConstantMatrix, Matrix]) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
 
-    curr1 = ConstantMatrix([[deep_simp(m[row, col] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
-    curr2 = ConstantMatrix([[deep_simp(m[col, row] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
+    curr1 = ConstantMatrix([[deep_simp(m[row, col] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
+    curr2 = ConstantMatrix([[deep_simp(m[col, row] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
     return curr1 - curr2
 
 
@@ -178,4 +180,4 @@ def _num_curr(m: Mat, p: Union[ndarray, ConstantMatrix]) -> ConstantMatrix:
 
     if hasattr(p, "nmat"):
         p = p.nmat
-    return ConstantMatrix(m * p - (m * p).T)
+    return ConstantMatrix((m.T * p).T - m.T * p)

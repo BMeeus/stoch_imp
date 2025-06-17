@@ -93,7 +93,7 @@ class WMatrix(TrMatrix):
         return _calc_coeff(self, force, verbose=verbose)
 
     def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> Callable[
-        [float | ndarray], float]:
+        [Union[float, ndarray]], float]:
         """
         Return a callable for the frequency-dependent conductivity.
 
@@ -238,12 +238,12 @@ def _num_calc_coeff(w: WMatrix) -> CoeffArray:
     Peq, nvals, nvecs = weq.peq, weq.nvals, weq.nvecs
 
     # Calculate Coeffs of Pad expanded in eigenvecs
-    p1coeffs = np_sum(nvecs[:, 1:].T * matmul(w1.nmat, Peq.nmat) / Peq.nmat, axis=1) / nvals[1:]
+    p1coeffs = np_sum(nvecs[:, 1:].T * matmul(w1.nmat, Peq.nmat).T / Peq.nmat.T, axis=1) / nvals[1:]
 
     # Calculate coefficients and store in array
     coeffs = CoeffArray(w.dim)
     coeffs[:, :, 0] = calc_curr_like(w1, Peq)
     for k in range(1, w.dim):
-        coeffs[:, :, k] = p1coeffs[k - 1] * calc_curr_like(weq, nvecs[k])
+        coeffs[:, :, k] = p1coeffs[k - 1] * calc_curr_like(weq, nvecs[:, k])
     w.coeff = coeffs
     return coeffs
