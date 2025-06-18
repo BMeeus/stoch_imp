@@ -40,8 +40,8 @@ class EqMatrix(ConstantObject, TrMatrix):
             self.calc_eig(force=force, verbose=verbose)
         return self.peq
 
-    def calc_eig(self, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> Union[
-        tuple[list, list[Matrix]], tuple[ndarray, ndarray]]:
+    def calc_eig(self, force: bool = False, verbose: bool = False)\
+            -> Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]:
         """
         Calculate eigenvalues and eigenvectors.
 
@@ -52,11 +52,11 @@ class EqMatrix(ConstantObject, TrMatrix):
         :return: (Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]) Eigenvalues and eigenvectors
         """
         if self.is_symbolic:
-            return _sym_calc_eig(self, tol=tol, force=force, verbose=verbose)
+            return _sym_calc_eig(self, tol=self.tol, force=force, verbose=verbose)
         else:
-            return _num_calc_eig(self, tol=tol, force=force, verbose=verbose)
+            return _num_calc_eig(self, tol=self.tol, force=force, verbose=verbose)
 
-    def check_db(self, tol: float = 1e-15) -> bool:
+    def check_db(self) -> bool:
         """
         Check detailed balance condition.
 
@@ -67,7 +67,7 @@ class EqMatrix(ConstantObject, TrMatrix):
         if self.peq is None:
             self.calc_peq()
         db_mat = calc_curr_like(self, self.peq)
-        return all(db_mat[*el] <= tol for el in self.iter)
+        return all(db_mat[*el] <= self.tol for el in self.iter)
 
     def to_num(self):
         """Convert symbolic matrices to numeric format."""
@@ -100,7 +100,7 @@ class EqMatrix(ConstantObject, TrMatrix):
             self.is_symbolic = True
 
 
-def _sym_calc_eig(weq, tol: float = 1e-14, force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
+def _sym_calc_eig(weq, tol, force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
     """
     Compute symbolic eigenvalues and eigenvectors.
 
@@ -157,7 +157,7 @@ def _sym_calc_eig(weq, tol: float = 1e-14, force: bool = False, verbose: bool = 
     return weq.vals, weq.vecs
 
 
-def _num_calc_eig(weq, tol=1e-15, force=False, verbose=False):
+def _num_calc_eig(weq, tol, force=False, verbose=False):
     """
     Compute numeric eigenvalues and eigenvectors.
 
@@ -191,7 +191,7 @@ def _num_calc_eig(weq, tol=1e-15, force=False, verbose=False):
     nvals[0] = 0
     nvecs[:, 0] /= sum(nvecs[:, 0])  # First eigenvector is Peq, normalize and rename
     weq.peq = ConstantMatrix(nvecs[:, 0], zi=weq.zero_index, sym=False)
-    if not weq.check_db(tol=tol):
+    if not weq.check_db():
         raise ValueError("detailed balance not fulfilled")
     if verbose:
         print("Equilibrium distribution calculated")
@@ -201,7 +201,7 @@ def _num_calc_eig(weq, tol=1e-15, force=False, verbose=False):
     for i in range(len(vecs)):
         res = norm(matmul(weq.nmat, vecs[:, i]) - vals[i] * vecs[:, i])
         if res >= tol:
-            raise ValueError("Incorrect computation of eigenvectors")
+            raise ValueError(f"Incorrect computation of eigenvectors (residue {res})")
 
     weq.nvals = nvals
     weq.nvecs = nvecs
