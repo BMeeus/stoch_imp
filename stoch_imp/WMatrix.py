@@ -117,7 +117,7 @@ class WMatrix(TrMatrix):
         vals = self.weq.vals if self.is_symbolic else self.weq.nvals
 
         cond = sum(
-            coeff[j, i, k] * (1 if k == 0 else (vals[k] / (1j * omega - vals[k])))
+            coeff[j, i, k] * (1 if k == 0 else (-vals[k] / (1j * omega - vals[k])))
             for k in range(self.dim))
 
         if self.is_symbolic:
