@@ -75,6 +75,7 @@ class Mat:
         self.iter = product(range(m.rows), range(m.cols))  # Iterator over all (row, col) pairs
         self.zero_index = kwargs.pop("zi") if "zi" in kwargs.keys() else False  # True if system uses 0-based indexing
         self.is_symbolic = kwargs.pop("sym") if "sym" in kwargs.keys() else True
+        self.tol = kwargs.pop("tol") if "tol" in kwargs.keys() else 10**-14
 
     def __str__(self):
         # Pretty-print matrix using sympy's printer
@@ -242,7 +243,7 @@ class TrMatrix(Mat):
 
     def check_diag(self) -> bool:
         """Check if all columns sum to zero."""
-        return check_diag(self)
+        return check_diag(self, tol=self.tol)
 
     def check_rates(self, verbose: bool = False) -> bool:
         """Check if all off-diagonal rates are non-negative."""

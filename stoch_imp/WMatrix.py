@@ -50,7 +50,7 @@ class WMatrix(TrMatrix):
         if self.weq is not None and not force:
             return self.weq
 
-        self.weq = EqMatrix(self.subs({self.ds: eq or self.eq}), zi=self.zero_index, sym=self.is_symbolic)
+        self.weq = EqMatrix(self.subs({self.ds: eq or self.eq}), zi=self.zero_index, sym=self.is_symbolic, tol=self.tol)
 
         if verbose:
             print("Equilibrium matrix calculated")
@@ -74,7 +74,7 @@ class WMatrix(TrMatrix):
         if self.ds not in self.free_symbols:
             raise AttributeError("Driving symbol not found in matrix")
 
-        self.w1 = ConstantMatrix(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index, sym=self.is_symbolic)
+        self.w1 = ConstantMatrix(diff(self, self.ds).subs({self.ds: eq}), zi=self.zero_index, sym=self.is_symbolic, tol=self.tol)
 
         if verbose:
             print("Driving matrix calculated")
