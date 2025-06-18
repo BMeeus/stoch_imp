@@ -1,6 +1,46 @@
 from matplotlib.lines import Line2D
-from matplotlib.pyplot import Axes
+from matplotlib.pyplot import Axes, rcParams, subplots, tight_layout, savefig, show
 from numpy import (absolute, argmin, array)
+from contextlib import contextmanager
+from typing import Union, Optional
+
+
+@contextmanager
+def create_fig(subplt: Union[int, tuple[int, int]],
+               save_path: Optional[str] = None,
+               dpi: Optional[int] = 600,
+               tight: Optional[bool] = True,
+               tick_dict: Optional[dict] = None,
+               **kwargs):
+
+    if tick_dict is None:
+        tick_dict = {'labelfontfamily':'serif'}
+
+    rcParams.update({
+        "text.usetex": True,
+        "font.family": "mathpazo"
+    })
+
+    if isinstance(subplt, int):
+        fig, ax = subplots(1, subplt, **kwargs)
+    elif isinstance(subplt, tuple) or isinstance(subplt, list):
+        fig, ax = subplots(subplt[0], subplt[1], **kwargs)
+    else:
+        raise TypeError(f"subplt argument must be int or [int, int], is {type(subplt)}")
+
+    try:
+        for axis in ax:
+            axis.tick_params(**tick_dict)
+    except TypeError:
+        ax.tick_params(**tick_dict)
+    yield fig, ax
+
+    if tight:
+        tight_layout()
+
+    if save_path:
+        savefig(save_path, dpi=dpi)
+    show()
 
 
 def add_arrow(line: Line2D,
