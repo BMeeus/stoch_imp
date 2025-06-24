@@ -1,14 +1,17 @@
-from .core_classes import (CoeffArray, Mat, TrMatrix, arr_to_mat, check_diag, check_rates)
+from .EqMatrix import EqMatrix
+from .WMatrix import WMatrix
+from .core_classes import (CoeffArray, Mat, TrMatrix, arr_to_mat, check_diag, check_rates, ConstantMatrix)
+from .pyplot_funcs import (add_arrow, complex_axes, create_fig)
 from .util import (calc_curr_like, deep_simp, gram_schmidt, inner)
-from .matrix_definitions import (EqMatrix, WMatrix)
-from .pyplot_funcs import (add_arrow, complex_axes)
 
 __all__ = [
-    "CoeffArray", "Mat", "TrMatrix", "arr_to_mat", "check_diag", "check_rates",
+    "CoeffArray", "Mat", "TrMatrix", "arr_to_mat", "check_diag", "check_rates", "ConstantMatrix",
 
     "calc_curr_like", "deep_simp", "gram_schmidt", "inner",
 
-    "EqMatrix", "WMatrix",
+    "WMatrix",
 
-    "add_arrow", "complex_axes"
+    "EqMatrix",
+
+    "add_arrow", "complex_axes", "create_fig"
 ]

@@ -2,123 +2,191 @@ from __future__ import annotations
 
 from itertools import product
 
+from numpy import (array, float64, ndarray)
 from numpy import zeros as np_zeros
-from sympy import (Expr, Matrix, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
+from sympy import (Expr, Matrix, N, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
 
 
 class CoeffArray:
-    """
-    Class handling the array containing the coefficients.
-    """
+    """3D coefficient array class for storing interaction or rate data."""
 
-    def __init__(self, n):
+    def __init__(self, n: int):
         """
-        Initialising an instance of CoeffArray
+        Initialize a 3D numpy array of objects with shape (n, n, n).
 
-        :param n: size of the system
+        :param n: Dimension size of the 3D array
+        :type n: int
         """
         self.mat = np_zeros((n, n, n), dtype=object)
+        self.iter = product(range(n), range(n), range(n))
 
-    # Let numpy handle item getting and setting
     def __getitem__(self, item):
-        return self.mat.__getitem__(item)
+        # Use native NumPy indexing
+        return self.mat[item]
 
     def __setitem__(self, key, value):
-        self.mat.__setitem__(key, value)
+        # Use native NumPy assignment
+        self.mat[key] = value
 
-    # Print pretty version of array
     def __str__(self):
+        # Pretty-print the full array using SymPy formatting
         return pretty(self.mat)
 
+    def to_num(self) -> None:
+        """Convert all symbolic entries to numerical values using SymPy N."""
+        for i, j, k in self.iter:
+            if len(self.mat[i, j, k].free_symbols) != 0:
+                raise TypeError("Can not convert expression containing symbols to numeric")
+            self.mat[i, j, k] = N(self.mat[i, j, k])
 
+
+class ConstantObject:
+    def __init__(self, nmat, *args, **kwargs):
+        """
+        Store numeric matrix form of symbolic matrix if symbolic flag is False.
+
+        :param nmat: Matrix input
+        :type nmat: ndarray or array-like
+        """
+        super().__init__(nmat, *args, **kwargs)  # forwards all unused arguments
+        if "sym" not in kwargs.keys() or kwargs["sym"]:
+            self.nmat = None
+        elif isinstance(nmat, ndarray):
+            self.nmat = nmat.astype(float64)
+        elif hasattr(nmat, "free_symbols") and len(nmat.free_symbols) > 0:
+            raise TypeError("Can not convert expression containing symbols to numeric")
+        else:
+            self.nmat = array(N(nmat)).astype(float64)
+
+
+# noinspection PyTypeChecker
 class Mat:
     """
     Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
     """
 
-    def __init__(self, arr, zi: bool = False) -> None:
+    def __init__(self, arr, *args, **kwargs) -> None:
         """
-        Initialises a Mat instance
+        Initialize matrix object from array-like input.
 
-        :param arr: (Array like) The Array with which the matrix is set.
-        :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param arr: Input data for matrix
+        :type arr: array-like
         """
-        m = arr_to_mat(arr)
-
-        self.mat = m  # The Sympy Matrix object
-        self.dim = self.mat.rows  # The dimension of the associated system
-        self.iter = product(range(self.mat.rows), range(self.mat.cols))  # An iterator going over both rows and cols
-        self.zero_index = zi  # Whether the system starts at 0
+        m = arr_to_mat(arr)  # Convert array-like to sympy.Matrix
+        self.mat = m
+        self.dim = m.rows  # System size inferred from row count
+        self.iter = product(range(m.rows), range(m.cols))  # Iterator over all (row, col) pairs
+        self.zero_index = kwargs.pop("zi") if "zi" in kwargs.keys() else False  # True if system uses 0-based indexing
+        self.is_symbolic = kwargs.pop("sym") if "sym" in kwargs.keys() else True
+        self.tol = kwargs.pop("tol") if "tol" in kwargs.keys() else 10**-14
 
     def __str__(self):
-        # This is a QoL improvement, ensures nice printing of matrix like objects
+        # Pretty-print matrix using sympy's printer
         return pretty(self.mat)
 
     def __setitem__(self, key, value) -> None:
-        self.mat.__setitem__(key, value)
-        return
+        # Support assignment via indexing
+        self.mat[key] = value
 
     def __getitem__(self, item):
-        return self.mat.__getitem__(item)
+        # Support retrieval via indexing
+        return self.mat[item]
 
     def __sub__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(self.mat - other.mat, zi=self.zero_index)
-        else:
-            return Mat(self.mat - other, zi=self.zero_index)
+        # Support subtraction with another Mat or scalar
+        return Mat(self.mat - getattr(other, 'mat', other), zi=self.zero_index)
 
     def __mul__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(self.mat * other.mat, zi=self.zero_index)
-        else:
-            return Mat(self.mat * other, zi=self.zero_index)
+        # Matrix multiplication (supports Mat or scalar)
+        return Mat(self.mat * getattr(other, 'mat', other), zi=self.zero_index)
 
     def __rmul__(self, other) -> Mat:
-        if isinstance(other, self.__class__):
-            return Mat(other.mat * self.mat, zi=self.zero_index)
-        else:
-            return Mat(other * self.mat, zi=self.zero_index)
+        # Right multiplication (e.g., scalar * Mat)
+        return Mat(getattr(other, 'mat', other) * self.mat, zi=self.zero_index)
+
+    def __truediv__(self, other):
+        # Scalar division
+        return self.mat / other
 
     def __len__(self):
-        return self.mat.__len__()
+        # Length = number of elements in matrix
+        return len(self.mat)
 
     def __getattr__(self, name):
-        # Delegate attribute access to self.mat if it exists there
+        # Forward missing attributes to underlying sympy.Matrix
         return getattr(self.mat, name)
 
     def __dir__(self):
-        # Combine Mat's own attrs + mat's attrs for better autocomplete/introspection
-        return list(set(super().__dir__())) + dir(self.mat)
+        # Combine native attributes with sympy.Matrix's for auto-completion
+        return list(set(super().__dir__()) | set(dir(self.mat)))
 
-    def simp(self):
+    def simp(self) -> None:
+        """In-place symbolic simplification of the matrix."""
         simplify(self.mat)
-        return
 
+
+class ConstantMatrix(ConstantObject, Mat):
+    def __init__(self, *args, **kwargs):
+        """Initialize ConstantMatrix object."""
+        super().__init__(*args, **kwargs)
+
+    def __sub__(self, other) -> ConstantMatrix:
+        # Support subtraction with another Mat or scalar
+        return ConstantMatrix(self.mat - getattr(other, 'mat', other), zi=self.zero_index, sym=self.is_symbolic)
+
+    def __mul__(self, other) -> ConstantMatrix:
+        # Matrix multiplication (supports Mat or scalar)
+        return ConstantMatrix(self.mat * getattr(other, 'mat', other), zi=self.zero_index, sym=self.is_symbolic)
+
+    def __rmul__(self, other) -> ConstantMatrix:
+        # Right multiplication (e.g., scalar * Mat)
+        return ConstantMatrix(getattr(other, 'mat', other) * self.mat, zi=self.zero_index, sym=self.is_symbolic)
+
+    def __truediv__(self, other):
+        # Scalar division
+        return ConstantMatrix(self.mat / other)
+
+    def to_num(self) -> None:
+        """Convert symbolic matrix to numeric form."""
+        if not self.is_symbolic:
+            pass
+        elif len(self.mat.free_symbols) != 0:
+            raise TypeError("Can not convert expression containing symbols to numeric")
+        else:
+            self.nmat = array(N(self.mat), dtype=float64)
+            self.is_symbolic = False
+
+    def to_sym(self) -> None:
+        """Convert numeric matrix back to symbolic form."""
+        if self.is_symbolic:
+            pass
+        else:
+            self.mat = arr_to_mat(self.nmat)
+            self.is_symbolic = True
+
+
+# noinspection PyTypeChecker
 class TrMatrix(Mat):
     """
-    Class handling all transition matrices. These matrices should sum ot zero along columns and have positive
+    Class handling all transition matrices. These matrices should sum to zero along columns and have positive
     off-diagonal elements.
     """
 
-    def __init__(self, arr, zi: bool = False) -> None:
+    def __init__(self, arr, *args, **kwargs) -> None:
         """
-        Initialise a new Transfer matrix
+        Initialize transition matrix and validate constraints.
 
-        :param arr: (Array like or Int) The Array with which the matrix is set. If arr is an integer, an empty
-            (arr,arr) Sympy Matrix is used
-        :param zi: (Bool) Whether the system is zero-indexed. Can be useful in systems where there can be no particles.
+        :param arr: Input data or dimension
+        :type arr: array-like or int
         """
-        if type(arr) == int:
+        if isinstance(arr, int):
             if arr <= 1:
                 raise ShapeError("Transfer matrix must be at least (2, 2) dimensional")
-            else:
-                arr = zeros(arr, arr)
+            arr = zeros(arr, arr)
 
-        super().__init__(arr, zi=zi)
-
-        check_diag(self, err=True)
+        super().__init__(arr, *args, **kwargs)
+        check_diag(self, err=True)  # Validate initial conditions
         check_rates(self, err=True)
-        return
 
     def add_trans(self, i: int, j: int,
                   r: float | Expr = 1.0,
@@ -126,21 +194,23 @@ class TrMatrix(Mat):
                   symm: bool = True,
                   simp: bool = True) -> None:
         """
-        Add a transition i --> j, with rate r.
+        Add a transition i --> j with rate r, and optionally symmetric transition j --> i.
 
-        If symm is True, a symmetric transition j --> i is added with rate 1/r. Optionally, ri can be
-        used to specify a rate for the symmetric transition.
-
-        :param i: (Int) The starting site of the transition
-        :param j: (Int) The target site of the transition
-        :param r: (Float) The transfer rate with which the transition should be set. Default is 1.0
-        :param ri: (Float) The transfer rate used for the inverse transition. Default is 1/r
-        :param symm: (Bool) If True, also adds a symmetric transition j --> i.
-        :param simp: (Bool) Whether to simplify the rates before setting.
+        :param i: Start index
+        :type i: int
+        :param j: Target index
+        :type j: int
+        :param r: Transition rate from i to j
+        :type r: float | Expr
+        :param ri: Optional inverse rate (j to i)
+        :type ri: float | Expr | None
+        :param symm: If True, adds j --> i with rate 1/r or ri
+        :type symm: bool
+        :param simp: If True, simplifies r and ri
+        :type simp: bool
         """
-
         if i == j:
-            raise ValueError("Start and target state are equal, must be different.")
+            raise ValueError("Start and target state must differ.")
 
         if not self.zero_index:
             i -= 1
@@ -149,105 +219,118 @@ class TrMatrix(Mat):
         if simp:
             r = nsimplify(r, rational=True)
 
-        # comparison to 0 can fail for expressions containing symbols
         try:
             if r < 0:
-                raise ValueError(f"Rate should be positive, is {r}")
+                raise ValueError(f"Rate should be positive, got {r}")
         except TypeError:
-            pass
+            pass  # Ignore symbolic inequalities
 
-        self[j, i] = r  # Set the matrix element
-        self[i, i] -= r  # Update diagonal element
+        self[j, i] = r
+        self[i, i] -= r
 
         if symm or (ri is not None):
-            if not ri:
-                ri = r ** (-1)
-
+            if ri is None:
+                ri = r ** -1
             if simp:
                 ri = nsimplify(ri, rational=True)
-            # comparison to 0 can fail for expressions containing symbols
+
             try:
                 if ri < 0:
-                    raise ValueError(f"Inverse rate should be positive, is {ri}")
+                    raise ValueError(f"Inverse rate should be positive, got {ri}")
             except TypeError:
-                pass
+                pass  # Ignore symbolic inequalities
+
             self[i, j] = ri
             self[j, j] -= ri
 
         if simp:
             simplify(self.mat)
-        return
 
     def calc_diag(self) -> None:
-        """Force calculation of the diagonal elements"""
+        """Force recomputation of diagonal terms to preserve column sum = 0."""
         for col in range(self.dim):
-            self[col, col] = - sum([self[row, col] for row in range(self.dim) if row != col])
+            self[col, col] = -sum(self[row, col] for row in range(self.dim) if row != col)
 
     def check_diag(self) -> bool:
-        """Check that columns sum to 0"""
-        return check_diag(self)
+        """Check if all columns sum to zero."""
+        return check_diag(self, tol=self.tol)
 
     def check_rates(self, verbose: bool = False) -> bool:
-        """Check if off-diagonal elements are positive"""
+        """Check if all off-diagonal rates are non-negative."""
         return check_rates(self, verbose=verbose)
 
 
-class SymbolicMatrix:
-    def __init__(self):
-        self.is_symbolic = True
-        self.is_numeric = False
+def arr_to_mat(arr) -> Matrix:
+    """
+    Convert input array-like to sympy.Matrix.
+    - Ensures proper shape.
+    - Converts row vectors to column vectors.
 
-
-class NumericMatrix:
-    def __init__(self):
-        self.is_symbolic = False
-        self.is_numeric = True
-        self.tol = 10**(-15)
-
-def arr_to_mat(arr):
-    """Cast array-like object to sympy matrix and check shape requirements"""
+    :param arr: Input data
+    :type arr: array-like
+    :return: SymPy matrix
+    :rtype: Matrix
+    """
     m = Matrix(arr)
 
     # Check if matrix is vector, transpose to col vec if necessary
     if (m.rows == 1) ^ (m.cols == 1):
-        if m.cols > 1:
-            return m.T
-        else:
-            return m
-    # If not vector must be square matrix of dim at least (2, 2)
-    elif not m.is_square:
-        raise NonSquareMatrixError(
-            "Matrix object must be square or vector, is neither: ({}, {})".format(m.rows, m.cols))
-    elif m.rows == 1:
+        return m.T if m.cols > 1 else m
+
+    if not m.is_square:
+        raise NonSquareMatrixError(f"Matrix must be square or vector, got ({m.rows}, {m.cols})")
+    if m.rows == 1:
         raise ShapeError("Matrix must be at least (2, 2) dimensional")
-    else:
-        return m
+
+    return m
 
 
-def check_diag(m: Mat, tol: float | None = 10**(-15), err: bool = False) -> bool:
-    """Check if columns sum to 0"""
+def check_diag(m: Mat, tol: float = 1e-15, err: bool = False) -> bool:
+    """
+    Check if each column in matrix m sums to zero.
+
+    :param m: Matrix to check
+    :type m: Mat
+    :param tol: Allowed numerical tolerance
+    :type tol: float
+    :param err: Raise exception if check fails
+    :type err: bool
+
+    :return: True if all columns sum to zero
+    :rtype: bool
+    """
     for col in range(m.dim):
-        if sum(m[:, col]) > tol:
+        s = N(sum(m[:, col]))
+        if s > tol:
             if err:
-                raise ValueError("Column {} does not sum to 0 (sum = {})".format(col, sum(m[:,col])))
-            else:
-                return False
+                raise ValueError(f"Column {col} does not sum to 0 (sum = {s})")
+            return False
     return True
 
 
 def check_rates(m: Mat, err: bool = False, verbose: bool = False) -> bool:
-    """Check if off-diagonal elements are 0"""
+    """
+    Check that all off-diagonal elements are non-negative.
+
+    :param m: Matrix to check
+    :type m: Mat
+    :param err: Raise exception on negative element
+    :type err: bool
+    :param verbose: Log indeterminate cases due to symbolic expressions
+    :type verbose: bool
+
+    :return: True if all off-diagonal elements are non-negative
+    :rtype: bool
+    """
     for col, row in m.iter:
-        # Try checking positivity. This can fail for elements containing symbols.
+        if row == col:
+            continue
         try:
-            if row != col and m[row, col] < 0:
+            if m[row, col] < 0:
                 if err:
-                    raise ValueError(
-                        "Transfer rate ({} -> {}) is negative ({})".format(col + 1, row + 1, m[row, col]))
-                else:
-                    return False
+                    raise ValueError(f"Transfer rate ({col + 1} -> {row + 1}) is negative: {m[row, col]}")
+                return False
         except TypeError:
             if verbose:
-                print("Positivity of transfer rate ({} -> {}) undetermined ({})".format(col + 1, row + 1,
-                                                                                            m[row, col]))
+                print(f"Positivity of transfer rate ({col + 1} -> {row + 1}) undetermined: {m[row, col]}")
     return True
