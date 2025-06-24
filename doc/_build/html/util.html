@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Util &#8212; Stochastic Impedance  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Pyplot Functionalities" href="Pyplot.html" />
+    <link rel="prev" title="EqMatrix" href="EqMatrix.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-stoch_imp.util">
+<span id="util"></span><h1>Util<a class="headerlink" href="#module-stoch_imp.util" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.util.calc_curr_like">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">calc_curr_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Mat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ConstantMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ConstantMatrix</span></span></span><a class="headerlink" href="#stoch_imp.util.calc_curr_like" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> – (Mat) The matrix to be used (must be square).</p></li>
+<li><p><strong>p</strong> – (ConstantMatrix | Matrix | ndarray) The vector to be used (length must match m).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(ConstantMatrix) Matrix of current-like values.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.util.deep_simp">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
+<dd><p>Simplify an arbitrary symbolic expression.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.util.gram_schmidt">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">gram_schmidt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MutableDenseMatrix</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ConstantMatrix</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ConstantMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MutableDenseMatrix</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="headerlink" href="#stoch_imp.util.gram_schmidt" title="Link to this definition">¶</a></dt>
+<dd><p>Orthogonalize a set of vectors using Gram-Schmidt procedure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_arr</strong> – (list[Matrix] | ndarray | list[ConstantMatrix]) List of symbolic vectors or NumPy array (columns = vectors).</p></li>
+<li><p><strong>Peq</strong> – (ConstantMatrix | Matrix | ndarray | None) Equilibrium distribution for weighted inner product.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(list[Matrix] | ndarray) Orthogonalized vectors.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.util.inner">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ConstantMatrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ConstantMatrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ConstantMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Expr</span></span></span><a class="headerlink" href="#stoch_imp.util.inner" title="Link to this definition">¶</a></dt>
+<dd><p>Compute inner product between two vectors, optionally weighted by Peq.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v1</strong> – (Matrix | ndarray | ConstantMatrix) First vector.</p></li>
+<li><p><strong>v2</strong> – (Matrix | ndarray | ConstantMatrix) Second vector.</p></li>
+<li><p><strong>Peq</strong> – (ConstantMatrix | Matrix | ndarray | None) Optional equilibrium vector.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(float | Expr) Scalar inner product.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Stochastic Impedance</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="core_classes.html">Core Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WMatrix.html">WMatrix</a></li>
+<li class="toctree-l1"><a class="reference internal" href="EqMatrix.html">EqMatrix</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stoch_imp.util.calc_curr_like"><code class="docutils literal notranslate"><span class="pre">calc_curr_like()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stoch_imp.util.deep_simp"><code class="docutils literal notranslate"><span class="pre">deep_simp()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stoch_imp.util.gram_schmidt"><code class="docutils literal notranslate"><span class="pre">gram_schmidt()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stoch_imp.util.inner"><code class="docutils literal notranslate"><span class="pre">inner()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="Pyplot.html">Pyplot Functionalities</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="EqMatrix.html" title="previous chapter">EqMatrix</a></li>
+      <li>Next: <a href="Pyplot.html" title="next chapter">Pyplot Functionalities</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Branko Meeus.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.3.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/util.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
