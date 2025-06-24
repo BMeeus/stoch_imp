@@ -15,8 +15,10 @@ class EqMatrix(ConstantObject, TrMatrix):
         """
         Initialize the EqMatrix object.
 
-        :param args: (tuple) Positional arguments for parent constructors
-        :param kwargs: (dict) Keyword arguments for parent constructors
+        :param args: Positional arguments for parent constructors
+        :type args: tuple
+        :param kwargs: Keyword arguments for parent constructors
+        :type kwargs: dict
         """
         super().__init__(*args, **kwargs)
         self.peq: Optional[ConstantMatrix] = None
@@ -31,10 +33,13 @@ class EqMatrix(ConstantObject, TrMatrix):
         """
         Calculate the Equilibrium distribution.
 
-        :param force: (bool) Force recalculation
-        :param verbose: (bool) Print verbose output
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (ConstantMatrix) Equilibrium distribution matrix
+        :return: Equilibrium distribution matrix
+        :rtype: ConstantMatrix
         """
         if self.peq is None or force:
             self.calc_eig(force=force, verbose=verbose)
@@ -45,11 +50,13 @@ class EqMatrix(ConstantObject, TrMatrix):
         """
         Calculate eigenvalues and eigenvectors.
 
-        :param tol: (float) Tolerance level for eigenvalue validation
-        :param force: (bool) Force recalculation
-        :param verbose: (bool) Print verbose output
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]) Eigenvalues and eigenvectors
+        :return: Eigenvalues and eigenvectors
+        :rtype: Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]
         """
         if self.is_symbolic:
             return _sym_calc_eig(self, tol=self.tol, force=force, verbose=verbose)
@@ -60,9 +67,8 @@ class EqMatrix(ConstantObject, TrMatrix):
         """
         Check detailed balance condition.
 
-        :param tol: (float) Tolerance level for checking detailed balance
-
-        :return: (bool) True if detailed balance is fulfilled
+        :return: True if detailed balance is fulfilled
+        :rtype: bool
         """
         if self.peq is None:
             self.calc_peq()
@@ -104,12 +110,17 @@ def _sym_calc_eig(weq, tol, force: bool = False, verbose: bool = False) -> tuple
     """
     Compute symbolic eigenvalues and eigenvectors.
 
-    :param weq: (EqMatrix) Equilibrium matrix object
-    :param tol: (float) Tolerance for validation
-    :param force: (bool) Force recalculation
-    :param verbose: (bool) Print verbose output
+    :param weq: Equilibrium matrix object
+    :type weq: EqMatrix
+    :param tol: Tolerance for validation
+    :type tol: float
+    :param force: Force recalculation
+    :type force: bool
+    :param verbose: Print verbose output
+    :type verbose: bool
 
-    :return: (tuple[list, list[Matrix]]) Eigenvalues and eigenvectors
+    :return: Eigenvalues and eigenvectors
+    :rtype: tuple[list, list[Matrix]]
     """
     if weq.vals is not None and weq.vecs is not None and not force:
         return weq.vals, weq.vecs
@@ -161,12 +172,17 @@ def _num_calc_eig(weq, tol, force=False, verbose=False):
     """
     Compute numeric eigenvalues and eigenvectors.
 
-    :param weq: (EqMatrix) Equilibrium matrix object
-    :param tol: (float) Tolerance for validation
-    :param force: (bool) Force recalculation
-    :param verbose: (bool) Print verbose output
+    :param weq: Equilibrium matrix object
+    :type weq: EqMatrix
+    :param tol: Tolerance for validation
+    :type tol: float
+    :param force: Force recalculation
+    :type force: bool
+    :param verbose: Print verbose output
+    :type verbose: bool
 
-    :return: (tuple[ndarray, ndarray]) Eigenvalues and eigenvectors
+    :return: Eigenvalues and eigenvectors
+    :rtype: tuple[ndarray, ndarray]
     """
     if weq.nvals is not None and weq.nvecs is not None and not force:
         return weq.nvals, weq.nvecs

@@ -14,7 +14,8 @@ class CoeffArray:
         """
         Initialize a 3D numpy array of objects with shape (n, n, n).
 
-        :param n: (int) Dimension size of the 3D array
+        :param n: Dimension size of the 3D array
+        :type n: int
         """
         self.mat = np_zeros((n, n, n), dtype=object)
         self.iter = product(range(n), range(n), range(n))
@@ -44,7 +45,8 @@ class ConstantObject:
         """
         Store numeric matrix form of symbolic matrix if symbolic flag is False.
 
-        :param nmat: (ndarray or array-like) Matrix input
+        :param nmat: Matrix input
+        :type nmat: ndarray or array-like
         """
         super().__init__(nmat, *args, **kwargs)  # forwards all unused arguments
         if "sym" not in kwargs.keys() or kwargs["sym"]:
@@ -67,7 +69,8 @@ class Mat:
         """
         Initialize matrix object from array-like input.
 
-        :param arr: (array-like) Input data for matrix
+        :param arr: Input data for matrix
+        :type arr: array-like
         """
         m = arr_to_mat(arr)  # Convert array-like to sympy.Matrix
         self.mat = m
@@ -173,7 +176,8 @@ class TrMatrix(Mat):
         """
         Initialize transition matrix and validate constraints.
 
-        :param arr: (array-like or int) Input data or dimension
+        :param arr: Input data or dimension
+        :type arr: array-like or int
         """
         if isinstance(arr, int):
             if arr <= 1:
@@ -192,12 +196,18 @@ class TrMatrix(Mat):
         """
         Add a transition i --> j with rate r, and optionally symmetric transition j --> i.
 
-        :param i: (int) Start index
-        :param j: (int) Target index
-        :param r: (float | Expr) Transition rate from i to j
-        :param ri: (float | Expr | None) Optional inverse rate (j to i)
-        :param symm: (bool) If True, adds j --> i with rate 1/r or ri
-        :param simp: (bool) If True, simplifies r and ri
+        :param i: Start index
+        :type i: int
+        :param j: Target index
+        :type j: int
+        :param r: Transition rate from i to j
+        :type r: float | Expr
+        :param ri: Optional inverse rate (j to i)
+        :type ri: float | Expr | None
+        :param symm: If True, adds j --> i with rate 1/r or ri
+        :type symm: bool
+        :param simp: If True, simplifies r and ri
+        :type simp: bool
         """
         if i == j:
             raise ValueError("Start and target state must differ.")
@@ -256,8 +266,10 @@ def arr_to_mat(arr) -> Matrix:
     - Ensures proper shape.
     - Converts row vectors to column vectors.
 
-    :param arr: (array-like) Input data
-    :return: (Matrix) SymPy matrix
+    :param arr: Input data
+    :type arr: array-like
+    :return: SymPy matrix
+    :rtype: Matrix
     """
     m = Matrix(arr)
 
@@ -277,11 +289,15 @@ def check_diag(m: Mat, tol: float = 1e-15, err: bool = False) -> bool:
     """
     Check if each column in matrix m sums to zero.
 
-    :param m: (Mat) Matrix to check
-    :param tol: (float) Allowed numerical tolerance
-    :param err: (bool) Raise exception if check fails
+    :param m: Matrix to check
+    :type m: Mat
+    :param tol: Allowed numerical tolerance
+    :type tol: float
+    :param err: Raise exception if check fails
+    :type err: bool
 
-    :return: (bool) True if all columns sum to zero
+    :return: True if all columns sum to zero
+    :rtype: bool
     """
     for col in range(m.dim):
         s = N(sum(m[:, col]))
@@ -296,11 +312,15 @@ def check_rates(m: Mat, err: bool = False, verbose: bool = False) -> bool:
     """
     Check that all off-diagonal elements are non-negative.
 
-    :param m: (Mat) Matrix to check
-    :param err: (bool) Raise exception on negative element
-    :param verbose: (bool) Log indeterminate cases due to symbolic expressions
+    :param m: Matrix to check
+    :type m: Mat
+    :param err: Raise exception on negative element
+    :type err: bool
+    :param verbose: Log indeterminate cases due to symbolic expressions
+    :type verbose: bool
 
-    :return: (bool) True if all off-diagonal elements are non-negative
+    :return: True if all off-diagonal elements are non-negative
+    :rtype: bool
     """
     for col, row in m.iter:
         if row == col:

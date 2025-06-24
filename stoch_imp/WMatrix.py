@@ -17,8 +17,10 @@ class WMatrix(TrMatrix):
         Initialize a WMatrix instance.
 
         :param args: Additional positional arguments for TrMatrix
-        :param ds: (Optional[Symbol]) Driving symbol for differentiation
-        :param eq: (float) Equilibrium point
+        :param ds: Driving symbol for differentiation
+        :type ds: Optional[Symbol]
+        :param eq: Equilibrium point
+        :type eq: float
         :param kwargs: Additional keyword arguments for TrMatrix
         """
         super().__init__(*args, **kwargs)
@@ -41,11 +43,15 @@ class WMatrix(TrMatrix):
         """
         Calculate the equilibrium matrix.
 
-        :param eq: (float) Equilibrium value
-        :param force: (bool) Force recalculation even if already computed
-        :param verbose: (bool) Print verbose output
+        :param eq: Equilibrium value
+        :type eq: float
+        :param force: Force recalculation even if already computed
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (EqMatrix) the equilibrium matrix.
+        :return: the equilibrium matrix.
+        :rtype: EqMatrix
         """
         if self.weq is not None and not force:
             return self.weq
@@ -60,11 +66,15 @@ class WMatrix(TrMatrix):
         """
         Calculate the first-order driving matrix.
 
-        :param eq: (float) Equilibrium value
-        :param force: (bool) Force recalculation
-        :param verbose: (bool) Print verbose output
+        :param eq: Equilibrium value
+        :type eq: float
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (ConstantMatrix) the first-order driving matrix.
+        :return: the first-order driving matrix.
+        :rtype: ConstantMatrix
         """
         if self.w1 is not None and not force:
             return self.w1
@@ -84,11 +94,14 @@ class WMatrix(TrMatrix):
         """
         Calculate coefficient array.
 
-        :param force: (bool) Force recalculation
-        :param verbose: (bool) Print verbose output
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (CoeffArray) Array containing the coefficients indexed such that the k-th coefficient for transition
+        :return: Array containing the coefficients indexed such that the k-th coefficient for transition
             i --> j is CoeffArray[i, j, k].
+        :rtype: CoeffArray
         """
         return _calc_coeff(self, force, verbose=verbose)
 
@@ -97,13 +110,19 @@ class WMatrix(TrMatrix):
         """
         Return a callable for the frequency-dependent conductivity.
 
-        :param i: (int) Index i
-        :param j: (int) Index j
-        :param normal: (bool) Normalize result
-        :param force: (bool) Force recalculation
-        :param verbose: (bool) Print verbose output
+        :param i: Index i
+        :type i: int
+        :param j: Index j
+        :type j: int
+        :param normal: Normalize result
+        :type normal: bool
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (Callable[[float | ndarray], float])
+        :return: Callable returning conductivity value
+        :rtype: Callable[[float | ndarray], float]
         """
         if self.coeff is None or force:
             self.calc_coeff(force=force, verbose=verbose)
@@ -139,14 +158,17 @@ class WMatrix(TrMatrix):
         """
         Return a list of conductivity callables for specified index pairs.
 
-        :param conds: (Union[tuple[int, int], list[tuple[int, int]], None]) Index pairs (i, j) encoding the transition
-            i --> j.
-        :param normal: (bool) Normalize results
-        :param force: (bool) Force recalculation
-        :param verbose: (bool) Print verbose output
+        :param conds: Index pairs (i, j) encoding the transition i --> j.
+        :type conds: Union[tuple[int, int], list[tuple[int, int]], None]
+        :param normal: Normalize results
+        :type normal: bool
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
 
-        :return: (list[tuple[tuple[int, int], Callable[[float], float]]]) list containing tuples (ind, cond), with cond
-            the conductivity of the transition i --> j.
+        :return: list containing tuples (ind, cond), with cond the conductivity of the transition i --> j.
+        :rtype: list[tuple[tuple[int, int], Callable[[float], float]]]
         """
         if conds is None:
             self.calc_weq()
@@ -188,11 +210,15 @@ def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffA
     """
     Wrapper to calculate coefficients based on symbolic/numeric status.
 
-    :param w: (WMatrix) Matrix instance
-    :param force: (bool) Force recalculation
-    :param verbose: (bool) Print verbose output
+    :param w: Matrix instance
+    :type w: WMatrix
+    :param force: Force recalculation
+    :type force: bool
+    :param verbose: Print verbose output
+    :type verbose: bool
 
-    :return: (CoeffArray) Coefficients
+    :return: Coefficients
+    :rtype: CoeffArray
     """
     w.calc_weq(force=force, verbose=verbose)
     w.weq.calc_eig(force=force, verbose=verbose)
@@ -205,9 +231,11 @@ def _sym_calc_coeff(w: WMatrix) -> CoeffArray:
     """
     Calculate symbolic coefficients for conductivity expansion.
 
-    :param w: (WMatrix) Matrix instance
+    :param w: Matrix instance
+    :type w: WMatrix
 
-    :return: (CoeffArray) Coefficients
+    :return: Coefficients
+    :rtype: CoeffArray
     """
     weq = w.weq
     peq, vals, vecs = weq.peq, weq.vals, weq.vecs
@@ -229,9 +257,11 @@ def _num_calc_coeff(w: WMatrix) -> CoeffArray:
     """
     Calculate numeric coefficients for conductivity expansion.
 
-    :param w: (WMatrix) Matrix instance
+    :param w: Matrix instance
+    :type w: WMatrix
 
-    :return: (CoeffArray)
+    :return: CoeffArray
+    :rtype: CoeffArray
     """
     weq = w.weq
     w1 = w.w1

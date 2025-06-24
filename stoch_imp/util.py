@@ -12,9 +12,12 @@ def calc_curr_like(m: Mat, p: Union[ConstantMatrix, Matrix, ndarray]) -> Constan
     """
     Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.
 
-    :param m: (Mat) The matrix to be used (must be square).
-    :param p: (ConstantMatrix | Matrix | ndarray) The vector to be used (length must match m).
-    :return: (ConstantMatrix) Matrix of current-like values.
+    :param m: The matrix to be used (must be square).
+    :type m: Mat
+    :param p: The vector to be used (length must match m).
+    :type p: ConstantMatrix | Matrix | ndarray
+    :return: Matrix of current-like values.
+    :rtype: ConstantMatrix
     """
     return _sym_curr(m, p) if m.is_symbolic else _num_curr(m, p)
 
@@ -34,9 +37,12 @@ def gram_schmidt(
     """
     Orthogonalize a set of vectors using Gram-Schmidt procedure.
 
-    :param v_arr: (list[Matrix] | ndarray | list[ConstantMatrix]) List of symbolic vectors or NumPy array (columns = vectors).
-    :param Peq: (ConstantMatrix | Matrix | ndarray | None) Equilibrium distribution for weighted inner product.
-    :return: (list[Matrix] | ndarray) Orthogonalized vectors.
+    :param v_arr: List of symbolic vectors or NumPy array (columns = vectors).
+    :type v_arr: list[Matrix] | ndarray | list[ConstantMatrix]
+    :param Peq: Equilibrium distribution for weighted inner product.
+    :type Peq: ConstantMatrix | Matrix | ndarray | None
+    :return: Orthogonalized vectors.
+    :rtype: list[Matrix] | ndarray
     """
     return _sym_gs(v_arr, Peq) if isinstance(v_arr, list) else _num_gs(v_arr, Peq)
 
@@ -49,10 +55,14 @@ def inner(
     """
     Compute inner product between two vectors, optionally weighted by Peq.
 
-    :param v1: (Matrix | ndarray | ConstantMatrix) First vector.
-    :param v2: (Matrix | ndarray | ConstantMatrix) Second vector.
-    :param Peq: (ConstantMatrix | Matrix | ndarray | None) Optional equilibrium vector.
-    :return: (float | Expr) Scalar inner product.
+    :param v1: First vector.
+    :type v1: Matrix | ndarray | ConstantMatrix
+    :param v2: Second vector.
+    :type v2: Matrix | ndarray | ConstantMatrix
+    :param Peq: Optional equilibrium vector.
+    :type Peq: ConstantMatrix | Matrix | ndarray | None
+    :return: Scalar inner product.
+    :rtype: float | Expr
     """
     if len(v1) != len(v2):
         raise ShapeError(f"Vectors are of different shapes: v1 ({len(v1)}), v2 ({len(v2)})")
@@ -69,10 +79,14 @@ def _sym_inner(v1: Matrix, v2: Matrix, Peq: Union[Matrix, None]) -> Expr:
     """
     Symbolic inner product of two vectors, weighted by Peq.
 
-    :param v1: (Matrix) First vector.
-    :param v2: (Matrix) Second vector.
-    :param Peq: (Matrix | None) Optional weighting vector.
-    :return: (Expr) Symbolic inner product.
+    :param v1: First vector.
+    :type v1: Matrix
+    :param v2: Second vector.
+    :type v2: Matrix
+    :param Peq: Optional weighting vector.
+    :type Peq: Matrix | None
+    :return: Symbolic inner product.
+    :rtype: Expr
     """
     if Peq is None:
         Peq = Matrix.ones(len(v1), 1)
@@ -86,10 +100,14 @@ def _num_inner(v1: Union[Mat, ndarray], v2: Union[Mat, ndarray], Peq: Union[Mat,
     """
     Numerical inner product of two vectors, weighted by Peq.
 
-    :param v1: (Mat | ndarray) First vector.
-    :param v2: (Mat | ndarray) Second vector.
-    :param Peq: (Mat | ndarray | None) Optional weighting vector.
-    :return: (float) Numerical inner product.
+    :param v1: First vector.
+    :type v1: Mat | ndarray
+    :param v2: Second vector.
+    :type v2: Mat | ndarray
+    :param Peq: Optional weighting vector.
+    :type Peq: Mat | ndarray | None
+    :return: Numerical inner product.
+    :rtype: float
     """
     if Peq is None:
         Peq = ones_like(v1)
@@ -110,9 +128,12 @@ def _sym_gs(v_arr: list[Matrix], Peq: Union[Matrix, None]) -> list[Matrix]:
     """
     Perform symbolic Gram-Schmidt orthogonalization.
 
-    :param v_arr: (list[Matrix]) List of symbolic vectors.
-    :param Peq: (Matrix | None) Optional weighting vector.
-    :return: (list[Matrix]) List of orthogonalized vectors.
+    :param v_arr: List of symbolic vectors.
+    :type v_arr: list[Matrix]
+    :param Peq: Optional weighting vector.
+    :type Peq: Matrix | None
+    :return: List of orthogonalized vectors.
+    :rtype: list[Matrix]
     """
     orthogonal: list[Matrix] = []
 
@@ -129,9 +150,12 @@ def _num_gs(v_arr: ndarray, Peq: Union[ndarray, None]) -> ndarray:
     """
     Perform numerical Gram-Schmidt orthogonalization.
 
-    :param v_arr: (ndarray) Array with column vectors.
-    :param Peq: (ndarray | None) Optional weighting vector.
-    :return: (ndarray) Array of orthogonalized vectors.
+    :param v_arr: Array with column vectors.
+    :type v_arr: ndarray
+    :param Peq: Optional weighting vector.
+    :type Peq: ndarray | None
+    :return: Array of orthogonalized vectors.
+    :rtype: ndarray
     """
     n = v_arr.shape[1]
     orthogonal = zeros_like(v_arr)
@@ -153,9 +177,12 @@ def _sym_curr(m: Mat, p: Union[ConstantMatrix, Matrix]) -> ConstantMatrix:
     """
     Compute symbolic current-like matrix from m and p.
 
-    :param m: (Mat) Symbolic square matrix.
-    :param p: (ConstantMatrix | Matrix) Vector for weighting.
-    :return: (ConstantMatrix) Resulting current matrix.
+    :param m: Symbolic square matrix.
+    :type m: Mat
+    :param p: Vector for weighting.
+    :type p: ConstantMatrix | Matrix
+    :return: Resulting current matrix.
+    :rtype: ConstantMatrix
     """
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
@@ -169,9 +196,12 @@ def _num_curr(m: Mat, p: Union[ndarray, ConstantMatrix]) -> ConstantMatrix:
     """
     Compute numerical current-like matrix from m and p.
 
-    :param m: (Mat) Numeric matrix.
-    :param p: (ndarray | ConstantMatrix) Vector for weighting.
-    :return: (ConstantMatrix) Resulting current matrix.
+    :param m: Numeric matrix.
+    :type m: Mat
+    :param p: Vector for weighting.
+    :type p: ndarray | ConstantMatrix
+    :return: Resulting current matrix.
+    :rtype: ConstantMatrix
     """
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
