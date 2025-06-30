@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>stoch_imp.pyplot_funcs &#8212; Stochastic Impedance  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stoch_imp.pyplot_funcs</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for stoch_imp.pyplot_funcs</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.lines</span><span class="w"> </span><span class="kn">import</span> <span class="n">Line2D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">Axes</span><span class="p">,</span> <span class="n">rcParams</span><span class="p">,</span> <span class="n">subplots</span><span class="p">,</span> <span class="n">tight_layout</span><span class="p">,</span> <span class="n">savefig</span><span class="p">,</span> <span class="n">show</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">absolute</span><span class="p">,</span> <span class="n">argmin</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+
+
+<div class="viewcode-block" id="create_fig">
+<a class="viewcode-back" href="../../ref/Pyplot.html#stoch_imp.pyplot_funcs.create_fig">[docs]</a>
+<span class="nd">@contextmanager</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_fig</span><span class="p">(</span><span class="n">subplt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
+               <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="n">dpi</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+               <span class="n">tight</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+               <span class="n">tick_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+               <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Context manager to create and configure a matplotlib figure with subplot(s).</span>
+
+<span class="sd">    This function initializes a matplotlib figure and subplots according to the</span>
+<span class="sd">    given layout, applies custom tick parameters, and manages figure display and</span>
+<span class="sd">    optional saving upon exit. It also configures LaTeX rendering and font settings</span>
+<span class="sd">    for consistent styling.</span>
+
+<span class="sd">    :param subplt: Number of subplots (if int) or subplot grid shape as (rows, cols)</span>
+<span class="sd">    :type subplt: int or tuple[int, int]</span>
+<span class="sd">    :param save_path: If specified, the figure is saved to this file path on exit</span>
+<span class="sd">    :type save_path: str or None</span>
+<span class="sd">    :param dpi: Resolution in dots per inch for saved figure (default: 600)</span>
+<span class="sd">    :type dpi: int or None</span>
+<span class="sd">    :param tight: Whether to apply `tight_layout()` to minimize padding (default: True)</span>
+<span class="sd">    :type tight: bool or None</span>
+<span class="sd">    :param tick_dict: Dictionary of parameters passed to `tick_params()` (default sets serif font)</span>
+<span class="sd">    :type tick_dict: dict or None</span>
+<span class="sd">    :param kwargs: Additional keyword arguments passed to `matplotlib.pyplot.subplots()`</span>
+
+<span class="sd">    :yield: Tuple containing the figure and axes objects</span>
+<span class="sd">    :rtype: tuple[matplotlib.figure.Figure, matplotlib.axes.Axes]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">tick_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tick_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;labelfontfamily&#39;</span><span class="p">:</span><span class="s1">&#39;serif&#39;</span><span class="p">}</span>
+
+    <span class="n">rcParams</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+        <span class="s2">&quot;text.usetex&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;font.family&quot;</span><span class="p">:</span> <span class="s2">&quot;mathpazo&quot;</span>
+    <span class="p">})</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subplt</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">subplt</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subplt</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subplt</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">subplots</span><span class="p">(</span><span class="n">subplt</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">subplt</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;subplt argument must be int or [int, int], is </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">subplt</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="n">ax</span><span class="p">:</span>
+            <span class="n">axis</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="o">**</span><span class="n">tick_dict</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="o">**</span><span class="n">tick_dict</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span>
+
+    <span class="k">if</span> <span class="n">tight</span><span class="p">:</span>
+        <span class="n">tight_layout</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">save_path</span><span class="p">:</span>
+        <span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+    <span class="n">show</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="add_arrow">
+<a class="viewcode-back" href="../../ref/Pyplot.html#stoch_imp.pyplot_funcs.add_arrow">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_arrow</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="n">Line2D</span><span class="p">,</span>
+              <span class="n">position</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+              <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span>
+              <span class="n">size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+              <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    add an arrow to a line.</span>
+
+<span class="sd">    :param line: The Line object to which the arrow is added</span>
+<span class="sd">    :type line: Line2D</span>
+<span class="sd">    :param position: x-position of the arrow. If None, mean of xdata is taken</span>
+<span class="sd">    :type position: float</span>
+<span class="sd">    :param direction: &#39;left&#39; or &#39;right&#39;</span>
+<span class="sd">    :type direction: str</span>
+<span class="sd">    :param size: size of the arrow in fontsize points</span>
+<span class="sd">    :type size: int</span>
+<span class="sd">    :param color: if None, line color is taken.</span>
+<span class="sd">    :type color: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">get_color</span><span class="p">()</span>
+
+    <span class="n">xdata</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">get_xdata</span><span class="p">())</span>
+    <span class="n">ydata</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">get_ydata</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xdata</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">position</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="n">xdata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">xdata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>  <span class="c1"># find approximate middle of data</span>
+    <span class="c1"># find the closest index</span>
+    <span class="n">start_ind</span> <span class="o">=</span> <span class="n">argmin</span><span class="p">(</span><span class="n">absolute</span><span class="p">(</span><span class="n">xdata</span> <span class="o">-</span> <span class="n">position</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">direction</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">):</span>
+        <span class="n">end_ind</span> <span class="o">=</span> <span class="n">start_ind</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">end_ind</span> <span class="o">=</span> <span class="n">start_ind</span> <span class="o">-</span> <span class="mi">1</span>
+
+    <span class="c1"># Add arrow note with empty string</span>
+    <span class="n">line</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+                       <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">xdata</span><span class="p">[</span><span class="n">start_ind</span><span class="p">],</span> <span class="n">ydata</span><span class="p">[</span><span class="n">start_ind</span><span class="p">]),</span>
+                       <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">xdata</span><span class="p">[</span><span class="n">end_ind</span><span class="p">],</span> <span class="n">ydata</span><span class="p">[</span><span class="n">end_ind</span><span class="p">]),</span>
+                       <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-|&gt;&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">),</span>
+                       <span class="n">size</span><span class="o">=</span><span class="n">size</span>
+                       <span class="p">)</span>
+    <span class="k">return</span></div>
+
+
+
+
+<div class="viewcode-block" id="complex_axes">
+<a class="viewcode-back" href="../../ref/Pyplot.html#stoch_imp.pyplot_funcs.complex_axes">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">complex_axes</span><span class="p">(</span><span class="n">ax</span><span class="p">:</span> <span class="n">Axes</span><span class="p">,</span>
+                 <span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">r_off</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                 <span class="n">i_off</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                 <span class="n">sz</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+                 <span class="n">grid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">color</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;k&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add complex axes to a figure, with labels of imaginary and real parts. These labels are heuristically placed and can</span>
+<span class="sd">    be offset if necessary.</span>
+
+<span class="sd">    The offset uses axis units. For example: if the label appears at (0.2, 5.4) on the axis</span>
+<span class="sd">    but should be placed at (0.3, 5.1), the offset should be given as (0.1, -0.3)</span>
+
+<span class="sd">    :param ax: An axes object</span>
+<span class="sd">    :type ax: Axes</span>
+<span class="sd">    :param q: The quantity plotted. This can be a string containing latex syntax.</span>
+<span class="sd">    :type q: str</span>
+<span class="sd">    :param r_off: Offset of the real axis label, given in axis units.</span>
+<span class="sd">    :type r_off: (float, float)</span>
+<span class="sd">    :param i_off: Offset of the imaginary axis label, given in axis units.</span>
+<span class="sd">    :type i_off: (float, float)</span>
+<span class="sd">    :param sz: Font size of the labels</span>
+<span class="sd">    :type sz: int</span>
+<span class="sd">    :param grid: If True, adds a grid to the axes object.</span>
+<span class="sd">    :type grid: bool</span>
+<span class="sd">    :param color: If None, black is used.</span>
+<span class="sd">    :type color: str</span>
+<span class="sd">    :return: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>  <span class="c1"># Force x and y to have ratio 1:1</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span>  <span class="c1"># Enable grid</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>  <span class="c1"># Plot y-axis</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>  <span class="c1"># Plot x-xis</span>
+
+    <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>  <span class="c1"># Get ranges for heuristic placement of text</span>
+    <span class="n">x_range</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
+    <span class="k">if</span> <span class="n">x_min</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">x_max</span><span class="p">:</span>
+        <span class="n">x_min</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+    <span class="n">y_range</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span>
+    <span class="k">if</span> <span class="n">y_min</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="n">y_max</span><span class="p">:</span>
+        <span class="n">y_min</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Make y-label</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x_min</span> <span class="o">+</span> <span class="n">x_range</span> <span class="o">/</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">i_off</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_range</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">+</span> <span class="n">i_off</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{Im}</span><span class="s2">\, &quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span>
+            <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
+
+    <span class="c1"># Make x-label</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x_max</span> <span class="o">-</span> <span class="n">x_range</span> <span class="o">/</span> <span class="mi">10</span> <span class="o">+</span> <span class="n">r_off</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_min</span> <span class="o">+</span> <span class="n">y_range</span> <span class="o">/</span> <span class="mi">50</span> <span class="o">+</span> <span class="n">r_off</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="sa">r</span><span class="s2">&quot;$\mathrm</span><span class="si">{Re}</span><span class="s2">\, &quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">$&quot;</span><span class="p">,</span>
+            <span class="n">wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">sz</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stoch_imp.pyplot_funcs</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Branko Meeus.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
+    </div>
+  </body>
+</html>

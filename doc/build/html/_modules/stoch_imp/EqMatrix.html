@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>stoch_imp.EqMatrix &#8212; Stochastic Impedance  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stoch_imp.EqMatrix</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for stoch_imp.EqMatrix</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">argsort</span><span class="p">,</span> <span class="n">flip</span><span class="p">,</span> <span class="n">float64</span><span class="p">,</span> <span class="n">hstack</span><span class="p">,</span> <span class="n">matmul</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">real</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">eig</span><span class="p">,</span> <span class="n">norm</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">re</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.core_classes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">ConstantMatrix</span><span class="p">,</span> <span class="n">TrMatrix</span><span class="p">,</span> <span class="n">ConstantObject</span><span class="p">,</span> <span class="n">arr_to_mat</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">calc_curr_like</span><span class="p">,</span> <span class="n">deep_simp</span><span class="p">,</span> <span class="n">gram_schmidt</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EqMatrix">
+<a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EqMatrix</span><span class="p">(</span><span class="n">ConstantObject</span><span class="p">,</span> <span class="n">TrMatrix</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class handling all Equilibrium Transfer Matrices.</span>
+
+<span class="sd">    This class extends ConstantObject and TrMatrix to provide functionality for equilibrium systems,</span>
+<span class="sd">    including eigenvalue/eigenvector computation and equilibrium distribution (peq) calculation.</span>
+
+<span class="sd">    :ivar mat: Internal sympy.Matrix representation of the transition matrix.</span>
+<span class="sd">    :ivar dim: Number of rows in the matrix.</span>
+<span class="sd">    :ivar iter: Iterator over matrix indices.</span>
+<span class="sd">    :ivar zero_index: Boolean indicating whether 0-based indexing is used.</span>
+<span class="sd">    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.</span>
+<span class="sd">    :ivar tol: Numerical tolerance used for validations.</span>
+<span class="sd">    :ivar nmat: Numeric matrix representation if symbolic flag is False; otherwise None.</span>
+<span class="sd">    :ivar peq: Equilibrium distribution as a ConstantMatrix, or None if not yet calculated.</span>
+<span class="sd">    :ivar vals: List of symbolic eigenvalues, or None if not yet calculated.</span>
+<span class="sd">    :ivar nvals: Numpy array of numeric eigenvalues, or None if not yet calculated.</span>
+<span class="sd">    :ivar vecs: List of symbolic eigenvectors, or None if not yet calculated.</span>
+<span class="sd">    :ivar nvecs: Numpy array of numeric eigenvectors, or None if not yet calculated.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the EqMatrix object.</span>
+
+<span class="sd">        :param args: Positional arguments for parent constructors</span>
+<span class="sd">        :type args: tuple</span>
+<span class="sd">        :param kwargs: Keyword arguments for parent constructors</span>
+<span class="sd">        :type kwargs: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstantMatrix</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nvals</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">vecs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nvecs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="EqMatrix.calc_peq">
+<a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.calc_peq">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_peq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the Equilibrium distribution.</span>
+
+<span class="sd">        :param force: Force recalculation</span>
+<span class="sd">        :type force: bool</span>
+<span class="sd">        :param verbose: Print verbose output</span>
+<span class="sd">        :type verbose: bool</span>
+
+<span class="sd">        :return: Equilibrium distribution matrix</span>
+<span class="sd">        :rtype: ConstantMatrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calc_eig</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span></div>
+
+
+<div class="viewcode-block" id="EqMatrix.calc_eig">
+<a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.calc_eig">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>\
+            <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]],</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate eigenvalues and eigenvectors.</span>
+
+<span class="sd">        :param force: Force recalculation</span>
+<span class="sd">        :type force: bool</span>
+<span class="sd">        :param verbose: Print verbose output</span>
+<span class="sd">        :type verbose: bool</span>
+
+<span class="sd">        :return: Eigenvalues and eigenvectors</span>
+<span class="sd">        :rtype: Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_sym_calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">_num_calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EqMatrix.check_db">
+<a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.check_db">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_db</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check detailed balance condition.</span>
+
+<span class="sd">        :return: True if detailed balance is fulfilled</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calc_peq</span><span class="p">()</span>
+        <span class="n">db_mat</span> <span class="o">=</span> <span class="n">calc_curr_like</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">db_mat</span><span class="p">[</span><span class="o">*</span><span class="n">el</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EqMatrix.to_num">
+<a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.to_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_num</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert symbolic matrices to numeric format.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can not convert expression containing symbols to numeric&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float64</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">peq</span><span class="o">.</span><span class="n">to_num</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nvals</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="n">N</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vals</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nvecs</span> <span class="o">=</span> <span class="n">hstack</span><span class="p">([</span><span class="n">N</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span> <span class="k">for</span> <span class="n">vec</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">vecs</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="EqMatrix.to_sym">
+<a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.to_sym">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_sym</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert numeric matrices back to symbolic format.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">arr_to_mat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmat</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">peq</span><span class="o">.</span><span class="n">to_sym</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvals</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nvecs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_sym_calc_eig</span><span class="p">(</span><span class="n">weq</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute symbolic eigenvalues and eigenvectors.</span>
+
+<span class="sd">    :param weq: Equilibrium matrix object</span>
+<span class="sd">    :type weq: EqMatrix</span>
+<span class="sd">    :param tol: Tolerance for validation</span>
+<span class="sd">    :type tol: float</span>
+<span class="sd">    :param force: Force recalculation</span>
+<span class="sd">    :type force: bool</span>
+<span class="sd">    :param verbose: Print verbose output</span>
+<span class="sd">    :type verbose: bool</span>
+
+<span class="sd">    :return: Eigenvalues and eigenvectors</span>
+<span class="sd">    :rtype: tuple[list, list[Matrix]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span>
+
+    <span class="n">eig_syst</span> <span class="o">=</span> <span class="n">weq</span><span class="o">.</span><span class="n">eigenvects</span><span class="p">(</span><span class="n">error_when_incomplete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">eig_syst</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">re</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">lead_val</span> <span class="o">=</span> <span class="n">eig_syst</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">re</span><span class="p">(</span><span class="n">lead_val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no eigenvalue 0 was found&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">eig_syst</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;multiple steady states found&quot;</span><span class="p">)</span>
+
+    <span class="n">eigvec_0</span> <span class="o">=</span> <span class="n">eig_syst</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">peq_vec</span> <span class="o">=</span> <span class="n">eigvec_0</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">eigvec_0</span><span class="p">)</span>
+    <span class="n">weq</span><span class="o">.</span><span class="n">peq</span> <span class="o">=</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="n">peq_vec</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zi</span><span class="o">=</span><span class="n">weq</span><span class="o">.</span><span class="n">zero_index</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">weq</span><span class="o">.</span><span class="n">check_db</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;detailed balance not fulfilled&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Equilibrium distribution calculated&quot;</span><span class="p">)</span>
+
+    <span class="n">vals</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">vecs</span> <span class="o">=</span> <span class="p">[</span><span class="n">weq</span><span class="o">.</span><span class="n">peq</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">val</span><span class="p">,</span> <span class="n">mult</span><span class="p">,</span> <span class="n">basis</span> <span class="ow">in</span> <span class="n">eig_syst</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">val_re</span><span class="p">,</span> <span class="n">val_im</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">val_im</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Complex eigenvalue found: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">vec</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">[:</span><span class="n">mult</span><span class="p">]:</span>
+            <span class="n">vec_re</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">deep_simp</span><span class="p">(</span><span class="n">weq</span><span class="o">.</span><span class="n">mat</span> <span class="o">*</span> <span class="n">vec_re</span><span class="p">)</span> <span class="o">-</span> <span class="n">deep_simp</span><span class="p">(</span><span class="n">val_re</span> <span class="o">*</span> <span class="n">vec_re</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">N</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect computation of eigenvectors&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">.</span><span class="n">is_zero</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect computation of eigenvectors&quot;</span><span class="p">)</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_re</span><span class="p">)</span>
+            <span class="n">vecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vec_re</span><span class="p">)</span>
+
+    <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span> <span class="o">=</span> <span class="n">gram_schmidt</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">peq</span><span class="p">)</span>
+    <span class="n">weq</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Eigensystem calculated&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_num_calc_eig</span><span class="p">(</span><span class="n">weq</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute numeric eigenvalues and eigenvectors.</span>
+
+<span class="sd">    :param weq: Equilibrium matrix object</span>
+<span class="sd">    :type weq: EqMatrix</span>
+<span class="sd">    :param tol: Tolerance for validation</span>
+<span class="sd">    :type tol: float</span>
+<span class="sd">    :param force: Force recalculation</span>
+<span class="sd">    :type force: bool</span>
+<span class="sd">    :param verbose: Print verbose output</span>
+<span class="sd">    :type verbose: bool</span>
+
+<span class="sd">    :return: Eigenvalues and eigenvectors</span>
+<span class="sd">    :rtype: tuple[ndarray, ndarray]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvecs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvecs</span>
+
+    <span class="c1"># noinspection PyTupleAssignmentBalance</span>
+    <span class="n">vals</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">eig</span><span class="p">(</span><span class="n">weq</span><span class="o">.</span><span class="n">nmat</span><span class="p">)</span>
+    <span class="n">nvals</span> <span class="o">=</span> <span class="n">real</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+    <span class="n">nvecs</span> <span class="o">=</span> <span class="n">real</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">im</span> <span class="o">&gt;</span> <span class="n">tol</span> <span class="k">for</span> <span class="n">im</span> <span class="ow">in</span> <span class="n">vals</span> <span class="o">-</span> <span class="n">nvals</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Complex eigenvalue found: </span><span class="si">{</span><span class="n">vals</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">ind_arr</span> <span class="o">=</span> <span class="n">flip</span><span class="p">(</span><span class="n">argsort</span><span class="p">(</span><span class="n">nvals</span><span class="p">))</span>  <span class="c1"># Sort eigenvalues in descending order and rearrange eigenvecs accordingly</span>
+
+    <span class="n">nvals</span> <span class="o">=</span> <span class="n">nvals</span><span class="p">[</span><span class="n">ind_arr</span><span class="p">]</span>
+    <span class="n">nvecs</span> <span class="o">=</span> <span class="n">nvecs</span><span class="p">[:,</span> <span class="n">ind_arr</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">nvals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no eigenvalue 0 was found&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">nvals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">nvals</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;multiple steady states found&quot;</span><span class="p">)</span>
+
+    <span class="n">nvals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">nvecs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">nvecs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>  <span class="c1"># First eigenvector is Peq, normalize and rename</span>
+    <span class="n">weq</span><span class="o">.</span><span class="n">peq</span> <span class="o">=</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="n">nvecs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">zi</span><span class="o">=</span><span class="n">weq</span><span class="o">.</span><span class="n">zero_index</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">weq</span><span class="o">.</span><span class="n">check_db</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;detailed balance not fulfilled&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Equilibrium distribution calculated&quot;</span><span class="p">)</span>
+
+    <span class="n">nvecs</span> <span class="o">=</span> <span class="n">gram_schmidt</span><span class="p">(</span><span class="n">nvecs</span><span class="p">,</span> <span class="n">nvecs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vecs</span><span class="p">)):</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">matmul</span><span class="p">(</span><span class="n">weq</span><span class="o">.</span><span class="n">nmat</span><span class="p">,</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="n">vals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">vecs</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">res</span> <span class="o">&gt;=</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Incorrect computation of eigenvectors (residue </span><span class="si">{</span><span class="n">res</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="n">weq</span><span class="o">.</span><span class="n">nvals</span> <span class="o">=</span> <span class="n">nvals</span>
+    <span class="n">weq</span><span class="o">.</span><span class="n">nvecs</span> <span class="o">=</span> <span class="n">nvecs</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Eigensystem calculated&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nvals</span><span class="p">,</span> <span class="n">nvecs</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stoch_imp.EqMatrix</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Branko Meeus.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
+    </div>
+  </body>
+</html>

@@ -10,7 +10,19 @@ from .util import calc_curr_like, deep_simp, inner
 
 
 class WMatrix(TrMatrix):
-    """Class handling driven transition matrices."""
+    """
+    Class handling driven transition matrices.
+
+    This class extends TrMatrix to support driven systems where a symbolic parameter (driving symbol)
+    modifies transition rates. It provides methods for calculating equilibrium matrices under driving,
+    extracting first-order derivatives, computing conductivity coefficients, and evaluating frequency-dependent conductivities.
+
+    :ivar ds: Symbol representing the driving parameter.
+    :ivar eq: Value at which to evaluate equilibrium (default is 0).
+    :ivar weq: Cached equilibrium matrix (EqMatrix), or None if not yet computed.
+    :ivar w1: First-order derivative matrix (ConstantMatrix), or None if not yet computed.
+    :ivar coeff: Coefficient array for conductivity calculations, or None if not yet computed.
+    """
 
     def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, **kwargs):
         """

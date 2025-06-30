@@ -8,14 +8,19 @@ from sympy import (Expr, Matrix, N, NonSquareMatrixError, nsimplify, pretty, Sha
 
 
 class CoeffArray:
-    """3D coefficient array class for storing interaction or rate data."""
+    """
+    (n, n, n) dim coefficient array class for storing transition coefficients. Prints pretty.
 
+    :ivar mat: The array of coefficients
+    :ivar iter: A simple iterator to iterate over the whole array. Use as `(elem in self.iter)` or `(i, j, k in self.iter)`
+    """
     def __init__(self, n: int):
         """
         Initialize a 3D numpy array of objects with shape (n, n, n).
 
         :param n: Dimension size of the 3D array
         :type n: int
+
         """
         self.mat = np_zeros((n, n, n), dtype=object)
         self.iter = product(range(n), range(n), range(n))
@@ -41,6 +46,12 @@ class CoeffArray:
 
 
 class ConstantObject:
+    """
+    Stores the numeric matrix form of a symbolic matrix when symbolic evaluation is disabled.
+
+    :ivar nmat: Numeric matrix representation if symbolic flag is False; otherwise None.
+    """
+
     def __init__(self, nmat, *args, **kwargs):
         """
         Store numeric matrix form of symbolic matrix if symbolic flag is False.
@@ -59,10 +70,18 @@ class ConstantObject:
             self.nmat = array(N(nmat)).astype(float64)
 
 
+
 # noinspection PyTypeChecker
 class Mat:
     """
-    Top level class for all matrix like objects (Vectors, WMatrix, EqMatrix, ...)
+    Top level class for all matrix-like objects such as Vectors, WMatrix, EqMatrix, etc.
+
+    :ivar mat: The internal sympy.Matrix representation of the object.
+    :ivar dim: Number of rows in the matrix (system size).
+    :ivar iter: Iterator over all (row, column) index pairs in the matrix.
+    :ivar zero_index: Boolean indicating whether 0-based indexing is used.
+    :ivar is_symbolic: Boolean indicating whether the matrix is treated as symbolic.
+    :ivar tol: Numerical tolerance used for approximate comparisons.
     """
 
     def __init__(self, arr, *args, **kwargs) -> None:
@@ -126,6 +145,20 @@ class Mat:
 
 
 class ConstantMatrix(ConstantObject, Mat):
+    """
+    Matrix class that supports both symbolic and numeric representations, with conversion between the two.
+
+    Inherits from ConstantObject and Mat to combine symbolic matrix functionality with numeric handling.
+
+    :ivar mat: Internal sympy.Matrix representation.
+    :ivar nmat: Numeric matrix representation (if symbolic mode is off).
+    :ivar dim: Number of rows in the matrix.
+    :ivar iter: Iterator over matrix indices.
+    :ivar zero_index: Boolean indicating whether 0-based indexing is used.
+    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.
+    :ivar tol: Numerical tolerance used for operations.
+    """
+
     def __init__(self, *args, **kwargs):
         """Initialize ConstantMatrix object."""
         super().__init__(*args, **kwargs)
@@ -170,6 +203,13 @@ class TrMatrix(Mat):
     """
     Class handling all transition matrices. These matrices should sum to zero along columns and have positive
     off-diagonal elements.
+
+    :ivar mat: Internal sympy.Matrix representation.
+    :ivar dim: Number of rows in the matrix.
+    :ivar iter: Iterator over matrix indices.
+    :ivar zero_index: Boolean indicating whether 0-based indexing is used.
+    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.
+    :ivar tol: Numerical tolerance used for validations.
     """
 
     def __init__(self, arr, *args, **kwargs) -> None:
@@ -194,7 +234,7 @@ class TrMatrix(Mat):
                   symm: bool = True,
                   simp: bool = True) -> None:
         """
-        Add a transition i --> j with rate r, and optionally symmetric transition j --> i.
+        Add a transition `i --> j` with rate `r`, and optionally symmetric transition `j --> i` with rate `ri`.
 
         :param i: Start index
         :type i: int
@@ -263,8 +303,8 @@ class TrMatrix(Mat):
 def arr_to_mat(arr) -> Matrix:
     """
     Convert input array-like to sympy.Matrix.
-    - Ensures proper shape.
-    - Converts row vectors to column vectors.
+      - Ensures proper shape.
+      - Converts row vectors to column vectors.
 
     :param arr: Input data
     :type arr: array-like
