@@ -9,7 +9,25 @@ from .util import (calc_curr_like, deep_simp, gram_schmidt)
 
 
 class EqMatrix(ConstantObject, TrMatrix):
-    """Class handling all Equilibrium Transfer Matrices."""
+    """
+    Class handling all Equilibrium Transfer Matrices.
+
+    This class extends ConstantObject and TrMatrix to provide functionality for equilibrium systems,
+    including eigenvalue/eigenvector computation and equilibrium distribution (peq) calculation.
+
+    :ivar mat: Internal sympy.Matrix representation of the transition matrix.
+    :ivar dim: Number of rows in the matrix.
+    :ivar iter: Iterator over matrix indices.
+    :ivar zero_index: Boolean indicating whether 0-based indexing is used.
+    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.
+    :ivar tol: Numerical tolerance used for validations.
+    :ivar nmat: Numeric matrix representation if symbolic flag is False; otherwise None.
+    :ivar peq: Equilibrium distribution as a ConstantMatrix, or None if not yet calculated.
+    :ivar vals: List of symbolic eigenvalues, or None if not yet calculated.
+    :ivar nvals: Numpy array of numeric eigenvalues, or None if not yet calculated.
+    :ivar vecs: List of symbolic eigenvectors, or None if not yet calculated.
+    :ivar nvecs: Numpy array of numeric eigenvectors, or None if not yet calculated.
+    """
 
     def __init__(self, *args, **kwargs) -> None:
         """

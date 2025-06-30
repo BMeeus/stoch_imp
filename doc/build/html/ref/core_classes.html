@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Core Classes &#8212; Stochastic Impedance  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="EqMatrix" href="EqMatrix.html" />
+    <link rel="prev" title="Reference Guides" href="reference.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="EqMatrix.html" title="EqMatrix"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Reference Guides"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference Guides</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Core Classes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-stoch_imp.core_classes">
+<span id="core-classes"></span><h1>Core Classes<a class="headerlink" href="#module-stoch_imp.core_classes" title="Link to this heading">¶</a></h1>
+<p>This module defines the core classes behind the algorithms. These will often not be used directly,
+but are used under the hood.</p>
+<section id="mat">
+<h2>Mat<a class="headerlink" href="#mat" title="Link to this heading">¶</a></h2>
+<p>This class handles all matrix like objects at the top level. It defines the basic properties and is used as the
+foundation of all lower matrix classes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.Mat">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">Mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#Mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.Mat" title="Link to this definition">¶</a></dt>
+<dd><p>Top level class for all matrix-like objects such as Vectors, WMatrix, EqMatrix, etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – The internal sympy.Matrix representation of the object.</p></li>
+<li><p><strong>dim</strong> – Number of rows in the matrix (system size).</p></li>
+<li><p><strong>iter</strong> – Iterator over all (row, column) index pairs in the matrix.</p></li>
+<li><p><strong>zero_index</strong> – Boolean indicating whether 0-based indexing is used.</p></li>
+<li><p><strong>is_symbolic</strong> – Boolean indicating whether the matrix is treated as symbolic.</p></li>
+<li><p><strong>tol</strong> – Numerical tolerance used for approximate comparisons.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.Mat.simp">
+<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#Mat.simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.Mat.simp" title="Link to this definition">¶</a></dt>
+<dd><p>In-place symbolic simplification of the matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="trmatrix">
+<h2>TrMatrix<a class="headerlink" href="#trmatrix" title="Link to this heading">¶</a></h2>
+<p>This class handles all transition matrices, and safeguards the mathematical properties.
+A transition matrix is a matrix <span class="math notranslate nohighlight">\(W\)</span> whose off diagonal elements are non-negative, and whose diagonal elements are given by
+<span class="math notranslate nohighlight">\(- \sum_{i: i \neq j} W_{ij}\)</span>, such that the columns sum to zero.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">TrMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix" title="Link to this definition">¶</a></dt>
+<dd><p>Class handling all transition matrices. These matrices should sum to zero along columns and have positive
+off-diagonal elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – Internal sympy.Matrix representation.</p></li>
+<li><p><strong>dim</strong> – Number of rows in the matrix.</p></li>
+<li><p><strong>iter</strong> – Iterator over matrix indices.</p></li>
+<li><p><strong>zero_index</strong> – Boolean indicating whether 0-based indexing is used.</p></li>
+<li><p><strong>is_symbolic</strong> – Boolean indicating whether the matrix is in symbolic form.</p></li>
+<li><p><strong>tol</strong> – Numerical tolerance used for validations.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.add_trans">
+<span class="sig-name descname"><span class="pre">add_trans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Expr</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Expr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.add_trans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.add_trans" title="Link to this definition">¶</a></dt>
+<dd><p>Add a transition <cite>i –&gt; j</cite> with rate <cite>r</cite>, and optionally symmetric transition <cite>j –&gt; i</cite> with rate <cite>ri</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – Start index</p></li>
+<li><p><strong>j</strong> (<em>int</em>) – Target index</p></li>
+<li><p><strong>r</strong> (<em>float</em><em> | </em><em>Expr</em>) – Transition rate from i to j</p></li>
+<li><p><strong>ri</strong> (<em>float</em><em> | </em><em>Expr</em><em> | </em><em>None</em>) – Optional inverse rate (j to i)</p></li>
+<li><p><strong>symm</strong> (<em>bool</em>) – If True, adds j –&gt; i with rate 1/r or ri</p></li>
+<li><p><strong>simp</strong> (<em>bool</em>) – If True, simplifies r and ri</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.calc_diag">
+<span class="sig-name descname"><span class="pre">calc_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.calc_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.calc_diag" title="Link to this definition">¶</a></dt>
+<dd><p>Force recomputation of diagonal terms to preserve column sum = 0.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.check_diag">
+<span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_diag" title="Link to this definition">¶</a></dt>
+<dd><p>Check if all columns sum to zero.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.check_rates">
+<span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_rates" title="Link to this definition">¶</a></dt>
+<dd><p>Check if all off-diagonal rates are non-negative.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.simp">
+<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.simp" title="Link to this definition">¶</a></dt>
+<dd><p>In-place symbolic simplification of the matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="coeffarray">
+<h2>CoeffArray<a class="headerlink" href="#coeffarray" title="Link to this heading">¶</a></h2>
+<p>This class is a custom class for 3D arrays used to store the <span class="math notranslate nohighlight">\(A^{(k)}_{mn}\)</span>
+coefficients and simplify retrieval when calculating conductances.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.CoeffArray">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">CoeffArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#CoeffArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.CoeffArray" title="Link to this definition">¶</a></dt>
+<dd><p>(n, n, n) dim coefficient array class for storing transition coefficients. Prints pretty.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – The array of coefficients</p></li>
+<li><p><strong>iter</strong> – A simple iterator to iterate over the whole array. Use as <cite>(elem in self.iter)</cite> or <cite>(i, j, k in self.iter)</cite></p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.CoeffArray.to_num">
+<span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#CoeffArray.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.CoeffArray.to_num" title="Link to this definition">¶</a></dt>
+<dd><p>Convert all symbolic entries to numerical values using SymPy N.</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>It forwards all indexing to numpy, and cn be used as a numpy array. The main reason for its existence is that
+it prints any symbolic expressions pretty.</p>
+</section>
+<section id="constantobject">
+<h2>ConstantObject<a class="headerlink" href="#constantobject" title="Link to this heading">¶</a></h2>
+<p>This is a mixin class used for explicitly constant objects, objects that do not contain any driving.
+It allows the definition of a numeric matrix which is impossible for driven objects, as they would lose their dependence
+on the driving symbol.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.ConstantObject">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">ConstantObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nmat</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantObject" title="Link to this definition">¶</a></dt>
+<dd><p>Stores the numeric matrix form of a symbolic matrix when symbolic evaluation is disabled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nmat</strong> – Numeric matrix representation if symbolic flag is False; otherwise None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="constantmatrix">
+<h2>ConstantMatrix<a class="headerlink" href="#constantmatrix" title="Link to this heading">¶</a></h2>
+<p>This class is the most general class for constant matrices. Most constant objects that are not an <code class="xref py py-class docutils literal notranslate"><span class="pre">EqMatrix</span></code>
+will be of this type</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.ConstantMatrix">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">ConstantMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix" title="Link to this definition">¶</a></dt>
+<dd><p>Matrix class that supports both symbolic and numeric representations, with conversion between the two.</p>
+<p>Inherits from ConstantObject and Mat to combine symbolic matrix functionality with numeric handling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mat</strong> – Internal sympy.Matrix representation.</p></li>
+<li><p><strong>nmat</strong> – Numeric matrix representation (if symbolic mode is off).</p></li>
+<li><p><strong>dim</strong> – Number of rows in the matrix.</p></li>
+<li><p><strong>iter</strong> – Iterator over matrix indices.</p></li>
+<li><p><strong>zero_index</strong> – Boolean indicating whether 0-based indexing is used.</p></li>
+<li><p><strong>is_symbolic</strong> – Boolean indicating whether the matrix is in symbolic form.</p></li>
+<li><p><strong>tol</strong> – Numerical tolerance used for operations.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.ConstantMatrix.to_num">
+<span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix.to_num" title="Link to this definition">¶</a></dt>
+<dd><p>Convert symbolic matrix to numeric form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.ConstantMatrix.to_sym">
+<span class="sig-name descname"><span class="pre">to_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix.to_sym"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix.to_sym" title="Link to this definition">¶</a></dt>
+<dd><p>Convert numeric matrix back to symbolic form.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.arr_to_mat">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">arr_to_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MutableDenseMatrix</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#arr_to_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.arr_to_mat" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Convert input array-like to sympy.Matrix.</dt><dd><ul class="simple">
+<li><p>Ensures proper shape.</p></li>
+<li><p>Converts row vectors to column vectors.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>arr</strong> (<em>array-like</em>) – Input data</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SymPy matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Matrix</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.check_diag">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><span class="pre">Mat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.check_diag" title="Link to this definition">¶</a></dt>
+<dd><p>Check if each column in matrix m sums to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – Matrix to check</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Allowed numerical tolerance</p></li>
+<li><p><strong>err</strong> (<em>bool</em>) – Raise exception if check fails</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all columns sum to zero</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.core_classes.check_rates">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><span class="pre">Mat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.check_rates" title="Link to this definition">¶</a></dt>
+<dd><p>Check that all off-diagonal elements are non-negative.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – Matrix to check</p></li>
+<li><p><strong>err</strong> (<em>bool</em>) – Raise exception on negative element</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Log indeterminate cases due to symbolic expressions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all off-diagonal elements are non-negative</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Core Classes</a><ul>
+<li><a class="reference internal" href="#mat">Mat</a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.Mat"><code class="docutils literal notranslate"><span class="pre">Mat</span></code></a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.Mat.simp"><code class="docutils literal notranslate"><span class="pre">Mat.simp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#trmatrix">TrMatrix</a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix"><code class="docutils literal notranslate"><span class="pre">TrMatrix</span></code></a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.add_trans"><code class="docutils literal notranslate"><span class="pre">TrMatrix.add_trans()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.calc_diag"><code class="docutils literal notranslate"><span class="pre">TrMatrix.calc_diag()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.check_diag"><code class="docutils literal notranslate"><span class="pre">TrMatrix.check_diag()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.check_rates"><code class="docutils literal notranslate"><span class="pre">TrMatrix.check_rates()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.simp"><code class="docutils literal notranslate"><span class="pre">TrMatrix.simp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#coeffarray">CoeffArray</a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.CoeffArray"><code class="docutils literal notranslate"><span class="pre">CoeffArray</span></code></a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.CoeffArray.to_num"><code class="docutils literal notranslate"><span class="pre">CoeffArray.to_num()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#constantobject">ConstantObject</a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.ConstantObject"><code class="docutils literal notranslate"><span class="pre">ConstantObject</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#constantmatrix">ConstantMatrix</a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.ConstantMatrix"><code class="docutils literal notranslate"><span class="pre">ConstantMatrix</span></code></a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.ConstantMatrix.to_num"><code class="docutils literal notranslate"><span class="pre">ConstantMatrix.to_num()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.ConstantMatrix.to_sym"><code class="docutils literal notranslate"><span class="pre">ConstantMatrix.to_sym()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#stoch_imp.core_classes.arr_to_mat"><code class="docutils literal notranslate"><span class="pre">arr_to_mat()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.check_diag"><code class="docutils literal notranslate"><span class="pre">check_diag()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.check_rates"><code class="docutils literal notranslate"><span class="pre">check_rates()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="reference.html"
+                          title="previous chapter">Reference Guides</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="EqMatrix.html"
+                          title="next chapter">EqMatrix</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/core_classes.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="EqMatrix.html" title="EqMatrix"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="reference.html" title="Reference Guides"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="reference.html" >Reference Guides</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Core Classes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Branko Meeus.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
+    </div>
+  </body>
+</html>

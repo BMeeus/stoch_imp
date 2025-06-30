@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>stoch_imp.core_classes &#8212; Stochastic Impedance  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/classic.css?v=2bf1fcf8" />
+    
+    <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stoch_imp.core_classes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for stoch_imp.core_classes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">float64</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">zeros</span> <span class="k">as</span> <span class="n">np_zeros</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Expr</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">NonSquareMatrixError</span><span class="p">,</span> <span class="n">nsimplify</span><span class="p">,</span> <span class="n">pretty</span><span class="p">,</span> <span class="n">ShapeError</span><span class="p">,</span> <span class="n">simplify</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CoeffArray">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.CoeffArray">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CoeffArray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    (n, n, n) dim coefficient array class for storing transition coefficients. Prints pretty.</span>
+
+<span class="sd">    :ivar mat: The array of coefficients</span>
+<span class="sd">    :ivar iter: A simple iterator to iterate over the whole array. Use as `(elem in self.iter)` or `(i, j, k in self.iter)`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize a 3D numpy array of objects with shape (n, n, n).</span>
+
+<span class="sd">        :param n: Dimension size of the 3D array</span>
+<span class="sd">        :type n: int</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">np_zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># Use native NumPy indexing</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># Use native NumPy assignment</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Pretty-print the full array using SymPy formatting</span>
+        <span class="k">return</span> <span class="n">pretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CoeffArray.to_num">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.CoeffArray.to_num">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_num</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert all symbolic entries to numerical values using SymPy N.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">iter</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can not convert expression containing symbols to numeric&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">N</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ConstantObject</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stores the numeric matrix form of a symbolic matrix when symbolic evaluation is disabled.</span>
+
+<span class="sd">    :ivar nmat: Numeric matrix representation if symbolic flag is False; otherwise None.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmat</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store numeric matrix form of symbolic matrix if symbolic flag is False.</span>
+
+<span class="sd">        :param nmat: Matrix input</span>
+<span class="sd">        :type nmat: ndarray or array-like</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">nmat</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>  <span class="c1"># forwards all unused arguments</span>
+        <span class="k">if</span> <span class="s2">&quot;sym&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">or</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;sym&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nmat</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">nmat</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nmat</span><span class="p">,</span> <span class="s2">&quot;free_symbols&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">nmat</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can not convert expression containing symbols to numeric&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="n">nmat</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">)</span>
+
+
+
+<span class="c1"># noinspection PyTypeChecker</span>
+<div class="viewcode-block" id="Mat">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.Mat">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Mat</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Top level class for all matrix-like objects such as Vectors, WMatrix, EqMatrix, etc.</span>
+
+<span class="sd">    :ivar mat: The internal sympy.Matrix representation of the object.</span>
+<span class="sd">    :ivar dim: Number of rows in the matrix (system size).</span>
+<span class="sd">    :ivar iter: Iterator over all (row, column) index pairs in the matrix.</span>
+<span class="sd">    :ivar zero_index: Boolean indicating whether 0-based indexing is used.</span>
+<span class="sd">    :ivar is_symbolic: Boolean indicating whether the matrix is treated as symbolic.</span>
+<span class="sd">    :ivar tol: Numerical tolerance used for approximate comparisons.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize matrix object from array-like input.</span>
+
+<span class="sd">        :param arr: Input data for matrix</span>
+<span class="sd">        :type arr: array-like</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">arr_to_mat</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>  <span class="c1"># Convert array-like to sympy.Matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">rows</span>  <span class="c1"># System size inferred from row count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iter</span> <span class="o">=</span> <span class="n">product</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">rows</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cols</span><span class="p">))</span>  <span class="c1"># Iterator over all (row, col) pairs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;zi&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;zi&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="kc">False</span>  <span class="c1"># True if system uses 0-based indexing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;sym&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;sym&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tol</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;tol&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;tol&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">else</span> <span class="mi">10</span><span class="o">**-</span><span class="mi">14</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Pretty-print matrix using sympy&#39;s printer</span>
+        <span class="k">return</span> <span class="n">pretty</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Support assignment via indexing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="c1"># Support retrieval via indexing</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat</span><span class="p">:</span>
+        <span class="c1"># Support subtraction with another Mat or scalar</span>
+        <span class="k">return</span> <span class="n">Mat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">-</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">zi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat</span><span class="p">:</span>
+        <span class="c1"># Matrix multiplication (supports Mat or scalar)</span>
+        <span class="k">return</span> <span class="n">Mat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">*</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">zi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Mat</span><span class="p">:</span>
+        <span class="c1"># Right multiplication (e.g., scalar * Mat)</span>
+        <span class="k">return</span> <span class="n">Mat</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">,</span> <span class="n">zi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c1"># Scalar division</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">/</span> <span class="n">other</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Length = number of elements in matrix</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># Forward missing attributes to underlying sympy.Matrix</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Combine native attributes with sympy.Matrix&#39;s for auto-completion</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">())</span> <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="Mat.simp">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.Mat.simp">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">simp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;In-place symbolic simplification of the matrix.&quot;&quot;&quot;</span>
+        <span class="n">simplify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ConstantMatrix</span><span class="p">(</span><span class="n">ConstantObject</span><span class="p">,</span> <span class="n">Mat</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Matrix class that supports both symbolic and numeric representations, with conversion between the two.</span>
+
+<span class="sd">    Inherits from ConstantObject and Mat to combine symbolic matrix functionality with numeric handling.</span>
+
+<span class="sd">    :ivar mat: Internal sympy.Matrix representation.</span>
+<span class="sd">    :ivar nmat: Numeric matrix representation (if symbolic mode is off).</span>
+<span class="sd">    :ivar dim: Number of rows in the matrix.</span>
+<span class="sd">    :ivar iter: Iterator over matrix indices.</span>
+<span class="sd">    :ivar zero_index: Boolean indicating whether 0-based indexing is used.</span>
+<span class="sd">    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.</span>
+<span class="sd">    :ivar tol: Numerical tolerance used for operations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize ConstantMatrix object.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__sub__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
+        <span class="c1"># Support subtraction with another Mat or scalar</span>
+        <span class="k">return</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">-</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">zi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
+        <span class="c1"># Matrix multiplication (supports Mat or scalar)</span>
+        <span class="k">return</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">*</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">),</span> <span class="n">zi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
+        <span class="c1"># Right multiplication (e.g., scalar * Mat)</span>
+        <span class="k">return</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s1">&#39;mat&#39;</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">,</span> <span class="n">zi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">,</span> <span class="n">sym</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="c1"># Scalar division</span>
+        <span class="k">return</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_num</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert symbolic matrix to numeric form.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can not convert expression containing symbols to numeric&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float64</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_sym</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert numeric matrix back to symbolic form.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">arr_to_mat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmat</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="c1"># noinspection PyTypeChecker</span>
+<div class="viewcode-block" id="TrMatrix">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrMatrix</span><span class="p">(</span><span class="n">Mat</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class handling all transition matrices. These matrices should sum to zero along columns and have positive</span>
+<span class="sd">    off-diagonal elements.</span>
+
+<span class="sd">    :ivar mat: Internal sympy.Matrix representation.</span>
+<span class="sd">    :ivar dim: Number of rows in the matrix.</span>
+<span class="sd">    :ivar iter: Iterator over matrix indices.</span>
+<span class="sd">    :ivar zero_index: Boolean indicating whether 0-based indexing is used.</span>
+<span class="sd">    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.</span>
+<span class="sd">    :ivar tol: Numerical tolerance used for validations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize transition matrix and validate constraints.</span>
+
+<span class="sd">        :param arr: Input data or dimension</span>
+<span class="sd">        :type arr: array-like or int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">arr</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s2">&quot;Transfer matrix must be at least (2, 2) dimensional&quot;</span><span class="p">)</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="n">zeros</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">check_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Validate initial conditions</span>
+        <span class="n">check_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TrMatrix.add_trans">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.add_trans">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_trans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                  <span class="n">r</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Expr</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+                  <span class="n">ri</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">Expr</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">symm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                  <span class="n">simp</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a transition `i --&gt; j` with rate `r`, and optionally symmetric transition `j --&gt; i` with rate `ri`.</span>
+
+<span class="sd">        :param i: Start index</span>
+<span class="sd">        :type i: int</span>
+<span class="sd">        :param j: Target index</span>
+<span class="sd">        :type j: int</span>
+<span class="sd">        :param r: Transition rate from i to j</span>
+<span class="sd">        :type r: float | Expr</span>
+<span class="sd">        :param ri: Optional inverse rate (j to i)</span>
+<span class="sd">        :type ri: float | Expr | None</span>
+<span class="sd">        :param symm: If True, adds j --&gt; i with rate 1/r or ri</span>
+<span class="sd">        :type symm: bool</span>
+<span class="sd">        :param simp: If True, simplifies r and ri</span>
+<span class="sd">        :type simp: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Start and target state must differ.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">:</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">simp</span><span class="p">:</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">nsimplify</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">rational</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rate should be positive, got </span><span class="si">{</span><span class="n">r</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># Ignore symbolic inequalities</span>
+
+        <span class="bp">self</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">r</span>
+
+        <span class="k">if</span> <span class="n">symm</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ri</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ri</span> <span class="o">=</span> <span class="n">r</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">if</span> <span class="n">simp</span><span class="p">:</span>
+                <span class="n">ri</span> <span class="o">=</span> <span class="n">nsimplify</span><span class="p">(</span><span class="n">ri</span><span class="p">,</span> <span class="n">rational</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">ri</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inverse rate should be positive, got </span><span class="si">{</span><span class="n">ri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">pass</span>  <span class="c1"># Ignore symbolic inequalities</span>
+
+            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ri</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">ri</span>
+
+        <span class="k">if</span> <span class="n">simp</span><span class="p">:</span>
+            <span class="n">simplify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrMatrix.calc_diag">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.calc_diag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Force recomputation of diagonal terms to preserve column sum = 0.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">col</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)</span> <span class="k">if</span> <span class="n">row</span> <span class="o">!=</span> <span class="n">col</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrMatrix.check_diag">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.check_diag">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if all columns sum to zero.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">check_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TrMatrix.check_rates">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.check_rates">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if all off-diagonal rates are non-negative.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">check_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="arr_to_mat">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.arr_to_mat">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">arr_to_mat</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Matrix</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert input array-like to sympy.Matrix.</span>
+<span class="sd">      - Ensures proper shape.</span>
+<span class="sd">      - Converts row vectors to column vectors.</span>
+
+<span class="sd">    :param arr: Input data</span>
+<span class="sd">    :type arr: array-like</span>
+<span class="sd">    :return: SymPy matrix</span>
+<span class="sd">    :rtype: Matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">Matrix</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+
+    <span class="c1"># Check if matrix is vector, transpose to col vec if necessary</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">rows</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">^</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">cols</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">T</span> <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">cols</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">m</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="o">.</span><span class="n">is_square</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NonSquareMatrixError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Matrix must be square or vector, got (</span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">rows</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">m</span><span class="o">.</span><span class="n">cols</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">rows</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ShapeError</span><span class="p">(</span><span class="s2">&quot;Matrix must be at least (2, 2) dimensional&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">m</span></div>
+
+
+
+<div class="viewcode-block" id="check_diag">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.check_diag">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_diag</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">Mat</span><span class="p">,</span> <span class="n">tol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-15</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if each column in matrix m sums to zero.</span>
+
+<span class="sd">    :param m: Matrix to check</span>
+<span class="sd">    :type m: Mat</span>
+<span class="sd">    :param tol: Allowed numerical tolerance</span>
+<span class="sd">    :type tol: float</span>
+<span class="sd">    :param err: Raise exception if check fails</span>
+<span class="sd">    :type err: bool</span>
+
+<span class="sd">    :return: True if all columns sum to zero</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">N</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">m</span><span class="p">[:,</span> <span class="n">col</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Column </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2"> does not sum to 0 (sum = </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="check_rates">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.check_rates">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">check_rates</span><span class="p">(</span><span class="n">m</span><span class="p">:</span> <span class="n">Mat</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that all off-diagonal elements are non-negative.</span>
+
+<span class="sd">    :param m: Matrix to check</span>
+<span class="sd">    :type m: Mat</span>
+<span class="sd">    :param err: Raise exception on negative element</span>
+<span class="sd">    :type err: bool</span>
+<span class="sd">    :param verbose: Log indeterminate cases due to symbolic expressions</span>
+<span class="sd">    :type verbose: bool</span>
+
+<span class="sd">    :return: True if all off-diagonal elements are non-negative</span>
+<span class="sd">    :rtype: bool</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">iter</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">==</span> <span class="n">col</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">err</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Transfer rate (</span><span class="si">{</span><span class="n">col</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">) is negative: </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Positivity of transfer rate (</span><span class="si">{</span><span class="n">col</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">) undetermined: </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Stochastic Impedance  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">stoch_imp.core_classes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2025, Branko Meeus.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.3.0.
+    </div>
+  </body>
+</html>
