@@ -1,7 +1,8 @@
+.. module:: stoch_imp.core_classes
+
 ============
 Core Classes
 ============
-.. module:: stoch_imp.core_classes
 
 This module defines the core classes behind the algorithms. These will often not be used directly,
 but are used under the hood.

@@ -44,53 +44,21 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-stoch_imp.pyplot_funcs">
-<span id="pyplot-functionalities"></span><h1>Pyplot Functionalities<a class="headerlink" href="#module-stoch_imp.pyplot_funcs" title="Link to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="stoch_imp.pyplot_funcs.add_arrow">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.pyplot_funcs.</span></span><span class="sig-name descname"><span class="pre">add_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Line2D</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/pyplot_funcs.html#add_arrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.pyplot_funcs.add_arrow" title="Link to this definition">¶</a></dt>
-<dd><p>add an arrow to a line.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>line</strong> (<em>Line2D</em>) – The Line object to which the arrow is added</p></li>
-<li><p><strong>position</strong> (<em>float</em>) – x-position of the arrow. If None, mean of xdata is taken</p></li>
-<li><p><strong>direction</strong> (<em>str</em>) – ‘left’ or ‘right’</p></li>
-<li><p><strong>size</strong> (<em>int</em>) – size of the arrow in fontsize points</p></li>
-<li><p><strong>color</strong> (<em>str</em>) – if None, line color is taken.</p></li>
-</ul>
+  <section id="pyplot-functionalities">
+<span id="module-stoch_imp.pyplot_funcs"></span><h1>Pyplot Functionalities<a class="headerlink" href="#pyplot-functionalities" title="Link to this heading">¶</a></h1>
+<p>This module contains functions that help with plotting the conductances (among other things). A quick overview:</p>
+<dl class="simple">
+<dt><strong>create_fig()</strong></dt><dd><p>is a context manager used to deal with subplots, simplifying the math and tick properties and ensuring consistent
+formatting and layout. It can be customised to the specific usecase.</p>
+</dd>
+<dt><strong>add_arrow()</strong></dt><dd><p>is a function that adds an arrow onto a line object.</p>
+</dd>
+<dt><strong>complex_axes()</strong></dt><dd><p>is a function that adds complex axes with appropriate labels to the plot. Placing of the labels can be fine-tuned.</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="stoch_imp.pyplot_funcs.complex_axes">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.pyplot_funcs.</span></span><span class="sig-name descname"><span class="pre">complex_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Axes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_off</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_off</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'k'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/pyplot_funcs.html#complex_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.pyplot_funcs.complex_axes" title="Link to this definition">¶</a></dt>
-<dd><p>Add complex axes to a figure, with labels of imaginary and real parts. These labels are heuristically placed and can
-be offset if necessary.</p>
-<p>The offset uses axis units. For example: if the label appears at (0.2, 5.4) on the axis
-but should be placed at (0.3, 5.1), the offset should be given as (0.1, -0.3)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<em>Axes</em>) – An axes object</p></li>
-<li><p><strong>q</strong> (<em>str</em>) – The quantity plotted. This can be a string containing latex syntax.</p></li>
-<li><p><strong>r_off</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em>) – Offset of the real axis label, given in axis units.</p></li>
-<li><p><strong>i_off</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em>) – Offset of the imaginary axis label, given in axis units.</p></li>
-<li><p><strong>sz</strong> (<em>int</em>) – Font size of the labels</p></li>
-<li><p><strong>grid</strong> (<em>bool</em>) – If True, adds a grid to the axes object.</p></li>
-<li><p><strong>color</strong> (<em>str</em>) – If None, black is used.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.pyplot_funcs.create_fig">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.pyplot_funcs.</span></span><span class="sig-name descname"><span class="pre">create_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tight</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tick_dict</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/pyplot_funcs.html#create_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.pyplot_funcs.create_fig" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.pyplot_funcs.</span></span><span class="sig-name descname"><span class="pre">create_fig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subplt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dpi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tick_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/pyplot_funcs.html#create_fig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.pyplot_funcs.create_fig" title="Link to this definition">¶</a></dt>
 <dd><p>Context manager to create and configure a matplotlib figure with subplot(s).</p>
 <p>This function initializes a matplotlib figure and subplots according to the
 given layout, applies custom tick parameters, and manages figure display and
@@ -116,6 +84,54 @@ for consistent styling.</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.pyplot_funcs.add_arrow">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.pyplot_funcs.</span></span><span class="sig-name descname"><span class="pre">add_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/pyplot_funcs.html#add_arrow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.pyplot_funcs.add_arrow" title="Link to this definition">¶</a></dt>
+<dd><p>add an arrow to a line.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line</strong> (<em>Line2D</em>) – The Line object to which the arrow is added</p></li>
+<li><p><strong>position</strong> (<em>float</em>) – x-position of the arrow. If None, mean of xdata is taken</p></li>
+<li><p><strong>direction</strong> (<em>str</em>) – ‘left’ or ‘right’</p></li>
+<li><p><strong>size</strong> (<em>int</em>) – size of the arrow in fontsize points</p></li>
+<li><p><strong>color</strong> (<em>str</em>) – if None, line color is taken.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.pyplot_funcs.complex_axes">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.pyplot_funcs.</span></span><span class="sig-name descname"><span class="pre">complex_axes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">q</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r_off</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i_off</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'k'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/pyplot_funcs.html#complex_axes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.pyplot_funcs.complex_axes" title="Link to this definition">¶</a></dt>
+<dd><p>Add complex axes to a figure, with labels of imaginary and real parts. These labels are heuristically placed and can
+be offset if necessary.</p>
+<p>The offset uses axis units. For example: if the label appears at (0.2, 5.4) on the axis
+but should be placed at (0.3, 5.1), the offset should be given as (0.1, -0.3)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ax</strong> (<em>Axes</em>) – An axes object</p></li>
+<li><p><strong>q</strong> (<em>str</em>) – The quantity plotted. This can be a string containing latex syntax.</p></li>
+<li><p><strong>r_off</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em>) – Offset of the real axis label, given in axis units.</p></li>
+<li><p><strong>i_off</strong> (<em>(</em><em>float</em><em>, </em><em>float</em><em>)</em>) – Offset of the imaginary axis label, given in axis units.</p></li>
+<li><p><strong>sz</strong> (<em>int</em>) – Font size of the labels</p></li>
+<li><p><strong>grid</strong> (<em>bool</em>) – If True, adds a grid to the axes object.</p></li>
+<li><p><strong>color</strong> (<em>str</em>) – If None, black is used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -129,9 +145,9 @@ for consistent styling.</p>
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Pyplot Functionalities</a><ul>
+<li><a class="reference internal" href="#stoch_imp.pyplot_funcs.create_fig"><code class="docutils literal notranslate"><span class="pre">create_fig()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.pyplot_funcs.add_arrow"><code class="docutils literal notranslate"><span class="pre">add_arrow()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.pyplot_funcs.complex_axes"><code class="docutils literal notranslate"><span class="pre">complex_axes()</span></code></a></li>
-<li><a class="reference internal" href="#stoch_imp.pyplot_funcs.create_fig"><code class="docutils literal notranslate"><span class="pre">create_fig()</span></code></a></li>
 </ul>
 </li>
 </ul>

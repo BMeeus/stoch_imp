@@ -45,8 +45,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-stoch_imp.core_classes">
-<span id="core-classes"></span><h1>Core Classes<a class="headerlink" href="#module-stoch_imp.core_classes" title="Link to this heading">¶</a></h1>
+  <section id="core-classes">
+<span id="module-stoch_imp.core_classes"></span><h1>Core Classes<a class="headerlink" href="#core-classes" title="Link to this heading">¶</a></h1>
 <p>This module defines the core classes behind the algorithms. These will often not be used directly,
 but are used under the hood.</p>
 <section id="mat">
@@ -71,8 +71,13 @@ foundation of all lower matrix classes.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.Mat.simp">
-<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#Mat.simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.Mat.simp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#Mat.simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.Mat.simp" title="Link to this definition">¶</a></dt>
 <dd><p>In-place symbolic simplification of the matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -102,7 +107,7 @@ off-diagonal elements.</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.add_trans">
-<span class="sig-name descname"><span class="pre">add_trans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Expr</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Expr</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.add_trans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.add_trans" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">add_trans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.add_trans"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.add_trans" title="Link to this definition">¶</a></dt>
 <dd><p>Add a transition <cite>i –&gt; j</cite> with rate <cite>r</cite>, and optionally symmetric transition <cite>j –&gt; i</cite> with rate <cite>ri</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -115,31 +120,57 @@ off-diagonal elements.</p>
 <li><p><strong>simp</strong> (<em>bool</em>) – If True, simplifies r and ri</p></li>
 </ul>
 </dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.calc_diag">
-<span class="sig-name descname"><span class="pre">calc_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.calc_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.calc_diag" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.calc_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.calc_diag" title="Link to this definition">¶</a></dt>
 <dd><p>Force recomputation of diagonal terms to preserve column sum = 0.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.check_diag">
-<span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_diag" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_diag" title="Link to this definition">¶</a></dt>
 <dd><p>Check if all columns sum to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.check_rates">
-<span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_rates" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_rates" title="Link to this definition">¶</a></dt>
 <dd><p>Check if all off-diagonal rates are non-negative.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.simp">
-<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.simp" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.simp" title="Link to this definition">¶</a></dt>
 <dd><p>In-place symbolic simplification of the matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -151,7 +182,7 @@ off-diagonal elements.</p>
 coefficients and simplify retrieval when calculating conductances.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.CoeffArray">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">CoeffArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#CoeffArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.CoeffArray" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">CoeffArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#CoeffArray"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.CoeffArray" title="Link to this definition">¶</a></dt>
 <dd><p>(n, n, n) dim coefficient array class for storing transition coefficients. Prints pretty.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
@@ -160,11 +191,19 @@ coefficients and simplify retrieval when calculating conductances.</p>
 <li><p><strong>iter</strong> – A simple iterator to iterate over the whole array. Use as <cite>(elem in self.iter)</cite> or <cite>(i, j, k in self.iter)</cite></p></li>
 </ul>
 </dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>n</strong> (<em>int</em>)</p>
+</dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.CoeffArray.to_num">
-<span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#CoeffArray.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.CoeffArray.to_num" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#CoeffArray.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.CoeffArray.to_num" title="Link to this definition">¶</a></dt>
 <dd><p>Convert all symbolic entries to numerical values using SymPy N.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -213,14 +252,24 @@ will be of this type</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.ConstantMatrix.to_num">
-<span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix.to_num" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix.to_num" title="Link to this definition">¶</a></dt>
 <dd><p>Convert symbolic matrix to numeric form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.ConstantMatrix.to_sym">
-<span class="sig-name descname"><span class="pre">to_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix.to_sym"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix.to_sym" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">to_sym</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#ConstantMatrix.to_sym"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.ConstantMatrix.to_sym" title="Link to this definition">¶</a></dt>
 <dd><p>Convert numeric matrix back to symbolic form.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -230,7 +279,7 @@ will be of this type</p>
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.arr_to_mat">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">arr_to_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">MutableDenseMatrix</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#arr_to_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.arr_to_mat" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">arr_to_mat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#arr_to_mat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.arr_to_mat" title="Link to this definition">¶</a></dt>
 <dd><dl class="simple">
 <dt>Convert input array-like to sympy.Matrix.</dt><dd><ul class="simple">
 <li><p>Ensures proper shape.</p></li>
@@ -253,7 +302,7 @@ will be of this type</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.check_diag">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><span class="pre">Mat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.check_diag" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.check_diag" title="Link to this definition">¶</a></dt>
 <dd><p>Check if each column in matrix m sums to zero.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -274,7 +323,7 @@ will be of this type</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.check_rates">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><span class="pre">Mat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.check_rates" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.core_classes.</span></span><span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">err</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.check_rates" title="Link to this definition">¶</a></dt>
 <dd><p>Check that all off-diagonal elements are non-negative.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

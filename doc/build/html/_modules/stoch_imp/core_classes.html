@@ -89,6 +89,8 @@
 
 
 
+<div class="viewcode-block" id="ConstantObject">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.ConstantObject">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConstantObject</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Stores the numeric matrix form of a symbolic matrix when symbolic evaluation is disabled.</span>
@@ -111,7 +113,8 @@
         <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">nmat</span><span class="p">,</span> <span class="s2">&quot;free_symbols&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">nmat</span><span class="o">.</span><span class="n">free_symbols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can not convert expression containing symbols to numeric&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="n">nmat</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="n">nmat</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">float64</span><span class="p">)</span></div>
+
 
 
 
@@ -194,6 +197,8 @@
 
 
 
+<div class="viewcode-block" id="ConstantMatrix">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.ConstantMatrix">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ConstantMatrix</span><span class="p">(</span><span class="n">ConstantObject</span><span class="p">,</span> <span class="n">Mat</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Matrix class that supports both symbolic and numeric representations, with conversion between the two.</span>
@@ -229,6 +234,8 @@
         <span class="c1"># Scalar division</span>
         <span class="k">return</span> <span class="n">ConstantMatrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">/</span> <span class="n">other</span><span class="p">)</span>
 
+<div class="viewcode-block" id="ConstantMatrix.to_num">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.ConstantMatrix.to_num">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_num</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert symbolic matrix to numeric form.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
@@ -237,15 +244,20 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Can not convert expression containing symbols to numeric&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nmat</span> <span class="o">=</span> <span class="n">array</span><span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float64</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">False</span></div>
 
+
+<div class="viewcode-block" id="ConstantMatrix.to_sym">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.ConstantMatrix.to_sym">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_sym</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert numeric matrix back to symbolic form.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mat</span> <span class="o">=</span> <span class="n">arr_to_mat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nmat</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
 
 
 <span class="c1"># noinspection PyTypeChecker</span>

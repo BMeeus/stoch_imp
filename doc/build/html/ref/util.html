@@ -44,43 +44,53 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-stoch_imp.util">
-<span id="util"></span><h1>Util<a class="headerlink" href="#module-stoch_imp.util" title="Link to this heading">¶</a></h1>
-<dl class="py function">
+  <section id="util">
+<h1>Util<a class="headerlink" href="#util" title="Link to this heading">¶</a></h1>
+<p>This module offers a bunch of helper functions and utility functions. These functions take into account the difference
+between symbolic and numeric calculations, and can be useful in certain cases.</p>
+<dl class="py function" id="module-stoch_imp.util">
 <dt class="sig sig-object py" id="stoch_imp.util.calc_curr_like">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">calc_curr_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><span class="pre">Mat</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ConstantMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ConstantMatrix</span></span></span><a class="reference internal" href="../_modules/stoch_imp/util.html#calc_curr_like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.calc_curr_like" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">calc_curr_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#calc_curr_like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.calc_curr_like" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>m</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – The matrix to be used (must be square).</p></li>
-<li><p><strong>p</strong> (<em>ConstantMatrix</em><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em>) – The vector to be used (length must match m).</p></li>
+<li><p><strong>p</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em>) – The vector to be used (length must match m).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Matrix of current-like values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ConstantMatrix</p>
+<dd class="field-odd"><p><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix">ConstantMatrix</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.deep_simp">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
 <dd><p>Simplify an arbitrary symbolic expression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>e</strong> (<em>Any</em>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>Any</em></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.gram_schmidt">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">gram_schmidt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MutableDenseMatrix</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ConstantMatrix</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ConstantMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MutableDenseMatrix</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span></span></span><a class="reference internal" href="../_modules/stoch_imp/util.html#gram_schmidt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.gram_schmidt" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">gram_schmidt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#gram_schmidt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.gram_schmidt" title="Link to this definition">¶</a></dt>
 <dd><p>Orthogonalize a set of vectors using Gram-Schmidt procedure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>v_arr</strong> (<em>list</em><em>[</em><em>Matrix</em><em>] </em><em>| </em><em>ndarray</em><em> | </em><em>list</em><em>[</em><em>ConstantMatrix</em><em>]</em>) – List of symbolic vectors or NumPy array (columns = vectors).</p></li>
-<li><p><strong>Peq</strong> (<em>ConstantMatrix</em><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Equilibrium distribution for weighted inner product.</p></li>
+<li><p><strong>v_arr</strong> (<em>list</em><em>[</em><em>Matrix</em><em>] </em><em>| </em><em>ndarray</em><em> | </em><em>list</em><em>[</em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em>]</em>) – List of symbolic vectors or NumPy array (columns = vectors).</p></li>
+<li><p><strong>Peq</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Equilibrium distribution for weighted inner product.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -94,14 +104,14 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.inner">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ConstantMatrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ConstantMatrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ConstantMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">MutableDenseMatrix</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Expr</span></span></span><a class="reference internal" href="../_modules/stoch_imp/util.html#inner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.inner" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#inner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.inner" title="Link to this definition">¶</a></dt>
 <dd><p>Compute inner product between two vectors, optionally weighted by Peq.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>v1</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>ConstantMatrix</em>) – First vector.</p></li>
-<li><p><strong>v2</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>ConstantMatrix</em>) – Second vector.</p></li>
-<li><p><strong>Peq</strong> (<em>ConstantMatrix</em><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Optional equilibrium vector.</p></li>
+<li><p><strong>v1</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a>) – First vector.</p></li>
+<li><p><strong>v2</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a>) – Second vector.</p></li>
+<li><p><strong>Peq</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Optional equilibrium vector.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

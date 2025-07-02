@@ -1,9 +1,4 @@
-test.*
-*.npz
-np_files
-misc.xml
 .venv
-.idea
 research
 calculator.py
 work_files

@@ -45,9 +45,10 @@
           <div class="body" role="main">
             
   <section id="eqmatrix">
-<h1>EqMatrix<a class="headerlink" href="#eqmatrix" title="Link to this heading">¶</a></h1>
-<p>This module introduces the EqMatrix class, a class handling all Equilibrium matrices and related calculations.</p>
-<dl class="py class" id="module-stoch_imp.EqMatrix">
+<span id="module-stoch_imp.EqMatrix"></span><h1>EqMatrix<a class="headerlink" href="#eqmatrix" title="Link to this heading">¶</a></h1>
+<p>This module introduces the EqMatrix class, a class handling all Equilibrium matrices and related calculations. It
+provides methods to calculate the eigensystem and stable solution, as well as a simple checker for detailed balance.</p>
+<dl class="py class">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.EqMatrix.</span></span><span class="sig-name descname"><span class="pre">EqMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix" title="Link to this definition">¶</a></dt>
 <dd><p>Class handling all Equilibrium Transfer Matrices.</p>
@@ -73,7 +74,7 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.calc_eig">
-<span class="sig-name descname"><span class="pre">calc_eig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">MutableDenseMatrix</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_eig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_eig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_eig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate eigenvalues and eigenvectors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -93,7 +94,7 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.calc_peq">
-<span class="sig-name descname"><span class="pre">calc_peq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ConstantMatrix</span></span></span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_peq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_peq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_peq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate the Equilibrium distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -106,14 +107,14 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 <dd class="field-even"><p>Equilibrium distribution matrix</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>ConstantMatrix</p>
+<dd class="field-odd"><p><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix">ConstantMatrix</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.check_db">
-<span class="sig-name descname"><span class="pre">check_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.check_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.check_db" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">check_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.check_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.check_db" title="Link to this definition">¶</a></dt>
 <dd><p>Check detailed balance condition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

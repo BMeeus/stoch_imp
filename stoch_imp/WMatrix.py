@@ -13,15 +13,18 @@ class WMatrix(TrMatrix):
     """
     Class handling driven transition matrices.
 
-    This class extends TrMatrix to support driven systems where a symbolic parameter (driving symbol)
-    modifies transition rates. It provides methods for calculating equilibrium matrices under driving,
-    extracting first-order derivatives, computing conductivity coefficients, and evaluating frequency-dependent conductivities.
-
+    :ivar mat: Internal sympy.Matrix representation of the transition matrix.
+    :ivar dim: Dimension of the system.
+    :ivar iter: Iterator over matrix indices.
     :ivar ds: Symbol representing the driving parameter.
     :ivar eq: Value at which to evaluate equilibrium (default is 0).
     :ivar weq: Cached equilibrium matrix (EqMatrix), or None if not yet computed.
     :ivar w1: First-order derivative matrix (ConstantMatrix), or None if not yet computed.
     :ivar coeff: Coefficient array for conductivity calculations, or None if not yet computed.
+    :ivar tol: Numerical tolerance used for validations.
+    :ivar is_symbolic: Boolean indicating whether the matrix is in symbolic form.
+    :ivar zero_index: Boolean indicating whether 0-based indexing is used.
+
     """
 
     def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, **kwargs):
