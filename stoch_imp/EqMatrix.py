@@ -76,6 +76,7 @@ class EqMatrix(ConstantObject, TrMatrix):
         :return: Eigenvalues and eigenvectors
         :rtype: Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]
         """
+        # TODO: rewrite using **kwargs and flags.
         if self.is_symbolic:
             return _sym_calc_eig(self, tol=self.tol, force=force, verbose=verbose)
         else:
