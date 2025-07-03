@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from itertools import product
 
 from numpy import (array, float64, ndarray)
@@ -43,7 +44,10 @@ class CoeffArray:
             if len(self.mat[i, j, k].free_symbols) != 0:
                 raise TypeError("Can not convert expression containing symbols to numeric")
             self.mat[i, j, k] = N(self.mat[i, j, k])
+        self.mat = self.mat.astype(float64)
 
+    def to_sym(self) -> None:
+        self.mat = self.mat.astype(object)
 
 class ConstantObject:
     """
@@ -212,7 +216,7 @@ class TrMatrix(Mat):
     :ivar tol: Numerical tolerance used for validations.
     """
 
-    def __init__(self, arr, *args, **kwargs) -> None:
+    def __init__(self, arr: Any, *args, **kwargs) -> None:
         """
         Initialize transition matrix and validate constraints.
 
