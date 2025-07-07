@@ -89,29 +89,28 @@
 
 <div class="viewcode-block" id="EqMatrix.calc_peq">
 <a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.calc_peq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calc_peq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">chk_db</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_peq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the Equilibrium distribution.</span>
 
-<span class="sd">        :param force: Force recalculation</span>
+<span class="sd">        :keyword force: Force recalculation</span>
 <span class="sd">        :type force: bool</span>
-<span class="sd">        :param verbose: Print verbose output</span>
+<span class="sd">        :keyword verbose: Print verbose output</span>
 <span class="sd">        :type verbose: bool</span>
-<span class="sd">        :param chk_db: Check detailed balance</span>
-<span class="sd">        :type verbose: bool</span>
+<span class="sd">        :keyword chk_db: Check detailed balance</span>
+<span class="sd">        :type chk_db: bool</span>
 
 <span class="sd">        :return: Equilibrium distribution matrix</span>
 <span class="sd">        :rtype: ConstantMatrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">calc_eig</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">chk_db</span><span class="o">=</span><span class="n">chk_db</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calc_eig</span><span class="p">(</span><span class="o">**</span><span class="n">flags</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">peq</span></div>
 
 
 <div class="viewcode-block" id="EqMatrix.calc_eig">
 <a class="viewcode-back" href="../../ref/EqMatrix.html#stoch_imp.EqMatrix.EqMatrix.calc_eig">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">chk_db</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>\
-            <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]],</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]],</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate eigenvalues and eigenvectors.</span>
 
@@ -120,15 +119,14 @@
 <span class="sd">        :param verbose: Print verbose output</span>
 <span class="sd">        :type verbose: bool</span>
 <span class="sd">        :param chk_db: Check detailed balance</span>
-<span class="sd">        :type verbose: bool</span>
+<span class="sd">        :type chk_db: bool</span>
 
 <span class="sd">        :return: Eigenvalues and eigenvectors</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO: rewrite using **kwargs and flags.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_sym_calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">chk_db</span><span class="o">=</span><span class="n">chk_db</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">_sym_calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">_num_calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">chk_db</span><span class="o">=</span><span class="n">chk_db</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">_num_calc_eig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="EqMatrix.check_db">
@@ -184,24 +182,15 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_sym_calc_eig</span><span class="p">(</span><span class="n">weq</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">chk_db</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sym_calc_eig</span><span class="p">(</span><span class="n">weq</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Matrix</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute symbolic eigenvalues and eigenvectors.</span>
-
-<span class="sd">    :param weq: Equilibrium matrix object</span>
-<span class="sd">    :type weq: EqMatrix</span>
-<span class="sd">    :param tol: Tolerance for validation</span>
-<span class="sd">    :type tol: float</span>
-<span class="sd">    :param force: Force recalculation</span>
-<span class="sd">    :type force: bool</span>
-<span class="sd">    :param verbose: Print verbose output</span>
-<span class="sd">    :type verbose: bool</span>
-<span class="sd">    :param chk_db: Check detailed balance</span>
-<span class="sd">    :type verbose: bool</span>
-
-<span class="sd">    :return: Eigenvalues and eigenvectors</span>
-<span class="sd">    :rtype: tuple[list, list[Matrix]]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">force</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">chk_db</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span>
 
@@ -248,24 +237,15 @@
     <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_num_calc_eig</span><span class="p">(</span><span class="n">weq</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">chk_db</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_num_calc_eig</span><span class="p">(</span><span class="n">weq</span><span class="p">,</span> <span class="n">tol</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute numeric eigenvalues and eigenvectors.</span>
-
-<span class="sd">    :param weq: Equilibrium matrix object</span>
-<span class="sd">    :type weq: EqMatrix</span>
-<span class="sd">    :param tol: Tolerance for validation</span>
-<span class="sd">    :type tol: float</span>
-<span class="sd">    :param force: Force recalculation</span>
-<span class="sd">    :type force: bool</span>
-<span class="sd">    :param verbose: Print verbose output</span>
-<span class="sd">    :type verbose: bool</span>
-<span class="sd">    :param chk_db: Check detailed balance</span>
-<span class="sd">    :type verbose: bool</span>
-
-<span class="sd">    :return: Eigenvalues and eigenvectors</span>
-<span class="sd">    :rtype: tuple[ndarray, ndarray]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">force</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">chk_db</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvecs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">nvecs</span>
 

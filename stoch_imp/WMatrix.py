@@ -218,6 +218,8 @@ class WMatrix(TrMatrix):
                 self.weq.to_sym()
             if self.w1 is not None:
                 self.w1.to_sym()
+            if self.coeff is not None:
+                self.coeff.to_sym()
             self.is_symbolic = True
 
 

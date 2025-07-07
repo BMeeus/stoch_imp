@@ -68,7 +68,7 @@ error will be raised.</p>
 </section>
 <section id="building-the-system">
 <h2>Building the system<a class="headerlink" href="#building-the-system" title="Link to this heading">¶</a></h2>
-<p>Starting from an empty matrix, interactions can be added by using the <code class="xref py py-func docutils literal notranslate"><span class="pre">add_trans()</span></code> method:</p>
+<p>Starting from an empty matrix, interactions can be added by using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">add_trans()</span></code> method:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">stoch_imp</span><span class="w"> </span><span class="kn">import</span> <span class="n">EqMatrix</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">weq</span> <span class="o">=</span> <span class="n">EqMatrix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">weq</span><span class="o">.</span><span class="n">add_trans</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ri</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -80,17 +80,17 @@ error will be raised.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>It is generally not advisable to add transitions directly to the matrix using item assignment. Although this can be
-done, the matrix diagonal needs to be recalculated using <code class="xref py py-func docutils literal notranslate"><span class="pre">calc_diag()</span></code>. <code class="xref py py-func docutils literal notranslate"><span class="pre">add_trans()</span></code> on the other hand
-takes care of this for you.</p>
+done, the matrix diagonal needs to be recalculated using <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.TrMatrix.calc_diag" title="stoch_imp.core_classes.TrMatrix.calc_diag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_diag()</span></code></a>.
+The <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.TrMatrix.add_trans" title="stoch_imp.core_classes.TrMatrix.add_trans"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_trans()</span></code></a> method on the other hand takes care of this for you.</p>
 </div>
 </section>
 <section id="calculating-eigensystem">
 <h2>Calculating eigensystem<a class="headerlink" href="#calculating-eigensystem" title="Link to this heading">¶</a></h2>
-<p>After building the system, we can calculate the eigensystem and equilibrium distribution using <code class="xref py py-func docutils literal notranslate"><span class="pre">calc_eig()</span></code>. These
+<p>After building the system, we can calculate the eigensystem and equilibrium distribution using <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="stoch_imp.EqMatrix.EqMatrix.calc_eig"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_eig()</span></code></a>. These
 values are then returned and stored as attributes of the object. By default, detailed balance is checked.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>The method <code class="xref py py-func docutils literal notranslate"><span class="pre">calc_peq()</span></code> is basically an alias for <code class="xref py py-func docutils literal notranslate"><span class="pre">calc_eig()</span></code>. Because the equilibrium distribution is
+<p>The method <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq" title="stoch_imp.EqMatrix.EqMatrix.calc_peq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_peq()</span></code></a> is basically an alias for <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="stoch_imp.EqMatrix.EqMatrix.calc_eig"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_eig()</span></code></a>. Because the equilibrium distribution is
 calculated using the eigensystem, the full calculation of the eigensystem is performed to avoid wasting resources.</p>
 </div>
 <p>If the eigensystem is already calculated and a recalculation is needed, you <em>must</em> use the <cite>force</cite> flag. Otherwise the
@@ -98,10 +98,10 @@ old values are returned.</p>
 </section>
 <section id="numeric-calculations">
 <h2>Numeric calculations<a class="headerlink" href="#numeric-calculations" title="Link to this heading">¶</a></h2>
-<p>By default, the EqMatrix is treated as a symbolic matrix. If numeric calculations are preferred, use the <code class="xref py py-func docutils literal notranslate"><span class="pre">to_num()</span></code>
+<p>By default, the EqMatrix is treated as a symbolic matrix. If numeric calculations are preferred, use the <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.to_num" title="stoch_imp.EqMatrix.EqMatrix.to_num"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_num()</span></code></a>
 to convert the matrix and eigensystem to numeric types. This method does not calculate anything, it merely converts all
 stored quantities to numeric and changes the type of the matrix. Any future calculations will be done numerically. To
-convert back to symbolical calculations, use <code class="xref py py-func docutils literal notranslate"><span class="pre">to_sym()</span></code>.</p>
+convert back to symbolical calculations, use <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.to_sym" title="stoch_imp.EqMatrix.EqMatrix.to_sym"><code class="xref py py-meth docutils literal notranslate"><span class="pre">to_sym()</span></code></a>.</p>
 </section>
 <section id="reference">
 <h2>Reference<a class="headerlink" href="#reference" title="Link to this heading">¶</a></h2>
@@ -131,7 +131,7 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.calc_eig">
-<span class="sig-name descname"><span class="pre">calc_eig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chk_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_eig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_eig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_eig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate eigenvalues and eigenvectors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -152,7 +152,7 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.calc_peq">
-<span class="sig-name descname"><span class="pre">calc_peq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chk_db</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_peq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">calc_peq</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_peq"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq" title="Link to this definition">¶</a></dt>
 <dd><p>Calculate the Equilibrium distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

@@ -185,6 +185,7 @@ def _num_calc_eig(weq, tol, **flags):
     """
     Compute numeric eigenvalues and eigenvectors.
     """
+    force = flags.setdefault('force', False)
     if weq.nvals is not None and weq.nvecs is not None and not force:
         return weq.nvals, weq.nvecs
 
