@@ -47,24 +47,25 @@ class EqMatrix(ConstantObject, TrMatrix):
         self.vecs: Optional[list[Matrix]] = None
         self.nvecs: Optional[ndarray] = None
 
-    def calc_peq(self, force: bool = False, verbose: bool = False) -> ConstantMatrix:
+    def calc_peq(self, **flags) -> ConstantMatrix:
         """
         Calculate the Equilibrium distribution.
 
-        :param force: Force recalculation
+        :keyword force: Force recalculation
         :type force: bool
-        :param verbose: Print verbose output
+        :keyword verbose: Print verbose output
         :type verbose: bool
+        :keyword chk_db: Check detailed balance
+        :type chk_db: bool
 
         :return: Equilibrium distribution matrix
         :rtype: ConstantMatrix
         """
-        if self.peq is None or force:
-            self.calc_eig(force=force, verbose=verbose)
+        if self.peq is None or flags.setdefault('force', False):
+            self.calc_eig(**flags)
         return self.peq
 
-    def calc_eig(self, force: bool = False, verbose: bool = False)\
-            -> Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]:
+    def calc_eig(self, **flags) -> Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]:
         """
         Calculate eigenvalues and eigenvectors.
 
@@ -72,15 +73,15 @@ class EqMatrix(ConstantObject, TrMatrix):
         :type force: bool
         :param verbose: Print verbose output
         :type verbose: bool
+        :param chk_db: Check detailed balance
+        :type chk_db: bool
 
         :return: Eigenvalues and eigenvectors
-        :rtype: Union[tuple[list, list[Matrix]], tuple[ndarray, ndarray]]
         """
-        # TODO: rewrite using **kwargs and flags.
         if self.is_symbolic:
-            return _sym_calc_eig(self, tol=self.tol, force=force, verbose=verbose)
+            return _sym_calc_eig(self, tol=self.tol, **flags)
         else:
-            return _num_calc_eig(self, tol=self.tol, force=force, verbose=verbose)
+            return _num_calc_eig(self, tol=self.tol, **flags)
 
     def check_db(self) -> bool:
         """
@@ -125,22 +126,15 @@ class EqMatrix(ConstantObject, TrMatrix):
             self.is_symbolic = True
 
 
-def _sym_calc_eig(weq, tol, force: bool = False, verbose: bool = False) -> tuple[list, list[Matrix]]:
+def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
     """
     Compute symbolic eigenvalues and eigenvectors.
-
-    :param weq: Equilibrium matrix object
-    :type weq: EqMatrix
-    :param tol: Tolerance for validation
-    :type tol: float
-    :param force: Force recalculation
-    :type force: bool
-    :param verbose: Print verbose output
-    :type verbose: bool
-
-    :return: Eigenvalues and eigenvectors
-    :rtype: tuple[list, list[Matrix]]
     """
+
+    force = flags.setdefault('force', False)
+    verbose = flags.setdefault('force', False)
+    chk_db = flags.setdefault('force', True)
+
     if weq.vals is not None and weq.vecs is not None and not force:
         return weq.vals, weq.vecs
 
@@ -187,21 +181,9 @@ def _sym_calc_eig(weq, tol, force: bool = False, verbose: bool = False) -> tuple
     return weq.vals, weq.vecs
 
 
-def _num_calc_eig(weq, tol, force=False, verbose=False):
+def _num_calc_eig(weq, tol, **flags):
     """
     Compute numeric eigenvalues and eigenvectors.
-
-    :param weq: Equilibrium matrix object
-    :type weq: EqMatrix
-    :param tol: Tolerance for validation
-    :type tol: float
-    :param force: Force recalculation
-    :type force: bool
-    :param verbose: Print verbose output
-    :type verbose: bool
-
-    :return: Eigenvalues and eigenvectors
-    :rtype: tuple[ndarray, ndarray]
     """
     if weq.nvals is not None and weq.nvecs is not None and not force:
         return weq.nvals, weq.nvecs
@@ -226,7 +208,7 @@ def _num_calc_eig(weq, tol, force=False, verbose=False):
     nvals[0] = 0
     nvecs[:, 0] /= sum(nvecs[:, 0])  # First eigenvector is Peq, normalize and rename
     weq.peq = ConstantMatrix(nvecs[:, 0], zi=weq.zero_index, sym=False)
-    if not weq.check_db():
+    if chk_db and not weq.check_db():
         raise ValueError("detailed balance not fulfilled")
     if verbose:
         print("Equilibrium distribution calculated")
