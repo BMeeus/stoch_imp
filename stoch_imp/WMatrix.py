@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from typing import Callable, Optional, Union
 
 from numpy import matmul, ndarray
@@ -54,7 +55,7 @@ class WMatrix(TrMatrix):
         self.w1: Optional[ConstantMatrix] = None
         self.coeff: Optional[CoeffArray] = None
 
-    def calc_weq(self, eq: float = None, force: bool = False, verbose: bool = False) -> EqMatrix:
+    def calc_weq(self, eq: float = None, **flags) -> EqMatrix:
         """
         Calculate the equilibrium matrix.
 
@@ -68,6 +69,9 @@ class WMatrix(TrMatrix):
         :return: the equilibrium matrix.
         :rtype: EqMatrix
         """
+        force = flags.setdefault('force', False)
+        verbose = flags.setdefault('verbose', False)
+
         if self.weq is not None and not force:
             return self.weq
 
@@ -75,9 +79,10 @@ class WMatrix(TrMatrix):
 
         if verbose:
             print("Equilibrium matrix calculated")
+
         return self.weq
 
-    def calc_w1(self, eq: float = None, force: bool = False, verbose: bool = False) -> ConstantMatrix:
+    def calc_w1(self, eq: float = None, **flags) -> ConstantMatrix:
         """
         Calculate the first-order driving matrix.
 
@@ -91,6 +96,9 @@ class WMatrix(TrMatrix):
         :return: the first-order driving matrix.
         :rtype: ConstantMatrix
         """
+        force = flags.setdefault('force', False)
+        verbose = flags.setdefault('verbose', False)
+
         if self.w1 is not None and not force:
             return self.w1
 
@@ -105,7 +113,7 @@ class WMatrix(TrMatrix):
             print("Driving matrix calculated")
         return self.w1
 
-    def calc_coeff(self, force: bool = False, verbose: bool = True) -> CoeffArray:
+    def calc_coeff(self, **flags) -> CoeffArray:
         """
         Calculate coefficient array.
 
@@ -118,10 +126,19 @@ class WMatrix(TrMatrix):
             i --> j is CoeffArray[i, j, k].
         :rtype: CoeffArray
         """
-        return _calc_coeff(self, force, verbose=verbose)
+        if 'force' not in flags.keys():
+            flags['force'] = False
 
-    def get_cond(self, i: int, j: int, normal: bool = False, force: bool = False, verbose: bool = True) -> Callable[
-        [Union[float, ndarray]], float]:
+        if verbose not in flags.keys():
+            flags['verbose'] = True
+
+        self.calc_weq(**flags)
+        self.weq.calc_eig(**flags)
+        self.calc_w1(**flags)
+
+        return _sym_calc_coeff(self) if self.is_symbolic else _num_calc_coeff(self)
+
+    def get_cond(self, i: int, j: int, normal: bool = False, **flags) -> Callable[[Union[float, ndarray]], float]:
         """
         Return a callable for the frequency-dependent conductivity.
 
@@ -139,8 +156,15 @@ class WMatrix(TrMatrix):
         :return: Callable returning conductivity value
         :rtype: Callable[[float | ndarray], float]
         """
-        if self.coeff is None or force:
-            self.calc_coeff(force=force, verbose=verbose)
+
+        if 'force' not in flags.keys():
+            flags['force'] = False
+
+        if verbose not in flags.keys():
+            flags['verbose'] = True
+
+        if self.coeff is None or flags['force']:
+            self.calc_coeff(**flags)
 
         if not self.zero_index:
             i -= 1
@@ -156,7 +180,7 @@ class WMatrix(TrMatrix):
 
         if self.is_symbolic:
             cond = deep_simp(cond)
-        if normal:
+        if flags.setdefault('normal', False):
             norm_val = sum(
                 coeff[j, i, k] * (1 if k == 0 else -1)
                 for k in range(self.dim))
@@ -167,9 +191,7 @@ class WMatrix(TrMatrix):
 
     def get_conds(self,
                   conds: Union[tuple[int, int], list[tuple[int, int]], None] = None,
-                  normal: bool = False,
-                  force: bool = False,
-                  verbose: bool = True) -> list[tuple[tuple[int, int], Callable[[float], float]]]:
+                  **flags) -> list[tuple[tuple[int, int], Callable[[float], float]]]:
         """
         Return a list of conductivity callables for specified index pairs.
 
@@ -194,7 +216,7 @@ class WMatrix(TrMatrix):
         elif isinstance(conds[0], int):
             conds = [conds]
 
-        return [(cond, self.get_cond(*cond, normal=normal, force=force, verbose=verbose)) for cond in conds]
+        return [(cond, self.get_cond(*cond, **flags)) for cond in conds]
 
     def to_num(self):
         """Convert internal data to numeric form."""
@@ -221,27 +243,6 @@ class WMatrix(TrMatrix):
             if self.coeff is not None:
                 self.coeff.to_sym()
             self.is_symbolic = True
-
-
-def _calc_coeff(w: WMatrix, force: bool = False, verbose: bool = True) -> CoeffArray:
-    """
-    Wrapper to calculate coefficients based on symbolic/numeric status.
-
-    :param w: Matrix instance
-    :type w: WMatrix
-    :param force: Force recalculation
-    :type force: bool
-    :param verbose: Print verbose output
-    :type verbose: bool
-
-    :return: Coefficients
-    :rtype: CoeffArray
-    """
-    w.calc_weq(force=force, verbose=verbose)
-    w.weq.calc_eig(force=force, verbose=verbose)
-    w.calc_w1(force=force, verbose=verbose)
-
-    return _sym_calc_coeff(w) if w.is_symbolic else _num_calc_coeff(w)
 
 
 def _sym_calc_coeff(w: WMatrix) -> CoeffArray:

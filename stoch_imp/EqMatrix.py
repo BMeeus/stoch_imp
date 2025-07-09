@@ -145,7 +145,7 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
     eigvec_0 = eig_syst[0][-1][0]
     peq_vec = eigvec_0 / sum(eigvec_0)
     weq.peq = ConstantMatrix(peq_vec.as_real_imag()[0], zi=weq.zero_index, sym=True)
-    if not weq.check_db():
+    if chk_db and not weq.check_db():
         raise ValueError("detailed balance not fulfilled")
     if verbose:
         print("Equilibrium distribution calculated")
@@ -180,7 +180,11 @@ def _num_calc_eig(weq, tol, **flags):
     """
     Compute numeric eigenvalues and eigenvectors.
     """
+
     force = flags.setdefault('force', False)
+    verbose = flags.setdefault('force', False)
+    chk_db = flags.setdefault('force', True)
+
     if weq.nvals is not None and weq.nvecs is not None and not force:
         return weq.nvals, weq.nvecs
 
