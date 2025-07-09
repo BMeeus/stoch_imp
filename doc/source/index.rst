@@ -38,8 +38,8 @@ Contents
 
    tutorial/tutorial
    howto/howto
-   ref/reference
    explanation/explanation
+   ref/reference
 
 License
 -------
