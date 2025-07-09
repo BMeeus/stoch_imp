@@ -16,8 +16,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="EqMatrix" href="EqMatrix.html" />
-    <link rel="prev" title="Reference Guides" href="reference.html" /> 
+    <link rel="next" title="Util" href="util.html" />
+    <link rel="prev" title="EqMatrix" href="EqMatrix.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -29,10 +29,10 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="EqMatrix.html" title="EqMatrix"
+          <a href="util.html" title="Util"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="reference.html" title="Reference Guides"
+          <a href="EqMatrix.html" title="EqMatrix"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference Guides</a> &#187;</li>
@@ -69,17 +69,6 @@ foundation of all lower matrix classes.</p>
 </ul>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="stoch_imp.core_classes.Mat.simp">
-<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#Mat.simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.Mat.simp" title="Link to this definition">¶</a></dt>
-<dd><p>In-place symbolic simplification of the matrix.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -142,9 +131,19 @@ off-diagonal elements.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.check_diag">
-<span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_diag" title="Link to this definition">¶</a></dt>
-<dd><p>Check if all columns sum to zero.</p>
+<span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_diag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_diag" title="Link to this definition">¶</a></dt>
+<dd><p>Check if each column in matrix m sums to zero.</p>
 <dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – Matrix to check</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Allowed numerical tolerance</p></li>
+<li><p><strong>err</strong> (<em>bool</em>) – Raise exception if check fails</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all columns sum to zero</p>
+</dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>
 </dd>
@@ -153,25 +152,21 @@ off-diagonal elements.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.check_rates">
-<span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_rates" title="Link to this definition">¶</a></dt>
-<dd><p>Check if all off-diagonal rates are non-negative.</p>
+<span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/core_classes.html#TrMatrix.check_rates"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.check_rates" title="Link to this definition">¶</a></dt>
+<dd><p>Check that all off-diagonal elements are non-negative.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>verbose</strong> (<em>bool</em>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<a class="reference internal" href="#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – Matrix to check</p></li>
+<li><p><strong>err</strong> (<em>bool</em>) – Raise exception on negative element</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Log indeterminate cases due to symbolic expressions</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all off-diagonal elements are non-negative</p>
 </dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="stoch_imp.core_classes.TrMatrix.simp">
-<span class="sig-name descname"><span class="pre">simp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.core_classes.TrMatrix.simp" title="Link to this definition">¶</a></dt>
-<dd><p>In-place symbolic simplification of the matrix.</p>
-<dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -371,10 +366,7 @@ will be of this type</p>
     <ul>
 <li><a class="reference internal" href="#">Core Classes</a><ul>
 <li><a class="reference internal" href="#mat">Mat</a><ul>
-<li><a class="reference internal" href="#stoch_imp.core_classes.Mat"><code class="docutils literal notranslate"><span class="pre">Mat</span></code></a><ul>
-<li><a class="reference internal" href="#stoch_imp.core_classes.Mat.simp"><code class="docutils literal notranslate"><span class="pre">Mat.simp()</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#stoch_imp.core_classes.Mat"><code class="docutils literal notranslate"><span class="pre">Mat</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#trmatrix">TrMatrix</a><ul>
@@ -383,7 +375,6 @@ will be of this type</p>
 <li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.calc_diag"><code class="docutils literal notranslate"><span class="pre">TrMatrix.calc_diag()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.check_diag"><code class="docutils literal notranslate"><span class="pre">TrMatrix.check_diag()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.check_rates"><code class="docutils literal notranslate"><span class="pre">TrMatrix.check_rates()</span></code></a></li>
-<li><a class="reference internal" href="#stoch_imp.core_classes.TrMatrix.simp"><code class="docutils literal notranslate"><span class="pre">TrMatrix.simp()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -421,13 +412,13 @@ will be of this type</p>
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="reference.html"
-                          title="previous chapter">Reference Guides</a></p>
+    <p class="topless"><a href="EqMatrix.html"
+                          title="previous chapter">EqMatrix</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="EqMatrix.html"
-                          title="next chapter">EqMatrix</a></p>
+    <p class="topless"><a href="util.html"
+                          title="next chapter">Util</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -460,10 +451,10 @@ will be of this type</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="EqMatrix.html" title="EqMatrix"
+          <a href="util.html" title="Util"
              >next</a> |</li>
         <li class="right" >
-          <a href="reference.html" title="Reference Guides"
+          <a href="EqMatrix.html" title="EqMatrix"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" >Reference Guides</a> &#187;</li>

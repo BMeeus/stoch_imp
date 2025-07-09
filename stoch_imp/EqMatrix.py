@@ -32,11 +32,6 @@ class EqMatrix(ConstantObject, TrMatrix):
     def __init__(self, *args, **kwargs) -> None:
         """
         Initialize the EqMatrix object.
-
-        :param args: Positional arguments for parent constructors
-        :type args: tuple
-        :param kwargs: Keyword arguments for parent constructors
-        :type kwargs: dict
         """
         super().__init__(*args, **kwargs)
         self.peq: Optional[ConstantMatrix] = None

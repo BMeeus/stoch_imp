@@ -12,10 +12,11 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Core Classes" href="core_classes.html" />
+    <link rel="next" title="WMatrix" href="WMatrix.html" />
     <link rel="prev" title="How To" href="../howto/howto.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
@@ -28,7 +29,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="core_classes.html" title="Core Classes"
+          <a href="WMatrix.html" title="WMatrix"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../howto/howto.html" title="How To"
@@ -47,13 +48,14 @@
 <h1>Reference Guides<a class="headerlink" href="#reference-guides" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="core_classes.html">Core Classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="core_classes.html#mat">Mat</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core_classes.html#trmatrix">TrMatrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core_classes.html#coeffarray">CoeffArray</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core_classes.html#constantobject">ConstantObject</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core_classes.html#constantmatrix">ConstantMatrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="core_classes.html#functions">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="WMatrix.html">WMatrix</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#creating-a-wmatrix">Creating a WMatrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#building-the-system">Building the system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#calculating-equilibrium-matrix">Calculating equilibrium matrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#calculating-coefficients-a-k-mn">Calculating coefficients <span class="math notranslate nohighlight">\(A^k_{mn}\)</span></a></li>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#calculating-conductances">Calculating conductances</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#numeric-calculations">Numeric calculations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#reference">Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="EqMatrix.html">EqMatrix</a><ul>
@@ -64,8 +66,13 @@
 <li class="toctree-l2"><a class="reference internal" href="EqMatrix.html#reference">Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="WMatrix.html">WMatrix</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="WMatrix.html#stoch_imp.WMatrix.WMatrix"><code class="docutils literal notranslate"><span class="pre">WMatrix</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="core_classes.html">Core Classes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="core_classes.html#mat">Mat</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_classes.html#trmatrix">TrMatrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_classes.html#coeffarray">CoeffArray</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_classes.html#constantobject">ConstantObject</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_classes.html#constantmatrix">ConstantMatrix</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core_classes.html#functions">Functions</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="util.html">Util</a><ul>
@@ -99,8 +106,8 @@
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="core_classes.html"
-                          title="next chapter">Core Classes</a></p>
+    <p class="topless"><a href="WMatrix.html"
+                          title="next chapter">WMatrix</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -133,7 +140,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="core_classes.html" title="Core Classes"
+          <a href="WMatrix.html" title="WMatrix"
              >next</a> |</li>
         <li class="right" >
           <a href="../howto/howto.html" title="How To"
