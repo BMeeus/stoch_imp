@@ -128,7 +128,7 @@ class WMatrix(TrMatrix):
         if 'force' not in flags.keys():
             flags['force'] = False
 
-        if verbose not in flags.keys():
+        if 'verbose' not in flags.keys():
             flags['verbose'] = True
 
         self.calc_weq(**flags)
@@ -137,7 +137,7 @@ class WMatrix(TrMatrix):
 
         return _sym_calc_coeff(self) if self.is_symbolic else _num_calc_coeff(self)
 
-    def get_cond(self, i: int, j: int, normal: bool = False, **flags) -> Callable[[Union[float, ndarray]], float]:
+    def get_cond(self, i: int, j: int, **flags) -> Callable[[Union[float, ndarray]], float]:
         """
         Return a callable for the frequency-dependent conductivity.
 
@@ -159,7 +159,7 @@ class WMatrix(TrMatrix):
         if 'force' not in flags.keys():
             flags['force'] = False
 
-        if verbose not in flags.keys():
+        if 'verbose' not in flags.keys():
             flags['verbose'] = True
 
         if self.coeff is None or flags['force']:
