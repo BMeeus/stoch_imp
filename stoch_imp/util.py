@@ -1,6 +1,6 @@
 from typing import Union, Any
 
-from numpy import ndarray, ones, ones_like, zeros_like
+from numpy import array, ndarray, ones, ones_like, zeros_like
 from numpy import sqrt as np_sqrt
 from numpy import sum as np_sum
 from sympy import nsimplify, simplify, sqrt, Matrix, Expr, ShapeError
@@ -8,26 +8,30 @@ from sympy import nsimplify, simplify, sqrt, Matrix, Expr, ShapeError
 from .core_classes import Mat, ConstantMatrix
 
 
-def calc_curr_like(m: Mat, p: Union[ConstantMatrix, Matrix, ndarray]) -> ConstantMatrix:
+def calc_curr_like(m: Union[Mat, Matrix, ndarray], p: Union[ConstantMatrix, Matrix, ndarray]) -> ConstantMatrix:
     """
-    Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.
+    Calculate expressions of current-like form: :math:`J_{mn} = W_{mn} P_n - W_{nm} P_m`.
 
     :param m: The matrix to be used (must be square).
     :type m: Mat
     :param p: The vector to be used (length must match m).
     :type p: ConstantMatrix | Matrix | ndarray
-    :return: Matrix of current-like values.
+    :return: Resulting matrix :math:`J_{mn}`.
     :rtype: ConstantMatrix
     """
-    return _sym_curr(m, p) if m.is_symbolic else _num_curr(m, p)
+    if hasattr(m, 'is_symbolic'):
+        return _sym_curr(m, p) if m.is_symbolic else _num_curr(m, p)
+    elif hasattr(m, 'free_symbols'):
+        return _sym_curr(m, p) if m.free_symbols else _num_curr(m, p)
+    else:
+        return _num_curr(m, p)
 
-
-def deep_simp(e: Any) -> Any:
+def deep_simp(e: Any, **flags) -> Any:
     """Simplify an arbitrary symbolic expression."""
     if hasattr(e, 'mat'):
-        e.mat = simplify(nsimplify(e.mat, full=True))
+        e.mat = simplify(nsimplify(e.mat, full=True, **flags))
         return e.mat
-    return simplify(nsimplify(e, full=True))
+    return simplify(nsimplify(e, full=True, **flags))
 
 
 def gram_schmidt(
@@ -206,8 +210,11 @@ def _num_curr(m: Mat, p: Union[ndarray, ConstantMatrix]) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
 
-    m = m.nmat
-
+    try:
+        m = m.nmat
+    except AttributeError:
+        m = array(m)
     if hasattr(p, "nmat"):
         p = p.nmat
     return ConstantMatrix((m.T * p).T - m.T * p)
+

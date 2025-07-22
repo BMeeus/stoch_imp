@@ -139,3 +139,4 @@ Reference
 .. autoclass:: WMatrix
     :members:
     :inherited-members:
+    :show-inheritance:

@@ -12,6 +12,7 @@
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -45,13 +46,20 @@
           <div class="body" role="main">
             
   <section id="util">
-<h1>Util<a class="headerlink" href="#util" title="Link to this heading">¶</a></h1>
+<span id="module-stoch_imp.util"></span><h1>Util<a class="headerlink" href="#util" title="Link to this heading">¶</a></h1>
 <p>This module offers a bunch of helper functions and utility functions. These functions take into account the difference
-between symbolic and numeric calculations, and can be useful in certain cases.</p>
-<dl class="py function" id="module-stoch_imp.util">
+between symbolic and numeric calculations, and are used in various calculations.</p>
+<section id="calc-curr-like">
+<h2>calc_curr_like<a class="headerlink" href="#calc-curr-like" title="Link to this heading">¶</a></h2>
+<p>The probability current from a state <span class="math notranslate nohighlight">\(m\)</span> to a state <span class="math notranslate nohighlight">\(n\)</span> is given by</p>
+<div class="math notranslate nohighlight">
+\[J_{mn} = W_{mn} P_{n} - W_{nm} P_{m}.\]</div>
+<p>Due to the nature of the theory, these types of equations show up a lot in calculating the conductances. This function
+calculates this expression for an arbitrary matrix and vector.</p>
+<dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.calc_curr_like">
 <span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">calc_curr_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#calc_curr_like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.calc_curr_like" title="Link to this definition">¶</a></dt>
-<dd><p>Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.</p>
+<dd><p>Calculate expressions of current-like form: <span class="math notranslate nohighlight">\(J_{mn} = W_{mn} P_n - W_{nm} P_m\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -60,7 +68,7 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Matrix of current-like values.</p>
+<dd class="field-even"><p>Resulting matrix <span class="math notranslate nohighlight">\(J_{mn}\)</span>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix">ConstantMatrix</a></p>
@@ -68,9 +76,14 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </dl>
 </dd></dl>
 
+</section>
+<section id="deep-simp">
+<h2>deep_simp<a class="headerlink" href="#deep-simp" title="Link to this heading">¶</a></h2>
+<p>This function simplifies symbolic objects in place by first simplifying numerically, then symbolically. If the object
+passed is an instance of (a subclass of) <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mat</span></code></a>, the internal matrix is simplified.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.deep_simp">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
 <dd><p>Simplify an arbitrary symbolic expression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -82,47 +95,7 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="stoch_imp.util.gram_schmidt">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">gram_schmidt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#gram_schmidt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.gram_schmidt" title="Link to this definition">¶</a></dt>
-<dd><p>Orthogonalize a set of vectors using Gram-Schmidt procedure.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>v_arr</strong> (<em>list</em><em>[</em><em>Matrix</em><em>] </em><em>| </em><em>ndarray</em><em> | </em><em>list</em><em>[</em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em>]</em>) – List of symbolic vectors or NumPy array (columns = vectors).</p></li>
-<li><p><strong>Peq</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Equilibrium distribution for weighted inner product.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Orthogonalized vectors.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>list[Matrix] | ndarray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="stoch_imp.util.inner">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#inner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.inner" title="Link to this definition">¶</a></dt>
-<dd><p>Compute inner product between two vectors, optionally weighted by Peq.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>v1</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a>) – First vector.</p></li>
-<li><p><strong>v2</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a>) – Second vector.</p></li>
-<li><p><strong>Peq</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Optional equilibrium vector.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Scalar inner product.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float | Expr</p>
-</dd>
-</dl>
-</dd></dl>
-
+</section>
 </section>
 
 
@@ -136,10 +109,14 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Util</a><ul>
+<li><a class="reference internal" href="#calc-curr-like">calc_curr_like</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.calc_curr_like"><code class="docutils literal notranslate"><span class="pre">calc_curr_like()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deep-simp">deep_simp</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.deep_simp"><code class="docutils literal notranslate"><span class="pre">deep_simp()</span></code></a></li>
-<li><a class="reference internal" href="#stoch_imp.util.gram_schmidt"><code class="docutils literal notranslate"><span class="pre">gram_schmidt()</span></code></a></li>
-<li><a class="reference internal" href="#stoch_imp.util.inner"><code class="docutils literal notranslate"><span class="pre">inner()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
