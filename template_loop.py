@@ -12,7 +12,7 @@ FEq = 0                          # base value of driving
 
 t = 1.0
 
-w = si.WMatrix(n, F)
+w = si.WMatrix(n, ds=F)
 
 for i in range(n):
     w.add_trans(i, i + 1, t * sp.exp(F))
@@ -20,34 +20,19 @@ for i in range(n):
 w.add_trans(1, 3, t * sp.exp(F))
 
 
-fig, ax = plt.subplots()
+with si.create_fig(1) as (fig, ax):
 
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "mathpazo"
-})
+    # Define range of frequencies
+    om_arr = np.logspace(-10, 2, 10000)
 
+    for ind, cond in w.get_conds([(1, 2), (3, 4), (1, 3)]):
+        res_arr = cond(om_arr)
+        # plot result
+        line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
+        si.add_arrow(line)
 
-"""
-Plot currents
-"""
+    # Add axes
+    si.complex_axes(ax, r"\sigma_{mn}(\omega)")
 
-# Define range of frequencies
-om_arr = np.logspace(-10, 2, 10000)
-
-for ind, cond in w.get_conds([(1, 2), (3, 4), (1, 3)]):
-    res_arr = cond(om_arr)
-    # plot result
-    line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
-    si.add_arrow(line)
-
-# Add axes
-si.complex_axes(ax, r"\sigma_{mn}(\omega)")
-
-# Polish figure
-ax.tick_params(labelfontfamily="serif")
-ax.set_title("Periodically driven current", fontname="serif", fontsize=18)
-# ax.legend()
-plt.tight_layout()
-# todo: Write figure saving code
-plt.show()
+    ax.set_title("Periodically driven current", fontname="serif", fontsize=18)
+    ax.legend()
