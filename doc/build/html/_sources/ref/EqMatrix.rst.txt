@@ -51,7 +51,8 @@ code sample we add a transition from site `1` to site `2` with transition rate `
 .. warning::
     It is generally not advisable to add transitions directly to the matrix using item assignment. Although this can be
     done, the matrix diagonal needs to be recalculated using :meth:`~stoch_imp.core_classes.TrMatrix.calc_diag`.
-    The :meth:`~stoch_imp.core_classes.TrMatrix.add_trans` method on the other hand takes care of this for you.
+    The :meth:`~stoch_imp.core_classes.TrMatrix.add_trans` method on the other hand takes care of this for you, along
+    with other quality of life improvements.
 
 Calculating eigensystem
 -----------------------

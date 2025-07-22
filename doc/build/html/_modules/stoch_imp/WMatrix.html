@@ -96,9 +96,9 @@
 
 <div class="viewcode-block" id="WMatrix.calc_weq">
 <a class="viewcode-back" href="../../ref/WMatrix.html#stoch_imp.WMatrix.WMatrix.calc_weq">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calc_weq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EqMatrix</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_weq</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EqMatrix</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculate the equilibrium matrix.</span>
+<span class="sd">        Calculate the equilibrium matrix :math:`W^{eq}`.</span>
 
 <span class="sd">        :param eq: Equilibrium value</span>
 <span class="sd">        :type eq: float</span>
@@ -110,6 +110,9 @@
 <span class="sd">        :return: the equilibrium matrix.</span>
 <span class="sd">        :rtype: EqMatrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weq</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weq</span>
 
@@ -117,12 +120,13 @@
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Equilibrium matrix calculated&quot;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">weq</span></div>
 
 
 <div class="viewcode-block" id="WMatrix.calc_w1">
 <a class="viewcode-back" href="../../ref/WMatrix.html#stoch_imp.WMatrix.WMatrix.calc_w1">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calc_w1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_w1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eq</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConstantMatrix</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the first-order driving matrix.</span>
 
@@ -136,6 +140,9 @@
 <span class="sd">        :return: the first-order driving matrix.</span>
 <span class="sd">        :rtype: ConstantMatrix</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">w1</span>
 
@@ -153,9 +160,9 @@
 
 <div class="viewcode-block" id="WMatrix.calc_coeff">
 <a class="viewcode-back" href="../../ref/WMatrix.html#stoch_imp.WMatrix.WMatrix.calc_coeff">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calc_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoeffArray</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calc_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoeffArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Calculate coefficient array.</span>
+<span class="sd">        Calculate coefficient array containing the coefficients :math:`A^{(k)}_{mn}`.</span>
 
 <span class="sd">        :param force: Force recalculation</span>
 <span class="sd">        :type force: bool</span>
@@ -166,13 +173,22 @@
 <span class="sd">            i --&gt; j is CoeffArray[i, j, k].</span>
 <span class="sd">        :rtype: CoeffArray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_calc_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="s1">&#39;force&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">flags</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="s1">&#39;verbose&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">flags</span><span class="p">[</span><span class="s1">&#39;verbose&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_weq</span><span class="p">(</span><span class="o">**</span><span class="n">flags</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">weq</span><span class="o">.</span><span class="n">calc_eig</span><span class="p">(</span><span class="o">**</span><span class="n">flags</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_w1</span><span class="p">(</span><span class="o">**</span><span class="n">flags</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_sym_calc_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="k">else</span> <span class="n">_num_calc_coeff</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="WMatrix.get_cond">
 <a class="viewcode-back" href="../../ref/WMatrix.html#stoch_imp.WMatrix.WMatrix.get_cond">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">normal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span>
-        <span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_cond</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">j</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">]],</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a callable for the frequency-dependent conductivity.</span>
 
@@ -190,8 +206,15 @@
 <span class="sd">        :return: Callable returning conductivity value</span>
 <span class="sd">        :rtype: Callable[[float | ndarray], float]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">calc_coeff</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;force&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">flags</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="s1">&#39;verbose&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flags</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">flags</span><span class="p">[</span><span class="s1">&#39;verbose&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">coeff</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">flags</span><span class="p">[</span><span class="s1">&#39;force&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">calc_coeff</span><span class="p">(</span><span class="o">**</span><span class="n">flags</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">:</span>
             <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
@@ -207,7 +230,7 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span><span class="p">:</span>
             <span class="n">cond</span> <span class="o">=</span> <span class="n">deep_simp</span><span class="p">(</span><span class="n">cond</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">normal</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">flags</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s1">&#39;normal&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">norm_val</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
                 <span class="n">coeff</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">))</span>
@@ -221,13 +244,11 @@
 <a class="viewcode-back" href="../../ref/WMatrix.html#stoch_imp.WMatrix.WMatrix.get_conds">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_conds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                   <span class="n">conds</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                  <span class="n">normal</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                  <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]]:</span>
+                  <span class="o">**</span><span class="n">flags</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return a list of conductivity callables for specified index pairs.</span>
 
-<span class="sd">        :param conds: Index pairs (i, j) encoding the transition i --&gt; j.</span>
+<span class="sd">        :param conds: Index pairs :code:`(i, j)` encoding the transition i --&gt; j.</span>
 <span class="sd">        :type conds: Union[tuple[int, int], list[tuple[int, int]], None]</span>
 <span class="sd">        :param normal: Normalize results</span>
 <span class="sd">        :type normal: bool</span>
@@ -248,7 +269,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">conds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
             <span class="n">conds</span> <span class="o">=</span> <span class="p">[</span><span class="n">conds</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="p">[(</span><span class="n">cond</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cond</span><span class="p">(</span><span class="o">*</span><span class="n">cond</span><span class="p">,</span> <span class="n">normal</span><span class="o">=</span><span class="n">normal</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span> <span class="k">for</span> <span class="n">cond</span> <span class="ow">in</span> <span class="n">conds</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">cond</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_cond</span><span class="p">(</span><span class="o">*</span><span class="n">cond</span><span class="p">,</span> <span class="o">**</span><span class="n">flags</span><span class="p">))</span> <span class="k">for</span> <span class="n">cond</span> <span class="ow">in</span> <span class="n">conds</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="WMatrix.to_num">
@@ -283,27 +304,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="o">=</span> <span class="kc">True</span></div>
 </div>
 
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_calc_coeff</span><span class="p">(</span><span class="n">w</span><span class="p">:</span> <span class="n">WMatrix</span><span class="p">,</span> <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoeffArray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Wrapper to calculate coefficients based on symbolic/numeric status.</span>
-
-<span class="sd">    :param w: Matrix instance</span>
-<span class="sd">    :type w: WMatrix</span>
-<span class="sd">    :param force: Force recalculation</span>
-<span class="sd">    :type force: bool</span>
-<span class="sd">    :param verbose: Print verbose output</span>
-<span class="sd">    :type verbose: bool</span>
-
-<span class="sd">    :return: Coefficients</span>
-<span class="sd">    :rtype: CoeffArray</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">w</span><span class="o">.</span><span class="n">calc_weq</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">w</span><span class="o">.</span><span class="n">weq</span><span class="o">.</span><span class="n">calc_eig</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">w</span><span class="o">.</span><span class="n">calc_w1</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="n">force</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">_sym_calc_coeff</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">is_symbolic</span> <span class="k">else</span> <span class="n">_num_calc_coeff</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_sym_calc_coeff</span><span class="p">(</span><span class="n">w</span><span class="p">:</span> <span class="n">WMatrix</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CoeffArray</span><span class="p">:</span>

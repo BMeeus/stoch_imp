@@ -56,6 +56,7 @@ def create_fig(subplt: Union[int, tuple[int, int]],
             axis.tick_params(**tick_dict)
     except TypeError:
         ax.tick_params(**tick_dict)
+
     yield fig, ax
 
     if tight:

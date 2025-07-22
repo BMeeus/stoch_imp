@@ -1,4 +1,3 @@
-from tabnanny import verbose
 from typing import Callable, Optional, Union
 
 from numpy import matmul, ndarray
@@ -57,7 +56,7 @@ class WMatrix(TrMatrix):
 
     def calc_weq(self, eq: float = None, **flags) -> EqMatrix:
         """
-        Calculate the equilibrium matrix.
+        Calculate the equilibrium matrix :math:`W^{eq}`.
 
         :param eq: Equilibrium value
         :type eq: float
@@ -115,7 +114,7 @@ class WMatrix(TrMatrix):
 
     def calc_coeff(self, **flags) -> CoeffArray:
         """
-        Calculate coefficient array.
+        Calculate coefficient array containing the coefficients :math:`A^{(k)}_{mn}`.
 
         :param force: Force recalculation
         :type force: bool
@@ -195,7 +194,7 @@ class WMatrix(TrMatrix):
         """
         Return a list of conductivity callables for specified index pairs.
 
-        :param conds: Index pairs (i, j) encoding the transition i --> j.
+        :param conds: Index pairs :code:`(i, j)` encoding the transition i --> j.
         :type conds: Union[tuple[int, int], list[tuple[int, int]], None]
         :param normal: Normalize results
         :type normal: bool
