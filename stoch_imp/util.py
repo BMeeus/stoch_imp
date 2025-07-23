@@ -26,12 +26,12 @@ def calc_curr_like(m: Union[Mat, Matrix, ndarray], p: Union[ConstantMatrix, Matr
     else:
         return _num_curr(m, p)
 
-def deep_simp(e: Any, **flags) -> Any:
+def deep_simp(expr: Any, **flags):
     """Simplify an arbitrary symbolic expression."""
-    if hasattr(e, 'mat'):
-        e.mat = simplify(nsimplify(e.mat, full=True, **flags))
-        return e.mat
-    return simplify(nsimplify(e, full=True, **flags))
+    if hasattr(expr, 'mat'):
+        expr.mat = simplify(nsimplify(expr.mat, full=True, **flags))
+        return expr.mat
+    return simplify(nsimplify(expr, full=True, **flags))
 
 
 def gram_schmidt(

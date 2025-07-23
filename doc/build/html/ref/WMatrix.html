@@ -7,7 +7,7 @@
 
     <title>WMatrix &#8212; Stochastic Impedance  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=f11ead97" />
     
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -179,8 +179,7 @@ convert back to symbolical calculations, use <a class="reference internal" href=
 <dl class="py class">
 <dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">stoch_imp.WMatrix.</span></span><span class="sig-name descname"><span class="pre">WMatrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/WMatrix.html#WMatrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.TrMatrix" title="stoch_imp.core_classes.TrMatrix"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrMatrix</span></code></a></p>
-<p>Class handling driven transition matrices.</p>
+<dd><p>Class handling driven transition matrices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -219,9 +218,6 @@ convert back to symbolical calculations, use <a class="reference internal" href=
 <li><p><strong>simp</strong> (<em>bool</em>) – If True, simplifies r and ri</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>None</p>
-</dd>
 </dl>
 </dd></dl>
 
@@ -250,11 +246,6 @@ i –&gt; j is CoeffArray[i, j, k].</p>
 <dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix.calc_diag">
 <span class="sig-name descname"><span class="pre">calc_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix.calc_diag" title="Link to this definition">¶</a></dt>
 <dd><p>Force recomputation of diagonal terms to preserve column sum = 0.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">

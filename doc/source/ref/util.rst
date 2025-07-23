@@ -26,3 +26,28 @@ passed is an instance of (a subclass of) :class:`~stoch_imp.core_classes.Mat`, t
 
 .. autofunction:: deep_simp
 
+gram_schmidt
+------------
+When orthogonalizing the vectors, a non-canonical inner product is used. This function implements the Gram-Schmidt
+algorithm using the inner product given by
+
+.. math::
+    \langle v, w \rangle = \sum_i \frac{v_i w_i}{P^{eq}_i}
+
+where :math:`P^{eq}` is given as optional input to the function. If no :math:`P^{eq}` is given a vector consisting
+only of ones is used, yielding the standard inner product.
+
+.. autofunction:: gram_schmidt
+
+inner
+-----
+
+This is a simple helper function performing the inner product as defined by
+
+.. math::
+    \langle v, w \rangle = \sum_i \frac{v_i w_i}{P^{eq}_i}
+
+where :math:`P^{eq}` is given as optional input to the function. If no :math:`P^{eq}` is given a vector consisting
+only of ones is used, yielding the standard inner product.
+
+.. autofunction:: inner

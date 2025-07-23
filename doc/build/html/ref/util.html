@@ -7,7 +7,7 @@
 
     <title>Util &#8212; Stochastic Impedance  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=f11ead97" />
     
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -83,14 +83,69 @@ calculates this expression for an arbitrary matrix and vector.</p>
 passed is an instance of (a subclass of) <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mat</span></code></a>, the internal matrix is simplified.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.deep_simp">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
 <dd><p>Simplify an arbitrary symbolic expression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>e</strong> (<em>Any</em>)</p>
+<dd class="field-odd"><p><strong>expr</strong> (<em>Any</em>)</p>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Any</em></p>
+</dl>
+</dd></dl>
+
+</section>
+<section id="gram-schmidt">
+<h2>gram_schmidt<a class="headerlink" href="#gram-schmidt" title="Link to this heading">¶</a></h2>
+<p>When orthogonalizing the vectors, a non-canonical inner product is used. This function implements the Gram-Schmidt
+algorithm using the inner product given by</p>
+<div class="math notranslate nohighlight">
+\[\langle v, w \rangle = \sum_i \frac{v_i w_i}{P^{eq}_i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given as optional input to the function. If no <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given a vector consisting
+only of ones is used, yielding the standard inner product.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.util.gram_schmidt">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">gram_schmidt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#gram_schmidt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.gram_schmidt" title="Link to this definition">¶</a></dt>
+<dd><p>Orthogonalize a set of vectors using Gram-Schmidt procedure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_arr</strong> (<em>list</em><em>[</em><em>Matrix</em><em>] </em><em>| </em><em>ndarray</em><em> | </em><em>list</em><em>[</em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em>]</em>) – List of symbolic vectors or NumPy array (columns = vectors).</p></li>
+<li><p><strong>Peq</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Equilibrium distribution for weighted inner product.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Orthogonalized vectors.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[Matrix] | ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="inner">
+<h2>inner<a class="headerlink" href="#inner" title="Link to this heading">¶</a></h2>
+<p>This is a simple helper function performing the inner product as defined by</p>
+<div class="math notranslate nohighlight">
+\[\langle v, w \rangle = \sum_i \frac{v_i w_i}{P^{eq}_i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given as optional input to the function. If no <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given a vector consisting
+only of ones is used, yielding the standard inner product.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="stoch_imp.util.inner">
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#inner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.inner" title="Link to this definition">¶</a></dt>
+<dd><p>Compute inner product between two vectors, optionally weighted by Peq.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v1</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a>) – First vector.</p></li>
+<li><p><strong>v2</strong> (<em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a>) – Second vector.</p></li>
+<li><p><strong>Peq</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix"><em>ConstantMatrix</em></a><em> | </em><em>Matrix</em><em> | </em><em>ndarray</em><em> | </em><em>None</em>) – Optional equilibrium vector.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Scalar inner product.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float | Expr</p>
 </dd>
 </dl>
 </dd></dl>
@@ -115,6 +170,14 @@ passed is an instance of (a subclass of) <a class="reference internal" href="cor
 </li>
 <li><a class="reference internal" href="#deep-simp">deep_simp</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.deep_simp"><code class="docutils literal notranslate"><span class="pre">deep_simp()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gram-schmidt">gram_schmidt</a><ul>
+<li><a class="reference internal" href="#stoch_imp.util.gram_schmidt"><code class="docutils literal notranslate"><span class="pre">gram_schmidt()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inner">inner</a><ul>
+<li><a class="reference internal" href="#stoch_imp.util.inner"><code class="docutils literal notranslate"><span class="pre">inner()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -38,7 +38,7 @@ class CoeffArray:
         # Pretty-print the full array using SymPy formatting
         return pretty(self.mat)
 
-    def to_num(self) -> None:
+    def to_num(self):
         """Convert array to numeric type"""
         for i, j, k in self.iter:
             if len(self.mat[i, j, k].free_symbols) != 0:
@@ -46,7 +46,7 @@ class CoeffArray:
             self.mat[i, j, k] = N(self.mat[i, j, k])
         self.mat = self.mat.astype(float64)
 
-    def to_sym(self) -> None:
+    def to_sym(self):
         """Convert array to symbolic type"""
         self.mat = self.mat.astype(object)
 
@@ -89,7 +89,7 @@ class Mat:
     :ivar tol: Numerical tolerance used for approximate comparisons.
     """
 
-    def __init__(self, arr, *args, **kwargs) -> None:
+    def __init__(self, arr, *args, **kwargs):
         """
         Initialize matrix object from array-like input.
 
@@ -108,7 +108,7 @@ class Mat:
         # Pretty-print matrix using sympy's printer
         return pretty(self.mat)
 
-    def __setitem__(self, key, value) -> None:
+    def __setitem__(self, key, value):
         # Support assignment via indexing
         self.mat[key] = value
 
@@ -180,7 +180,7 @@ class ConstantMatrix(ConstantObject, Mat):
         # Scalar division
         return ConstantMatrix(self.mat / other)
 
-    def to_num(self) -> None:
+    def to_num(self):
         """Convert symbolic matrix to numeric form."""
         if not self.is_symbolic:
             pass
@@ -190,7 +190,7 @@ class ConstantMatrix(ConstantObject, Mat):
             self.nmat = array(N(self.mat), dtype=float64)
             self.is_symbolic = False
 
-    def to_sym(self) -> None:
+    def to_sym(self):
         """Convert numeric matrix back to symbolic form."""
         if self.is_symbolic:
             pass
@@ -213,7 +213,7 @@ class TrMatrix(Mat):
     :ivar tol: Numerical tolerance used for validations.
     """
 
-    def __init__(self, arr: Any, *args, **kwargs) -> None:
+    def __init__(self, arr: Any, *args, **kwargs):
         """
         Initialize transition matrix and validate constraints.
 
@@ -233,7 +233,7 @@ class TrMatrix(Mat):
                   r: float | Expr = 1.0,
                   ri: float | Expr | None = None,
                   symm: bool = True,
-                  simp: bool = True) -> None:
+                  simp: bool = True):
         """
         Add a transition `i --> j` with rate `r`, and optionally symmetric transition `j --> i` with rate `ri`.
 
@@ -287,7 +287,7 @@ class TrMatrix(Mat):
         if simp:
             simplify(self.mat)
 
-    def calc_diag(self) -> None:
+    def calc_diag(self):
         """Force recomputation of diagonal terms to preserve column sum = 0."""
         for col in range(self.dim):
             self[col, col] = -sum(self[row, col] for row in range(self.dim) if row != col)

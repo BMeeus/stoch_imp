@@ -29,7 +29,7 @@ class EqMatrix(ConstantObject, TrMatrix):
     :ivar nvecs: Numpy array of numeric eigenvectors, or None if not yet calculated.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         """
         Initialize the EqMatrix object.
         """
