@@ -71,7 +71,7 @@ def add_arrow(line: Line2D,
               position: float = None,
               direction: str = 'right',
               size: int = 15,
-              color: str = None) -> None:
+              color: str = None):
     """
     add an arrow to a line.
 
@@ -119,9 +119,7 @@ def complex_axes(ax: Axes,
                  q: str,
                  r_off: list[float] | tuple[float, float] = (0, 0),
                  i_off: list[float] | tuple[float, float] = (0, 0),
-                 sz: int = 10,
-                 grid: bool = True,
-                 color: str = "k") -> None:
+                 grid: bool = True, **kwargs):
     """
     Add complex axes to a figure, with labels of imaginary and real parts. These labels are heuristically placed and can
     be offset if necessary.
@@ -137,17 +135,24 @@ def complex_axes(ax: Axes,
     :type r_off: (float, float)
     :param i_off: Offset of the imaginary axis label, given in axis units.
     :type i_off: (float, float)
-    :param sz: Font size of the labels
-    :type sz: int
     :param grid: If True, adds a grid to the axes object.
     :type grid: bool
-    :param color: If None, black is used.
-    :type color: str
-    :return: None
     """
 
+    for alias in ['c', 'colour']:
+        if alias in kwargs.keys():
+            kwargs['color'] = kwargs[alias]
+
+    color = kwargs.setdefault('color', 'k')
+
+    if 'size' in kwargs.keys():
+        sz = kwargs['size']
+    else:
+        sz = kwargs.setdefault('sz', 10)
+
     ax.set_aspect('equal')  # Force x and y to have ratio 1:1
-    ax.grid(grid, which='both')  # Enable grid
+    if grid:
+        ax.grid(grid, which='both')  # Enable grid
     ax.axvline(x=0, color=color)  # Plot y-axis
     ax.axhline(y=0, color=color)  # Plot x-xis
 
