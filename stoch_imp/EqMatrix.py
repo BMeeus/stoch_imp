@@ -2,7 +2,7 @@ from typing import (Optional, Union)
 
 from numpy import (array, argsort, flip, float64, hstack, matmul, ndarray, real)
 from scipy.linalg import (eig, norm)
-from sympy import (N, Matrix, re)
+from sympy import (N, Matrix)
 
 from .core_classes import (ConstantMatrix, TrMatrix, ConstantObject, arr_to_mat)
 from .util import (calc_curr_like, deep_simp, gram_schmidt)
@@ -134,10 +134,10 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
         return weq.vals, weq.vecs
 
     eig_syst = weq.eigenvects(error_when_incomplete=True)
-    eig_syst.sort(key=lambda x: re(x[0]), reverse=True)
+    eig_syst.sort(key=lambda x: N(x[0]).as_real_imag()[0], reverse=True)
 
-    lead_val = eig_syst[0][0]
-    if re(lead_val) > tol:
+    lead_val = N(eig_syst[0][0]).as_real_imag()[0]
+    if lead_val > tol:
         raise ValueError("no eigenvalue 0 was found")
     elif eig_syst[0][1] != 1:
         raise ValueError("multiple steady states found")
@@ -157,7 +157,7 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
         val_re, val_im = val.as_real_imag()
         if val_im > tol:
             raise ValueError(f"Complex eigenvalue found: {val}")
-        for vec in basis[:mult]:
+        for vec in basis:
             vec_re, _ = vec.as_real_imag()
             res = deep_simp(weq.mat * vec_re) - deep_simp(val_re * vec_re)
             try:
@@ -166,7 +166,7 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
             except TypeError:
                 if res.norm().is_zero:
                     raise ValueError("Incorrect computation of eigenvectors")
-            vals.append(val_re)
+            vals.append(deep_simp(val_re))
             vecs.append(vec_re)
 
     weq.vecs = gram_schmidt(vecs, weq.peq)
