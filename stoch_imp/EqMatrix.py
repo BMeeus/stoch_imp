@@ -2,7 +2,7 @@ from typing import (Optional, Union)
 
 from numpy import (array, argsort, flip, float64, hstack, matmul, ndarray, real)
 from scipy.linalg import (eig, norm)
-from sympy import (N, Matrix, re)
+from sympy import (N, Matrix)
 
 from .core_classes import (ConstantMatrix, TrMatrix, ConstantObject, arr_to_mat)
 from .util import (calc_curr_like, deep_simp, gram_schmidt)
@@ -29,14 +29,9 @@ class EqMatrix(ConstantObject, TrMatrix):
     :ivar nvecs: Numpy array of numeric eigenvectors, or None if not yet calculated.
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, **kwargs):
         """
         Initialize the EqMatrix object.
-
-        :param args: Positional arguments for parent constructors
-        :type args: tuple
-        :param kwargs: Keyword arguments for parent constructors
-        :type kwargs: dict
         """
         super().__init__(*args, **kwargs)
         self.peq: Optional[ConstantMatrix] = None
@@ -139,10 +134,10 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
         return weq.vals, weq.vecs
 
     eig_syst = weq.eigenvects(error_when_incomplete=True)
-    eig_syst.sort(key=lambda x: re(x[0]), reverse=True)
+    eig_syst.sort(key=lambda x: N(x[0]).as_real_imag()[0], reverse=True)
 
-    lead_val = eig_syst[0][0]
-    if re(lead_val) > tol:
+    lead_val = N(eig_syst[0][0]).as_real_imag()[0]
+    if lead_val > tol:
         raise ValueError("no eigenvalue 0 was found")
     elif eig_syst[0][1] != 1:
         raise ValueError("multiple steady states found")
@@ -150,7 +145,7 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
     eigvec_0 = eig_syst[0][-1][0]
     peq_vec = eigvec_0 / sum(eigvec_0)
     weq.peq = ConstantMatrix(peq_vec.as_real_imag()[0], zi=weq.zero_index, sym=True)
-    if not weq.check_db():
+    if chk_db and not weq.check_db():
         raise ValueError("detailed balance not fulfilled")
     if verbose:
         print("Equilibrium distribution calculated")
@@ -162,7 +157,7 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
         val_re, val_im = val.as_real_imag()
         if val_im > tol:
             raise ValueError(f"Complex eigenvalue found: {val}")
-        for vec in basis[:mult]:
+        for vec in basis:
             vec_re, _ = vec.as_real_imag()
             res = deep_simp(weq.mat * vec_re) - deep_simp(val_re * vec_re)
             try:
@@ -171,7 +166,7 @@ def _sym_calc_eig(weq, tol, **flags) -> tuple[list, list[Matrix]]:
             except TypeError:
                 if res.norm().is_zero:
                     raise ValueError("Incorrect computation of eigenvectors")
-            vals.append(val_re)
+            vals.append(deep_simp(val_re))
             vecs.append(vec_re)
 
     weq.vecs = gram_schmidt(vecs, weq.peq)
@@ -185,7 +180,11 @@ def _num_calc_eig(weq, tol, **flags):
     """
     Compute numeric eigenvalues and eigenvectors.
     """
+
     force = flags.setdefault('force', False)
+    verbose = flags.setdefault('force', False)
+    chk_db = flags.setdefault('force', True)
+
     if weq.nvals is not None and weq.nvecs is not None and not force:
         return weq.nvals, weq.nvecs
 

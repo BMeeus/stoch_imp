@@ -7,16 +7,17 @@
 
     <title>Util &#8212; Stochastic Impedance  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=f11ead97" />
     
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Pyplot Functionalities" href="Pyplot.html" />
-    <link rel="prev" title="WMatrix" href="WMatrix.html" /> 
+    <link rel="prev" title="Core Classes" href="core_classes.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -31,7 +32,7 @@
           <a href="Pyplot.html" title="Pyplot Functionalities"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="WMatrix.html" title="WMatrix"
+          <a href="core_classes.html" title="Core Classes"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference Guides</a> &#187;</li>
@@ -45,13 +46,20 @@
           <div class="body" role="main">
             
   <section id="util">
-<h1>Util<a class="headerlink" href="#util" title="Link to this heading">¶</a></h1>
+<span id="module-stoch_imp.util"></span><h1>Util<a class="headerlink" href="#util" title="Link to this heading">¶</a></h1>
 <p>This module offers a bunch of helper functions and utility functions. These functions take into account the difference
-between symbolic and numeric calculations, and can be useful in certain cases.</p>
-<dl class="py function" id="module-stoch_imp.util">
+between symbolic and numeric calculations, and are used in various calculations.</p>
+<section id="calc-curr-like">
+<h2>calc_curr_like<a class="headerlink" href="#calc-curr-like" title="Link to this heading">¶</a></h2>
+<p>The probability current from a state <span class="math notranslate nohighlight">\(m\)</span> to a state <span class="math notranslate nohighlight">\(n\)</span> is given by</p>
+<div class="math notranslate nohighlight">
+\[J_{mn} = W_{mn} P_{n} - W_{nm} P_{m}.\]</div>
+<p>Due to the nature of the theory, these types of equations show up a lot in calculating the conductances. This function
+calculates this expression for an arbitrary matrix and vector.</p>
+<dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.calc_curr_like">
 <span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">calc_curr_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#calc_curr_like"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.calc_curr_like" title="Link to this definition">¶</a></dt>
-<dd><p>Calculate expressions of current-like form: J_mn = W_mn * P_n - W_nm * P_m.</p>
+<dd><p>Calculate expressions of current-like form: <span class="math notranslate nohighlight">\(J_{mn} = W_{mn} P_n - W_{nm} P_m\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -60,7 +68,7 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Matrix of current-like values.</p>
+<dd class="field-even"><p>Resulting matrix <span class="math notranslate nohighlight">\(J_{mn}\)</span>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="core_classes.html#stoch_imp.core_classes.ConstantMatrix" title="stoch_imp.core_classes.ConstantMatrix">ConstantMatrix</a></p>
@@ -68,20 +76,31 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </dl>
 </dd></dl>
 
+</section>
+<section id="deep-simp">
+<h2>deep_simp<a class="headerlink" href="#deep-simp" title="Link to this heading">¶</a></h2>
+<p>This function simplifies symbolic objects in place by first simplifying numerically, then symbolically. If the object
+passed is an instance of (a subclass of) <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mat</span></code></a>, the internal matrix is simplified.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.deep_simp">
-<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">deep_simp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#deep_simp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.deep_simp" title="Link to this definition">¶</a></dt>
 <dd><p>Simplify an arbitrary symbolic expression.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>e</strong> (<em>Any</em>)</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>Any</em></p>
+<dd class="field-odd"><p><strong>expr</strong> (<em>Any</em>)</p>
 </dd>
 </dl>
 </dd></dl>
 
+</section>
+<section id="gram-schmidt">
+<h2>gram_schmidt<a class="headerlink" href="#gram-schmidt" title="Link to this heading">¶</a></h2>
+<p>When orthogonalizing the vectors, a non-canonical inner product is used. This function implements the Gram-Schmidt
+algorithm using the inner product given by</p>
+<div class="math notranslate nohighlight">
+\[\langle v, w \rangle = \sum_i \frac{v_i w_i}{P^{eq}_i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given as optional input to the function. If no <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given a vector consisting
+only of ones is used, yielding the standard inner product.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.gram_schmidt">
 <span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">gram_schmidt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#gram_schmidt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.gram_schmidt" title="Link to this definition">¶</a></dt>
@@ -102,6 +121,14 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </dl>
 </dd></dl>
 
+</section>
+<section id="inner">
+<h2>inner<a class="headerlink" href="#inner" title="Link to this heading">¶</a></h2>
+<p>This is a simple helper function performing the inner product as defined by</p>
+<div class="math notranslate nohighlight">
+\[\langle v, w \rangle = \sum_i \frac{v_i w_i}{P^{eq}_i}\]</div>
+<p>where <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given as optional input to the function. If no <span class="math notranslate nohighlight">\(P^{eq}\)</span> is given a vector consisting
+only of ones is used, yielding the standard inner product.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="stoch_imp.util.inner">
 <span class="sig-prename descclassname"><span class="pre">stoch_imp.util.</span></span><span class="sig-name descname"><span class="pre">inner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Peq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/util.html#inner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.util.inner" title="Link to this definition">¶</a></dt>
@@ -124,6 +151,7 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
 </dd></dl>
 
 </section>
+</section>
 
 
             <div class="clearer"></div>
@@ -136,10 +164,22 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
     <h3><a href="../index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Util</a><ul>
+<li><a class="reference internal" href="#calc-curr-like">calc_curr_like</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.calc_curr_like"><code class="docutils literal notranslate"><span class="pre">calc_curr_like()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#deep-simp">deep_simp</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.deep_simp"><code class="docutils literal notranslate"><span class="pre">deep_simp()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gram-schmidt">gram_schmidt</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.gram_schmidt"><code class="docutils literal notranslate"><span class="pre">gram_schmidt()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#inner">inner</a><ul>
 <li><a class="reference internal" href="#stoch_imp.util.inner"><code class="docutils literal notranslate"><span class="pre">inner()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -147,8 +187,8 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="WMatrix.html"
-                          title="previous chapter">WMatrix</a></p>
+    <p class="topless"><a href="core_classes.html"
+                          title="previous chapter">Core Classes</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -189,7 +229,7 @@ between symbolic and numeric calculations, and can be useful in certain cases.</
           <a href="Pyplot.html" title="Pyplot Functionalities"
              >next</a> |</li>
         <li class="right" >
-          <a href="WMatrix.html" title="WMatrix"
+          <a href="core_classes.html" title="Core Classes"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" >Reference Guides</a> &#187;</li>

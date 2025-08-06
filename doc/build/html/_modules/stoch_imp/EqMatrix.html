@@ -41,6 +41,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">argsort</span><span class="p">,</span> <span class="n">flip</span><span class="p">,</span> <span class="n">float64</span><span class="p">,</span> <span class="n">hstack</span><span class="p">,</span> <span class="n">matmul</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">real</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.linalg</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">eig</span><span class="p">,</span> <span class="n">norm</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">re</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.core_classes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">ConstantMatrix</span><span class="p">,</span> <span class="n">TrMatrix</span><span class="p">,</span> <span class="n">ConstantObject</span><span class="p">,</span> <span class="n">arr_to_mat</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.util</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">calc_curr_like</span><span class="p">,</span> <span class="n">deep_simp</span><span class="p">,</span> <span class="n">gram_schmidt</span><span class="p">)</span>
@@ -69,14 +70,9 @@
 <span class="sd">    :ivar nvecs: Numpy array of numeric eigenvectors, or None if not yet calculated.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize the EqMatrix object.</span>
-
-<span class="sd">        :param args: Positional arguments for parent constructors</span>
-<span class="sd">        :type args: tuple</span>
-<span class="sd">        :param kwargs: Keyword arguments for parent constructors</span>
-<span class="sd">        :type kwargs: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">peq</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConstantMatrix</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -195,10 +191,10 @@
         <span class="k">return</span> <span class="n">weq</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span>
 
     <span class="n">eig_syst</span> <span class="o">=</span> <span class="n">weq</span><span class="o">.</span><span class="n">eigenvects</span><span class="p">(</span><span class="n">error_when_incomplete</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">eig_syst</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">re</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">eig_syst</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">N</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">lead_val</span> <span class="o">=</span> <span class="n">eig_syst</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">re</span><span class="p">(</span><span class="n">lead_val</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
+    <span class="n">lead_val</span> <span class="o">=</span> <span class="n">N</span><span class="p">(</span><span class="n">eig_syst</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">lead_val</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;no eigenvalue 0 was found&quot;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">eig_syst</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;multiple steady states found&quot;</span><span class="p">)</span>
@@ -218,8 +214,10 @@
         <span class="n">val_re</span><span class="p">,</span> <span class="n">val_im</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">val_im</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Complex eigenvalue found: </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">vec</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">[:</span><span class="n">mult</span><span class="p">]:</span>
-            <span class="n">vec_re</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">vec</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">vec</span> <span class="ow">in</span> <span class="n">basis</span><span class="p">:</span>
+            <span class="n">sp</span><span class="o">.</span><span class="n">pretty_print</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">cse</span><span class="p">(</span><span class="n">vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">vec_re</span> <span class="o">=</span> <span class="n">deep_simp</span><span class="p">(</span><span class="n">vec</span><span class="o">.</span><span class="n">as_real_imag</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">vec_re</span><span class="p">)</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">deep_simp</span><span class="p">(</span><span class="n">weq</span><span class="o">.</span><span class="n">mat</span> <span class="o">*</span> <span class="n">vec_re</span><span class="p">)</span> <span class="o">-</span> <span class="n">deep_simp</span><span class="p">(</span><span class="n">val_re</span> <span class="o">*</span> <span class="n">vec_re</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">N</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">norm</span><span class="p">())</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">:</span>
@@ -227,8 +225,10 @@
             <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span><span class="o">.</span><span class="n">is_zero</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect computation of eigenvectors&quot;</span><span class="p">)</span>
-            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_re</span><span class="p">)</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">deep_simp</span><span class="p">(</span><span class="n">val_re</span><span class="p">))</span>
             <span class="n">vecs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vec_re</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">vecs</span><span class="p">)</span>
 
     <span class="n">weq</span><span class="o">.</span><span class="n">vecs</span> <span class="o">=</span> <span class="n">gram_schmidt</span><span class="p">(</span><span class="n">vecs</span><span class="p">,</span> <span class="n">weq</span><span class="o">.</span><span class="n">peq</span><span class="p">)</span>
     <span class="n">weq</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="n">vals</span>

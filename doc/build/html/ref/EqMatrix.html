@@ -7,7 +7,7 @@
 
     <title>EqMatrix &#8212; Stochastic Impedance  documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="../_static/classic.css?v=f11ead97" />
     
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -15,8 +15,8 @@
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="WMatrix" href="WMatrix.html" />
-    <link rel="prev" title="Core Classes" href="core_classes.html" /> 
+    <link rel="next" title="Core Classes" href="core_classes.html" />
+    <link rel="prev" title="WMatrix" href="WMatrix.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="Related">
       <h3>Navigation</h3>
@@ -28,10 +28,10 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="WMatrix.html" title="WMatrix"
+          <a href="core_classes.html" title="Core Classes"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="core_classes.html" title="Core Classes"
+          <a href="WMatrix.html" title="WMatrix"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" accesskey="U">Reference Guides</a> &#187;</li>
@@ -50,17 +50,23 @@
 provides methods to calculate the eigensystem and stable solution, as well as a simple checker for detailed balance.</p>
 <section id="creating-an-equilibrium-matrix">
 <h2>Creating an equilibrium matrix<a class="headerlink" href="#creating-an-equilibrium-matrix" title="Link to this heading">¶</a></h2>
+<p>Most of the time, EqMatrix objects will be created through the <a class="reference internal" href="WMatrix.html#stoch_imp.WMatrix.WMatrix.calc_weq" title="stoch_imp.WMatrix.WMatrix.calc_weq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_weq()</span></code></a> method.
+It is possible however to create an EqMatrix as-is.</p>
 <p>To create an equilibrium matrix, we declare an EqMartix object. As input one can use either an array like object or
 an integer. If an integer <cite>n</cite> is used, EqMatrix will be an empty <cite>(n, n)</cite> matrix:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">stoch_imp</span><span class="w"> </span><span class="kn">import</span> <span class="n">EqMatrix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">weq</span> <span class="o">=</span> <span class="n">EqMatrix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">weq</span><span class="p">)</span>
-<span class="go">[0 0 0]</span>
-<span class="go">[0 0 0]</span>
-<span class="go">[0 0 0]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">EqMatrix</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
-<span class="go">[-0.5  1]</span>
-<span class="go">[ 0.5 -1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">EqMatrix</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">⎡0  0  0⎤</span>
+<span class="go">⎢       ⎥</span>
+<span class="go">⎢0  0  0⎥</span>
+<span class="go">⎢       ⎥</span>
+<span class="go">⎣0  0  0⎦</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">EqMatrix</span><span class="p">([[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]]))</span>
+<span class="go">⎡-0.5  1 ⎤</span>
+<span class="go">⎢        ⎥</span>
+<span class="go">⎣0.5   -1⎦</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">EqMatrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]))</span>
+<span class="go">ValueError: Column 0 does not sum to 0 (sum = 1.00000000000000)</span>
 </pre></div>
 </div>
 <p>When creating the equilibrium matrix that is not a valid transfer matrix (non-zero column sums or negative rates) an
@@ -68,20 +74,24 @@ error will be raised.</p>
 </section>
 <section id="building-the-system">
 <h2>Building the system<a class="headerlink" href="#building-the-system" title="Link to this heading">¶</a></h2>
-<p>Starting from an empty matrix, interactions can be added by using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">add_trans()</span></code> method:</p>
+<p>Starting from an empty matrix, interactions can be added by using the <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.add_trans" title="stoch_imp.EqMatrix.EqMatrix.add_trans"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_trans()</span></code></a> method. In the
+code sample we add a transition from site <cite>1</cite> to site <cite>2</cite> with transition rate <cite>2</cite>.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">stoch_imp</span><span class="w"> </span><span class="kn">import</span> <span class="n">EqMatrix</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">weq</span> <span class="o">=</span> <span class="n">EqMatrix</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">weq</span><span class="o">.</span><span class="n">add_trans</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ri</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="go">[-2  0.5 0]</span>
-<span class="go">[ 2 -0.5 0]</span>
-<span class="go">[ 0  0   0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">weq</span><span class="o">.</span><span class="n">add_trans</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<span class="go">⎡-2  1/2   0⎤</span>
+<span class="go">⎢           ⎥</span>
+<span class="go">⎢2   -1/2  0⎥</span>
+<span class="go">⎢           ⎥</span>
+<span class="go">⎣0    0    0⎦</span>
 </pre></div>
 </div>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <p>It is generally not advisable to add transitions directly to the matrix using item assignment. Although this can be
 done, the matrix diagonal needs to be recalculated using <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.TrMatrix.calc_diag" title="stoch_imp.core_classes.TrMatrix.calc_diag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_diag()</span></code></a>.
-The <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.TrMatrix.add_trans" title="stoch_imp.core_classes.TrMatrix.add_trans"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_trans()</span></code></a> method on the other hand takes care of this for you.</p>
+The <a class="reference internal" href="core_classes.html#stoch_imp.core_classes.TrMatrix.add_trans" title="stoch_imp.core_classes.TrMatrix.add_trans"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_trans()</span></code></a> method on the other hand takes care of this for you, along
+with other quality of life improvements.</p>
 </div>
 </section>
 <section id="calculating-eigensystem">
@@ -93,7 +103,7 @@ values are then returned and stored as attributes of the object. By default, det
 <p>The method <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq" title="stoch_imp.EqMatrix.EqMatrix.calc_peq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_peq()</span></code></a> is basically an alias for <a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="stoch_imp.EqMatrix.EqMatrix.calc_eig"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calc_eig()</span></code></a>. Because the equilibrium distribution is
 calculated using the eigensystem, the full calculation of the eigensystem is performed to avoid wasting resources.</p>
 </div>
-<p>If the eigensystem is already calculated and a recalculation is needed, you <em>must</em> use the <cite>force</cite> flag. Otherwise the
+<p>If the eigensystem is already calculated and a recalculation is needed, you <strong>must</strong> use the <cite>force</cite> flag. Otherwise the
 old values are returned.</p>
 </section>
 <section id="numeric-calculations">
@@ -129,6 +139,30 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.add_trans">
+<span class="sig-name descname"><span class="pre">add_trans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ri</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.add_trans" title="Link to this definition">¶</a></dt>
+<dd><p>Add a transition <cite>i –&gt; j</cite> with rate <cite>r</cite>, and optionally symmetric transition <cite>j –&gt; i</cite> with rate <cite>ri</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – Start index</p></li>
+<li><p><strong>j</strong> (<em>int</em>) – Target index</p></li>
+<li><p><strong>r</strong> (<em>float</em><em> | </em><em>Expr</em>) – Transition rate from i to j</p></li>
+<li><p><strong>ri</strong> (<em>float</em><em> | </em><em>Expr</em><em> | </em><em>None</em>) – Optional inverse rate (j to i)</p></li>
+<li><p><strong>symm</strong> (<em>bool</em>) – If True, adds j –&gt; i with rate 1/r or ri</p></li>
+<li><p><strong>simp</strong> (<em>bool</em>) – If True, simplifies r and ri</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.calc_diag">
+<span class="sig-name descname"><span class="pre">calc_diag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_diag" title="Link to this definition">¶</a></dt>
+<dd><p>Force recomputation of diagonal terms to preserve column sum = 0.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.calc_eig">
 <span class="sig-name descname"><span class="pre">calc_eig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.calc_eig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig" title="Link to this definition">¶</a></dt>
@@ -186,6 +220,48 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.check_diag">
+<span class="sig-name descname"><span class="pre">check_diag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.check_diag" title="Link to this definition">¶</a></dt>
+<dd><p>Check if each column in matrix m sums to zero.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – Matrix to check</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Allowed numerical tolerance</p></li>
+<li><p><strong>err</strong> (<em>bool</em>) – Raise exception if check fails</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all columns sum to zero</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.check_rates">
+<span class="sig-name descname"><span class="pre">check_rates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.check_rates" title="Link to this definition">¶</a></dt>
+<dd><p>Check that all off-diagonal elements are non-negative.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<a class="reference internal" href="core_classes.html#stoch_imp.core_classes.Mat" title="stoch_imp.core_classes.Mat"><em>Mat</em></a>) – Matrix to check</p></li>
+<li><p><strong>err</strong> (<em>bool</em>) – Raise exception on negative element</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Log indeterminate cases due to symbolic expressions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if all off-diagonal elements are non-negative</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.EqMatrix.EqMatrix.to_num">
 <span class="sig-name descname"><span class="pre">to_num</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/EqMatrix.html#EqMatrix.to_num"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.EqMatrix.EqMatrix.to_num" title="Link to this definition">¶</a></dt>
 <dd><p>Convert symbolic matrices to numeric format.</p>
@@ -219,9 +295,13 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
 <li><a class="reference internal" href="#numeric-calculations">Numeric calculations</a></li>
 <li><a class="reference internal" href="#reference">Reference</a><ul>
 <li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix"><code class="docutils literal notranslate"><span class="pre">EqMatrix</span></code></a><ul>
+<li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.add_trans"><code class="docutils literal notranslate"><span class="pre">EqMatrix.add_trans()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_diag"><code class="docutils literal notranslate"><span class="pre">EqMatrix.calc_diag()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_eig"><code class="docutils literal notranslate"><span class="pre">EqMatrix.calc_eig()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.calc_peq"><code class="docutils literal notranslate"><span class="pre">EqMatrix.calc_peq()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.check_db"><code class="docutils literal notranslate"><span class="pre">EqMatrix.check_db()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.check_diag"><code class="docutils literal notranslate"><span class="pre">EqMatrix.check_diag()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.check_rates"><code class="docutils literal notranslate"><span class="pre">EqMatrix.check_rates()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.to_num"><code class="docutils literal notranslate"><span class="pre">EqMatrix.to_num()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.EqMatrix.EqMatrix.to_sym"><code class="docutils literal notranslate"><span class="pre">EqMatrix.to_sym()</span></code></a></li>
 </ul>
@@ -235,13 +315,13 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="core_classes.html"
-                          title="previous chapter">Core Classes</a></p>
+    <p class="topless"><a href="WMatrix.html"
+                          title="previous chapter">WMatrix</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="WMatrix.html"
-                          title="next chapter">WMatrix</a></p>
+    <p class="topless"><a href="core_classes.html"
+                          title="next chapter">Core Classes</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -274,10 +354,10 @@ including eigenvalue/eigenvector computation and equilibrium distribution (peq) 
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="WMatrix.html" title="WMatrix"
+          <a href="core_classes.html" title="Core Classes"
              >next</a> |</li>
         <li class="right" >
-          <a href="core_classes.html" title="Core Classes"
+          <a href="WMatrix.html" title="WMatrix"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Stochastic Impedance  documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="reference.html" >Reference Guides</a> &#187;</li>

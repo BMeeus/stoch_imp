@@ -38,7 +38,7 @@ class CoeffArray:
         # Pretty-print the full array using SymPy formatting
         return pretty(self.mat)
 
-    def to_num(self) -> None:
+    def to_num(self):
         """Convert array to numeric type"""
         for i, j, k in self.iter:
             if len(self.mat[i, j, k].free_symbols) != 0:
@@ -46,7 +46,7 @@ class CoeffArray:
             self.mat[i, j, k] = N(self.mat[i, j, k])
         self.mat = self.mat.astype(float64)
 
-    def to_sym(self) -> None:
+    def to_sym(self):
         """Convert array to symbolic type"""
         self.mat = self.mat.astype(object)
 
@@ -89,7 +89,7 @@ class Mat:
     :ivar tol: Numerical tolerance used for approximate comparisons.
     """
 
-    def __init__(self, arr, *args, **kwargs) -> None:
+    def __init__(self, arr, *args, **kwargs):
         """
         Initialize matrix object from array-like input.
 
@@ -100,15 +100,15 @@ class Mat:
         self.mat = m
         self.dim = m.rows  # System size inferred from row count
         self.iter = product(range(m.rows), range(m.cols))  # Iterator over all (row, col) pairs
-        self.zero_index = kwargs.pop("zi") if "zi" in kwargs.keys() else False  # True if system uses 0-based indexing
-        self.is_symbolic = kwargs.pop("sym") if "sym" in kwargs.keys() else True
-        self.tol = kwargs.pop("tol") if "tol" in kwargs.keys() else 10**-14
+        self.zero_index = kwargs.setdefault("zi", False)  # True if system uses 0-based indexing
+        self.is_symbolic = kwargs.setdefault("sym", True)
+        self.tol = kwargs.setdefault("tol", 10e-14)
 
     def __str__(self):
         # Pretty-print matrix using sympy's printer
         return pretty(self.mat)
 
-    def __setitem__(self, key, value) -> None:
+    def __setitem__(self, key, value):
         # Support assignment via indexing
         self.mat[key] = value
 
@@ -143,10 +143,6 @@ class Mat:
     def __dir__(self):
         # Combine native attributes with sympy.Matrix's for auto-completion
         return list(set(super().__dir__()) | set(dir(self.mat)))
-
-    def simp(self) -> None:
-        """In-place symbolic simplification of the matrix."""
-        simplify(self.mat)
 
 
 class ConstantMatrix(ConstantObject, Mat):
@@ -184,7 +180,7 @@ class ConstantMatrix(ConstantObject, Mat):
         # Scalar division
         return ConstantMatrix(self.mat / other)
 
-    def to_num(self) -> None:
+    def to_num(self):
         """Convert symbolic matrix to numeric form."""
         if not self.is_symbolic:
             pass
@@ -194,7 +190,7 @@ class ConstantMatrix(ConstantObject, Mat):
             self.nmat = array(N(self.mat), dtype=float64)
             self.is_symbolic = False
 
-    def to_sym(self) -> None:
+    def to_sym(self):
         """Convert numeric matrix back to symbolic form."""
         if self.is_symbolic:
             pass
@@ -217,7 +213,7 @@ class TrMatrix(Mat):
     :ivar tol: Numerical tolerance used for validations.
     """
 
-    def __init__(self, arr: Any, *args, **kwargs) -> None:
+    def __init__(self, arr: Any, *args, **kwargs):
         """
         Initialize transition matrix and validate constraints.
 
@@ -237,7 +233,7 @@ class TrMatrix(Mat):
                   r: float | Expr = 1.0,
                   ri: float | Expr | None = None,
                   symm: bool = True,
-                  simp: bool = True) -> None:
+                  simp: bool = True):
         """
         Add a transition `i --> j` with rate `r`, and optionally symmetric transition `j --> i` with rate `ri`.
 
@@ -291,18 +287,63 @@ class TrMatrix(Mat):
         if simp:
             simplify(self.mat)
 
-    def calc_diag(self) -> None:
+    def calc_diag(self):
         """Force recomputation of diagonal terms to preserve column sum = 0."""
         for col in range(self.dim):
             self[col, col] = -sum(self[row, col] for row in range(self.dim) if row != col)
 
-    def check_diag(self) -> bool:
-        """Check if all columns sum to zero."""
-        return check_diag(self, tol=self.tol)
+    def check_diag(self, **flags) -> bool:
+        """
+        Check if each column in matrix m sums to zero.
 
-    def check_rates(self, verbose: bool = False) -> bool:
-        """Check if all off-diagonal rates are non-negative."""
-        return check_rates(self, verbose=verbose)
+        :param m: Matrix to check
+        :type m: Mat
+        :param tol: Allowed numerical tolerance
+        :type tol: float
+        :param err: Raise exception if check fails
+        :type err: bool
+
+        :return: True if all columns sum to zero
+        :rtype: bool
+        """
+        err = flags.setdefault("err", False)
+        for col in range(self.dim):
+            s = N(sum(self[:, col]))
+            if s > self.tol:
+                if err:
+                    raise ValueError(f"Column {col} does not sum to 0 (sum = {s})")
+                return False
+        return True
+
+    def check_rates(self, **flags) -> bool:
+        """
+        Check that all off-diagonal elements are non-negative.
+
+        :param m: Matrix to check
+        :type m: Mat
+        :param err: Raise exception on negative element
+        :type err: bool
+        :param verbose: Log indeterminate cases due to symbolic expressions
+        :type verbose: bool
+
+        :return: True if all off-diagonal elements are non-negative
+        :rtype: bool
+        """
+        err = flags.setdefault("err", False)
+        verbose = flags.setdefault("verbose", False)
+
+        for col, row in self.iter:
+            if row == col:
+                continue
+            try:
+                if self[row, col] < 0:
+                    if err:
+                        raise ValueError(f"Transfer rate ({col + 1} -> {row + 1}) is negative: {self[row, col]}")
+                    return False
+            except TypeError:
+                if verbose:
+                    print(f"Positivity of transfer rate ({col + 1} -> {row + 1}) undetermined: {self[row, col]}")
+        return True
 
 
 def arr_to_mat(arr) -> Matrix:
@@ -353,7 +394,7 @@ def check_diag(m: Mat, tol: float = 1e-15, err: bool = False) -> bool:
     return True
 
 
-def check_rates(m: Mat, err: bool = False, verbose: bool = False) -> bool:
+def check_rates(m: Mat, **flags) -> bool:
     """
     Check that all off-diagonal elements are non-negative.
 
@@ -367,6 +408,10 @@ def check_rates(m: Mat, err: bool = False, verbose: bool = False) -> bool:
     :return: True if all off-diagonal elements are non-negative
     :rtype: bool
     """
+
+    err = flags.setdefault('err', False)
+    verbose = flags.setdefault('verbose', False)
+
     for col, row in m.iter:
         if row == col:
             continue

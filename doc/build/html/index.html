@@ -7,7 +7,7 @@
 
     <title>Welcome to the StochImp docs! &#8212; Stochastic Impedance  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=2bf1fcf8" />
+    <link rel="stylesheet" type="text/css" href="_static/classic.css?v=f11ead97" />
     
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
@@ -71,14 +71,15 @@ fork the project. Once done, the package can be imported as usual.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="tutorial/tutorial.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="howto/howto.html">How To</a></li>
+<li class="toctree-l1"><a class="reference internal" href="explanation/explanation.html">Explanation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="ref/reference.html">Reference Guides</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ref/core_classes.html">Core Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#mat">Mat</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#trmatrix">TrMatrix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#coeffarray">CoeffArray</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#constantobject">ConstantObject</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#constantmatrix">ConstantMatrix</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#functions">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref/WMatrix.html">WMatrix</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#creating-a-wmatrix">Creating a WMatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#building-the-system">Building the system</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#calculating-equilibrium-matrix">Calculating equilibrium matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#calculating-conductances">Calculating conductances</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#numeric-calculations">Numeric calculations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#reference">Reference</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ref/EqMatrix.html">EqMatrix</a><ul>
@@ -89,15 +90,20 @@ fork the project. Once done, the package can be imported as usual.</p>
 <li class="toctree-l3"><a class="reference internal" href="ref/EqMatrix.html#reference">Reference</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="ref/WMatrix.html">WMatrix</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ref/WMatrix.html#stoch_imp.WMatrix.WMatrix"><code class="docutils literal notranslate"><span class="pre">WMatrix</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="ref/core_classes.html">Core Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#mat">Mat</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#trmatrix">TrMatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#coeffarray">CoeffArray</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#constantobject">ConstantObject</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#constantmatrix">ConstantMatrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/core_classes.html#functions">Functions</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ref/util.html">Util</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ref/util.html#stoch_imp.util.calc_curr_like"><code class="docutils literal notranslate"><span class="pre">calc_curr_like()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/util.html#stoch_imp.util.deep_simp"><code class="docutils literal notranslate"><span class="pre">deep_simp()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/util.html#stoch_imp.util.gram_schmidt"><code class="docutils literal notranslate"><span class="pre">gram_schmidt()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="ref/util.html#stoch_imp.util.inner"><code class="docutils literal notranslate"><span class="pre">inner()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/util.html#calc-curr-like">calc_curr_like</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/util.html#deep-simp">deep_simp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/util.html#gram-schmidt">gram_schmidt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ref/util.html#inner">inner</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ref/Pyplot.html">Pyplot Functionalities</a><ul>
@@ -108,7 +114,6 @@ fork the project. Once done, the package can be imported as usual.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="explanation/explanation.html">Explantion</a></li>
 </ul>
 </div>
 </section>
