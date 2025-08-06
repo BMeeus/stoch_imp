@@ -169,7 +169,7 @@ class WMatrix(TrMatrix):
                   conds: Union[tuple[int, int], list[tuple[int, int]], None] = None,
                   normal: bool = False,
                   force: bool = False,
-                  verbose: bool = True) -> list[tuple[tuple[int, int], Callable[[float], float]]]:
+                  verbose: bool = True) -> list[tuple[tuple[int, int], Callable[[float | ndarray], float]]]:
         """
         Return a list of conductivity callables for specified index pairs.
 
