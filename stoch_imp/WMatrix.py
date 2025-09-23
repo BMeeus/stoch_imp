@@ -228,7 +228,7 @@ class WMatrix(TrMatrix):
         if conds is None:
             self.calc_weq()
             self.calc_w1()
-            conds = [(i, j) for i in range(self.dim) for j in range(i + 1, self.dim)
+            conds = [(i + (not self.zero_index), j+ (not self.zero_index)) for i in range(self.dim) for j in range(i + 1, self.dim)
                      if any(elem != 0 for elem in (self.weq[i, j], self.weq[j, i], self.w1[i, j], self.w1[j, i]))]
 
         elif isinstance(conds[0], int):

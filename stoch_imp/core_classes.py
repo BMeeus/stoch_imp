@@ -229,6 +229,7 @@ class TrMatrix(Mat):
         check_diag(self, err=True, tol=self.tol)  # Validate initial conditions
         check_rates(self, err=True)
 
+
     def add_trans(self, i: int, j: int,
                   r: float | Expr = 1.0,
                   ri: float | Expr | None = None,
@@ -387,6 +388,7 @@ def check_diag(m: Mat, tol: float = 1e-15, err: bool = False) -> bool:
     """
     for col in range(m.dim):
         s = N(sum(m[:, col]))
+
         if s > tol:
             if err:
                 raise ValueError(f"Column {col} does not sum to 0 (sum = {s})")

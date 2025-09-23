@@ -3,7 +3,7 @@ from typing import Union, Any
 from numpy import array, ndarray, ones, ones_like, zeros_like
 from numpy import sqrt as np_sqrt
 from numpy import sum as np_sum
-from sympy import nsimplify, simplify, sqrt, Matrix, Expr, ShapeError
+from sympy import nsimplify, simplify, sqrt, Matrix, Expr, ShapeError, zeros
 
 from .core_classes import Mat, ConstantMatrix
 
@@ -191,9 +191,13 @@ def _sym_curr(m: Mat, p: Union[ConstantMatrix, Matrix]) -> ConstantMatrix:
     if len(p) != m.dim:
         raise ShapeError(f"Inconsistent dimensions: m ({m.dim}), p ({len(p)})")
 
-    curr1 = ConstantMatrix([[deep_simp(m[row, col] * p[col]) for col in range(m.dim)] for row in range(m.dim)])
-    curr2 = ConstantMatrix([[deep_simp(m[col, row] * p[row]) for col in range(m.dim)] for row in range(m.dim)])
-    return curr1 - curr2
+    curr = zeros(*m.shape)
+
+    for col in range(curr.cols):
+        for row in range(curr.rows):
+            curr[row, col] = m[row, col] * p[col] - m.T[row, col] * p[row]
+
+    return ConstantMatrix(curr)
 
 
 def _num_curr(m: Mat, p: Union[ndarray, ConstantMatrix]) -> ConstantMatrix:
