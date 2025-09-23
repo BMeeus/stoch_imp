@@ -2,7 +2,7 @@ from typing import Callable, Optional, Union
 
 from numpy import matmul, ndarray
 from numpy import sum as np_sum
-from sympy import diff, lambdify, Symbol, pretty
+from sympy import diff, lambdify, Symbol, pretty, zeros
 
 from .EqMatrix import EqMatrix
 from .core_classes import CoeffArray, TrMatrix, ConstantMatrix
@@ -53,6 +53,13 @@ class WMatrix(TrMatrix):
         self.weq: Optional[EqMatrix] = None
         self.w1: Optional[ConstantMatrix] = None
         self.coeff: Optional[CoeffArray] = None
+
+
+    def clear(self):
+        self.mat = zeros(self.dim, self.dim)
+        self.weq = None
+        self.w1 = None
+        self.coeff = None
 
     def calc_weq(self, eq: float = None, **flags) -> EqMatrix:
         """
