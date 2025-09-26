@@ -27,7 +27,7 @@ class WMatrix(TrMatrix):
 
     """
 
-    def __init__(self, *args, ds: Optional[Symbol] = None, eq: float = 0, **kwargs):
+    def __init__(self, *args, ds: Optional[Symbol|str] = None, eq: Optional[float] = 0, **kwargs):
         """
         Initialize a WMatrix instance.
 
@@ -48,6 +48,11 @@ class WMatrix(TrMatrix):
             if len(symbols) > 1:
                 raise ValueError("Ambiguity in driving symbol, please provide a specific symbol")
             ds = symbols[0]
+            if verbose:
+                print(f"Driving symbol set to {pretty(ds)}")
+
+        elif isinstance(ds, str):
+            ds = Symbol(ds, real=True)
             if verbose:
                 print(f"Driving symbol set to {pretty(ds)}")
 
