@@ -145,6 +145,7 @@ class WMatrix(TrMatrix):
 
 
     def clear(self):
+        """Clear WMatrix object, keep eq and driving symbol."""
         self.mat = zeros(self.dim, self.dim)
         self.weq = None
         self.w1 = None
@@ -231,6 +232,35 @@ class WMatrix(TrMatrix):
             conds = [conds]
 
         return [(cond, self.get_cond(*cond, **flags)) for cond in conds]
+
+
+    def get_cond_inf(self, i: int, j: int, **flags):
+        """
+        Return :math:`\sigma(\infty)` of the transition i to j.
+
+        :param i: Index :math:`i`
+        :param j: Index :math:`j`
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
+        :return:
+        """
+        if 'force' not in flags.keys():
+            flags['force'] = False
+
+        if 'verbose' not in flags.keys():
+            flags['verbose'] = True
+
+        if self.coeff is None or flags['force']:
+            self.calc_coeff(**flags)
+
+        if not self.zero_index:
+            i -= 1
+            j -= 1
+
+        return -self.coeff[i, j, 0]
+
 
     def to_num(self):
         """Convert internal data to numeric form."""
