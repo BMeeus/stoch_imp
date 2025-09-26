@@ -36,9 +36,11 @@ class WMatrix(TrMatrix):
         :type ds: Optional[Symbol]
         :param eq: Equilibrium point
         :type eq: float
+        :param verbose: If True, output driving symbol when choosing one. Default is True.
         :param kwargs: Additional keyword arguments for TrMatrix
         """
         super().__init__(*args, **kwargs)
+        verbose = kwargs.setdefault("verbose", True)
         if ds is None:
             symbols = list(self.free_symbols)
             if not symbols:
@@ -46,7 +48,8 @@ class WMatrix(TrMatrix):
             if len(symbols) > 1:
                 raise ValueError("Ambiguity in driving symbol, please provide a specific symbol")
             ds = symbols[0]
-            print(f"Driving symbol set to {pretty(ds)}")
+            if verbose:
+                print(f"Driving symbol set to {pretty(ds)}")
 
         self.ds: Symbol = ds
         self.eq: float = eq
