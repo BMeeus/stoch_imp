@@ -333,6 +333,12 @@ i –&gt; j is CoeffArray[i, j, k].</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/WMatrix.html#WMatrix.clear"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix.clear" title="Link to this definition">¶</a></dt>
+<dd><p>Clear WMatrix object, keep eq and driving symbol.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix.get_cond">
 <span class="sig-name descname"><span class="pre">get_cond</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/WMatrix.html#WMatrix.get_cond"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix.get_cond" title="Link to this definition">¶</a></dt>
 <dd><p>Return a callable for the frequency-dependent conductivity.</p>
@@ -351,6 +357,25 @@ i –&gt; j is CoeffArray[i, j, k].</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Callable[[float | ndarray], float]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix.get_cond_inf">
+<span class="sig-name descname"><span class="pre">get_cond_inf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">flags</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/stoch_imp/WMatrix.html#WMatrix.get_cond_inf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix.get_cond_inf" title="Link to this definition">¶</a></dt>
+<dd><p>Return <span class="math notranslate nohighlight">\(\sigma(\infty)\)</span> of the transition i to j.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<em>int</em>) – Index <span class="math notranslate nohighlight">\(i\)</span></p></li>
+<li><p><strong>j</strong> (<em>int</em>) – Index <span class="math notranslate nohighlight">\(j\)</span></p></li>
+<li><p><strong>force</strong> (<em>bool</em>) – Force recalculation</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Print verbose output</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
 </dd>
 </dl>
 </dd></dl>
@@ -419,7 +444,9 @@ i –&gt; j is CoeffArray[i, j, k].</p>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.calc_weq"><code class="docutils literal notranslate"><span class="pre">WMatrix.calc_weq()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.check_diag"><code class="docutils literal notranslate"><span class="pre">WMatrix.check_diag()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.check_rates"><code class="docutils literal notranslate"><span class="pre">WMatrix.check_rates()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.clear"><code class="docutils literal notranslate"><span class="pre">WMatrix.clear()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.get_cond"><code class="docutils literal notranslate"><span class="pre">WMatrix.get_cond()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.get_cond_inf"><code class="docutils literal notranslate"><span class="pre">WMatrix.get_cond_inf()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.get_conds"><code class="docutils literal notranslate"><span class="pre">WMatrix.get_conds()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.to_num"><code class="docutils literal notranslate"><span class="pre">WMatrix.to_num()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.to_sym"><code class="docutils literal notranslate"><span class="pre">WMatrix.to_sym()</span></code></a></li>
