@@ -58,12 +58,6 @@ class WMatrix(TrMatrix):
         self.coeff: Optional[CoeffArray] = None
 
 
-    def clear(self):
-        self.mat = zeros(self.dim, self.dim)
-        self.weq = None
-        self.w1 = None
-        self.coeff = None
-
     def calc_weq(self, eq: float = None, **flags) -> EqMatrix:
         """
         Calculate the equilibrium matrix :math:`W^{eq}`.
@@ -90,6 +84,7 @@ class WMatrix(TrMatrix):
             print("Equilibrium matrix calculated")
 
         return self.weq
+
 
     def calc_w1(self, eq: float = None, **flags) -> ConstantMatrix:
         """
@@ -122,6 +117,7 @@ class WMatrix(TrMatrix):
             print("Driving matrix calculated")
         return self.w1
 
+
     def calc_coeff(self, **flags) -> CoeffArray:
         """
         Calculate coefficient array containing the coefficients :math:`A^{(k)}_{mn}`.
@@ -146,6 +142,14 @@ class WMatrix(TrMatrix):
         self.calc_w1(**flags)
 
         return _sym_calc_coeff(self) if self.is_symbolic else _num_calc_coeff(self)
+
+
+    def clear(self):
+        self.mat = zeros(self.dim, self.dim)
+        self.weq = None
+        self.w1 = None
+        self.coeff = None
+
 
     def get_cond(self, i: int, j: int, **flags) -> Callable[[Union[float, ndarray]], float]:
         """
@@ -198,6 +202,7 @@ class WMatrix(TrMatrix):
             return lambdify([omega], deep_simp(cond / norm_val))
         return lambdify([omega], cond)
 
+
     def get_conds(self,
                   conds: Union[tuple[int, int], list[tuple[int, int]], None] = None,
                   **flags) -> list[tuple[tuple[int, int], Callable[[float], float]]]:
@@ -239,6 +244,7 @@ class WMatrix(TrMatrix):
             if self.coeff is not None:
                 self.coeff.to_num()
             self.is_symbolic = False
+
 
     def to_sym(self):
         """Convert internal data to symbolic form."""
