@@ -2,7 +2,7 @@ from typing import Callable, Optional, Union
 
 from numpy import matmul, ndarray
 from numpy import sum as np_sum
-from sympy import diff, lambdify, Symbol, pretty, zeros
+from sympy import diff, Expr,lambdify, Symbol, pretty, zeros
 
 from .EqMatrix import EqMatrix
 from .core_classes import CoeffArray, TrMatrix, ConstantMatrix
@@ -239,7 +239,7 @@ class WMatrix(TrMatrix):
         return [(cond, self.get_cond(*cond, **flags)) for cond in conds]
 
 
-    def get_cond_inf(self, i: int, j: int, **flags):
+    def get_cond_inf(self, i: int, j: int, **flags) -> Union[float, Expr]:
         """
         Return :math:`\sigma(\infty)` of the transition i to j.
 
@@ -249,7 +249,7 @@ class WMatrix(TrMatrix):
         :type force: bool
         :param verbose: Print verbose output
         :type verbose: bool
-        :return:
+        :return: :math:`\sigma_{ji}(\infty)`
         """
         if 'force' not in flags.keys():
             flags['force'] = False
@@ -266,6 +266,33 @@ class WMatrix(TrMatrix):
 
         return -self.coeff[i, j, 0]
 
+
+    def get_cond_zero(self, i: int, j: int, **flags) -> Union[float, Expr]:
+        """
+        Return :math:`\sigma(0)` of the transition :math:`i` to :math:`j`.
+
+        :param i: Index :math:`i`
+        :param j: Index :math:`j`
+        :param force: Force recalculation
+        :type force: bool
+        :param verbose: Print verbose output
+        :type verbose: bool
+        :return: :math:`\sigma_{ji}(0)`
+        """
+        if 'force' not in flags.keys():
+            flags['force'] = False
+
+        if 'verbose' not in flags.keys():
+            flags['verbose'] = True
+
+        if self.coeff is None or flags['force']:
+            self.calc_coeff(**flags)
+
+        if not self.zero_index:
+            i -= 1
+            j -= 1
+
+        return sum(self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim))
 
     def to_num(self):
         """Convert internal data to numeric form."""
