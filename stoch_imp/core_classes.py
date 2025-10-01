@@ -226,7 +226,7 @@ class TrMatrix(Mat):
             arr = zeros(arr, arr)
 
         super().__init__(arr, *args, **kwargs)
-        check_diag(self, err=True)  # Validate initial conditions
+        check_diag(self, err=True, tol=self.tol)  # Validate initial conditions
         check_rates(self, err=True)
 
     def add_trans(self, i: int, j: int,

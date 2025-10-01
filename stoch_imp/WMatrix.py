@@ -172,7 +172,7 @@ class WMatrix(TrMatrix):
         :param verbose: Print verbose output
         :type verbose: bool
 
-        :return: Callable returning conductivity value
+        :return: Callable function repr of :math:`\sigma_{ij}(\omega)`
         :rtype: Callable[[float | ndarray], float]
         """
 
@@ -200,9 +200,7 @@ class WMatrix(TrMatrix):
         if self.is_symbolic:
             cond = deep_simp(cond)
         if flags.setdefault('normal', False):
-            norm_val = sum(
-                coeff[j, i, k] * (1 if k == 0 else -1)
-                for k in range(self.dim))
+            norm_val = sum(coeff[j, i, :])
             if self.is_symbolic:
                 norm_val = deep_simp(norm_val)
             return lambdify([omega], deep_simp(cond / norm_val))
@@ -241,7 +239,7 @@ class WMatrix(TrMatrix):
 
     def get_cond_inf(self, i: int, j: int, **flags) -> Union[float, Expr]:
         """
-        Return :math:`\sigma(\infty)` of the transition i to j.
+        Return :math:`\sigma(\infty)` of the transition :math:`i` to :math:`j`.
 
         :param i: Index :math:`i`
         :param j: Index :math:`j`
@@ -292,7 +290,7 @@ class WMatrix(TrMatrix):
             i -= 1
             j -= 1
 
-        return sum(self.coeff[j, i, k] * (1 if k == 0 else -1) for k in range(self.dim))
+        return sum(self.coeff[j, i, :])
 
     def to_num(self):
         """Convert internal data to numeric form."""
