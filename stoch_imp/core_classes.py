@@ -3,9 +3,19 @@ from __future__ import annotations
 from typing import Any
 from itertools import product
 
+from networkx import (arf_layout, bipartite_layout, circular_layout, DiGraph, draw, draw_networkx_edge_labels,
+                      kamada_kawai_layout, planar_layout, random_layout, rescale_layout, shell_layout, spring_layout,
+                      spectral_layout, multipartite_layout)
 from numpy import (array, float64, ndarray)
 from numpy import zeros as np_zeros
-from sympy import (Expr, Matrix, N, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros)
+from sympy import (Expr, Matrix, N, NonSquareMatrixError, nsimplify, pretty, ShapeError, simplify, zeros, latex)
+
+
+
+drawmap = {'arf': arf_layout, 'bipartite': bipartite_layout, 'circular': circular_layout,
+           'kamada_kawai': kamada_kawai_layout, 'planar': planar_layout, 'random': random_layout,
+           'rescale': rescale_layout, 'shell': shell_layout, 'spring': spring_layout, 'spectral': spectral_layout,
+           'multipartite': multipartite_layout}
 
 
 class CoeffArray:
@@ -229,6 +239,11 @@ class TrMatrix(Mat):
         check_diag(self, err=True, tol=self.tol)  # Validate initial conditions
         check_rates(self, err=True)
 
+        graph = DiGraph()
+        graph.add_nodes_from([i + (not self.zero_index) for i in range(self.dim)])
+        self.graph = graph
+
+
     def add_trans(self, i: int, j: int,
                   r: float | Expr = 1.0,
                   ri: float | Expr | None = None,
@@ -268,6 +283,7 @@ class TrMatrix(Mat):
 
         self[j, i] = r
         self[i, i] -= r
+        self.graph.add_edge(i+(not self.zero_index), j+(not self.zero_index), rate=r, print_rate=latex(r))
 
         if symm or (ri is not None):
             if ri is None:
@@ -283,6 +299,7 @@ class TrMatrix(Mat):
 
             self[i, j] = ri
             self[j, j] -= ri
+            self.graph.add_edge(j+(not self.zero_index), i+(not self.zero_index), rate=ri, print_rate=latex(ri))
 
         if simp:
             simplify(self.mat)
@@ -345,7 +362,58 @@ class TrMatrix(Mat):
                     print(f"Positivity of transfer rate ({col + 1} -> {row + 1}) undetermined: {self[row, col]}")
         return True
 
+    def view_graph(self, pos: str='circular', pos_kwargs: dict=None, draw_kwargs: dict=None):
+        """
+        View the graph representation of the stochastic network. This does not portray rates, it only shows the topology
+        of the states.
 
+        :param pos: drawing layout to be used by NetworkX.
+        :param pos_kwargs: Arguments for the layout function. Should be given as a dict, also for non-kwargs.
+                           Default is none.
+        :param draw_kwargs: kwargs for the draw function. Should be given as a dict. Default is ``{'with_labels': True}``.
+        """
+        from matplotlib.pyplot import show
+
+        if pos_kwargs is None:
+            pos_kwargs = {}
+
+        if draw_kwargs is None:
+            draw_kwargs = {'with_labels': True}
+        draw(self.graph, pos=drawmap[pos](self.graph, **pos_kwargs), **draw_kwargs)
+        show()
+        return
+
+    def view_network(self, pos: str='circular', pos_kwargs: dict=None, draw_kwargs: dict=None, edge_kwargs: dict = None):
+        """
+        View the full stochastic network, including rates.
+
+        :param pos: drawing layout to be used by NetworkX.
+        :param pos_kwargs: Arguments for the layout function. Should be given as a dict, also for non-kwargs.
+                           Default is none.
+        :param draw_kwargs: kwargs for the draw function. Should be given as a dict. Default is
+                            ``{'with_labels': True, 'connectionstyle': 'arc3, rad=0.1'}``.
+        :param edge_kwargs: kwargs for the edge labels. Should be given as a dict. Default is
+                            ``{'edge_labels': edgedict, 'connectionstyle': 'arc3, rad=0.1'}``. Note that the connection
+                            style should be the same as in ``draw_kwargs``.
+        """
+        from matplotlib.pyplot import show
+
+        if pos_kwargs is None:
+            pos_kwargs = {}
+
+        if draw_kwargs is None:
+            draw_kwargs = {'with_labels': True, 'connectionstyle': 'arc3, rad=0.1'}
+
+        if edge_kwargs is None:
+            edges = self.graph.edges
+            edgedict = {edge: '$' + edges[*edge]['print_rate'] + '$' for edge in edges}
+            edge_kwargs = {'edge_labels': edgedict, 'connectionstyle': 'arc3, rad=0.1'}
+
+
+        draw(self.graph, pos=drawmap[pos](self.graph, **pos_kwargs), **draw_kwargs)
+        draw_networkx_edge_labels(self.graph, pos=drawmap[pos](self.graph, **pos_kwargs), **edge_kwargs)
+        show()
+        return
 def arr_to_mat(arr) -> Matrix:
     """
     Convert input array-like to sympy.Matrix.
