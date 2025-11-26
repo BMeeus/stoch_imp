@@ -16,6 +16,7 @@ class EqMatrix(ConstantObject, TrMatrix):
     including eigenvalue/eigenvector computation and equilibrium distribution (peq) calculation.
 
     :ivar mat: Internal sympy.Matrix representation of the transition matrix.
+    :ivar graph: Graph representation of the stochastic network.
     :ivar dim: Number of rows in the matrix.
     :ivar iter: Iterator over matrix indices.
     :ivar zero_index: Boolean indicating whether 0-based indexing is used.

@@ -20,10 +20,10 @@ drawmap = {'arf': arf_layout, 'bipartite': bipartite_layout, 'circular': circula
 
 class CoeffArray:
     """
-    (n, n, n) dim coefficient array class for storing transition coefficients. Prints pretty.
+    :math:`(n, n, n)` dim coefficient array class for storing transition coefficients. Prints pretty.
 
     :ivar mat: The array of coefficients
-    :ivar iter: A simple iterator to iterate over the whole array. Use as `(elem in self.iter)` or `(i, j, k in self.iter)`
+    :ivar iter: A simple iterator to iterate over the whole array. Use as ``(elem in self.iter)`` or ``(i, j, k in self.iter)``
     """
     def __init__(self, n: int):
         """
@@ -216,6 +216,7 @@ class TrMatrix(Mat):
     off-diagonal elements.
 
     :ivar mat: Internal sympy.Matrix representation.
+    :ivar graph: Graph representation of the stochastic network.
     :ivar dim: Number of rows in the matrix.
     :ivar iter: Iterator over matrix indices.
     :ivar zero_index: Boolean indicating whether 0-based indexing is used.

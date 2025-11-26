@@ -184,6 +184,7 @@ convert back to symbolical calculations, use <a class="reference internal" href=
 <dt class="field-odd">Variables<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mat</strong> – Internal sympy.Matrix representation of the transition matrix.</p></li>
+<li><p><strong>graph</strong> – Graph representation of the stochastic network.</p></li>
 <li><p><strong>dim</strong> – Dimension of the system.</p></li>
 <li><p><strong>iter</strong> – Iterator over matrix indices.</p></li>
 <li><p><strong>ds</strong> – Symbol representing the driving parameter.</p></li>
@@ -439,6 +440,43 @@ i –&gt; j is CoeffArray[i, j, k].</p>
 <dd><p>Convert internal data to symbolic form.</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix.view_graph">
+<span class="sig-name descname"><span class="pre">view_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix.view_graph" title="Link to this definition">¶</a></dt>
+<dd><p>View the graph representation of the stochastic network. This does not portray rates, it only shows the topology
+of the states.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>str</em>) – drawing layout to be used by NetworkX.</p></li>
+<li><p><strong>pos_kwargs</strong> (<em>dict</em>) – Arguments for the layout function. Should be given as a dict, also for non-kwargs.
+Default is none.</p></li>
+<li><p><strong>draw_kwargs</strong> (<em>dict</em>) – kwargs for the draw function. Should be given as a dict. Default is <code class="docutils literal notranslate"><span class="pre">{'with_labels':</span> <span class="pre">True}</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="stoch_imp.WMatrix.WMatrix.view_network">
+<span class="sig-name descname"><span class="pre">view_network</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'circular'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#stoch_imp.WMatrix.WMatrix.view_network" title="Link to this definition">¶</a></dt>
+<dd><p>View the full stochastic network, including rates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> (<em>str</em>) – drawing layout to be used by NetworkX.</p></li>
+<li><p><strong>pos_kwargs</strong> (<em>dict</em>) – Arguments for the layout function. Should be given as a dict, also for non-kwargs.
+Default is none.</p></li>
+<li><p><strong>draw_kwargs</strong> (<em>dict</em>) – kwargs for the draw function. Should be given as a dict. Default is
+<code class="docutils literal notranslate"><span class="pre">{'with_labels':</span> <span class="pre">True,</span> <span class="pre">'connectionstyle':</span> <span class="pre">'arc3,</span> <span class="pre">rad=0.1'}</span></code>.</p></li>
+<li><p><strong>edge_kwargs</strong> (<em>dict</em>) – kwargs for the edge labels. Should be given as a dict. Default is
+<code class="docutils literal notranslate"><span class="pre">{'edge_labels':</span> <span class="pre">edgedict,</span> <span class="pre">'connectionstyle':</span> <span class="pre">'arc3,</span> <span class="pre">rad=0.1'}</span></code>. Note that the connection
+style should be the same as in <code class="docutils literal notranslate"><span class="pre">draw_kwargs</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -476,6 +514,8 @@ i –&gt; j is CoeffArray[i, j, k].</p>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.get_conds"><code class="docutils literal notranslate"><span class="pre">WMatrix.get_conds()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.to_num"><code class="docutils literal notranslate"><span class="pre">WMatrix.to_num()</span></code></a></li>
 <li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.to_sym"><code class="docutils literal notranslate"><span class="pre">WMatrix.to_sym()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.view_graph"><code class="docutils literal notranslate"><span class="pre">WMatrix.view_graph()</span></code></a></li>
+<li><a class="reference internal" href="#stoch_imp.WMatrix.WMatrix.view_network"><code class="docutils literal notranslate"><span class="pre">WMatrix.view_network()</span></code></a></li>
 </ul>
 </li>
 </ul>

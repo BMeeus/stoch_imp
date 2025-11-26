@@ -14,6 +14,7 @@ class WMatrix(TrMatrix):
     Class handling driven transition matrices.
 
     :ivar mat: Internal sympy.Matrix representation of the transition matrix.
+    :ivar graph: Graph representation of the stochastic network.
     :ivar dim: Dimension of the system.
     :ivar iter: Iterator over matrix indices.
     :ivar ds: Symbol representing the driving parameter.

@@ -38,7 +38,7 @@ coefficients and simplify retrieval when calculating conductances.
     :members:
     :inherited-members:
 
-It forwards all indexing to numpy, and cn be used as a numpy array. The main reason for its existence is that
+It forwards all indexing to numpy, and can be used as a numpy array. The main reason for its existence is that
 it prints any symbolic expressions pretty.
 
 ConstantObject
@@ -53,7 +53,7 @@ on the driving symbol.
 ConstantMatrix
 --------------
 This class is the most general class for constant matrices. Most constant objects that are not an :class:`EqMatrix`
-will be of this type
+will be of this type.
 
 .. autoclass:: ConstantMatrix
     :members:

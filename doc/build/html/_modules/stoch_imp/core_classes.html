@@ -43,17 +43,25 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">float64</span><span class="p">,</span> <span class="n">ndarray</span><span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="kn">import</span> <span class="n">zeros</span> <span class="k">as</span> <span class="n">np_zeros</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Expr</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">NonSquareMatrixError</span><span class="p">,</span> <span class="n">nsimplify</span><span class="p">,</span> <span class="n">pretty</span><span class="p">,</span> <span class="n">ShapeError</span><span class="p">,</span> <span class="n">simplify</span><span class="p">,</span> <span class="n">zeros</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">Expr</span><span class="p">,</span> <span class="n">Matrix</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">NonSquareMatrixError</span><span class="p">,</span> <span class="n">nsimplify</span><span class="p">,</span> <span class="n">pretty</span><span class="p">,</span> <span class="n">ShapeError</span><span class="p">,</span> <span class="n">simplify</span><span class="p">,</span> <span class="n">zeros</span><span class="p">,</span> <span class="n">latex</span><span class="p">)</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+
+<span class="n">drawmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;arf&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">arf_layout</span><span class="p">,</span>  <span class="s1">&#39;bipartite&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">bipartite_layout</span><span class="p">,</span>  <span class="s1">&#39;bfs&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">bfs_layout</span><span class="p">,</span>
+           <span class="s1">&#39;circular&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">circular_layout</span><span class="p">,</span>  <span class="s1">&#39;forceatlas2&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">forceatlas2_layout</span><span class="p">,</span>
+           <span class="s1">&#39;kamada_kawai&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">kamada_kawai_layout</span><span class="p">,</span>  <span class="s1">&#39;planar&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">planar_layout</span><span class="p">,</span>  <span class="s1">&#39;random&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">random_layout</span><span class="p">,</span>
+           <span class="s1">&#39;rescale&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">rescale_layout</span><span class="p">,</span>  <span class="s1">&#39;shell&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">shell_layout</span><span class="p">,</span>  <span class="s1">&#39;spring&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">,</span>
+           <span class="s1">&#39;spectral&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">spectral_layout</span><span class="p">,</span>  <span class="s1">&#39;multipartite&#39;</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">multipartite_layout</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="CoeffArray">
 <a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.CoeffArray">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">CoeffArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    (n, n, n) dim coefficient array class for storing transition coefficients. Prints pretty.</span>
+<span class="sd">    :math:`(n, n, n)` dim coefficient array class for storing transition coefficients. Prints pretty.</span>
 
 <span class="sd">    :ivar mat: The array of coefficients</span>
-<span class="sd">    :ivar iter: A simple iterator to iterate over the whole array. Use as `(elem in self.iter)` or `(i, j, k in self.iter)`</span>
+<span class="sd">    :ivar iter: A simple iterator to iterate over the whole array. Use as ``(elem in self.iter)`` or ``(i, j, k in self.iter)``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -270,6 +278,7 @@
 <span class="sd">    off-diagonal elements.</span>
 
 <span class="sd">    :ivar mat: Internal sympy.Matrix representation.</span>
+<span class="sd">    :ivar graph: Graph representation of the stochastic network.</span>
 <span class="sd">    :ivar dim: Number of rows in the matrix.</span>
 <span class="sd">    :ivar iter: Iterator over matrix indices.</span>
 <span class="sd">    :ivar zero_index: Boolean indicating whether 0-based indexing is used.</span>
@@ -292,6 +301,11 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">check_diag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tol</span><span class="p">)</span>  <span class="c1"># Validate initial conditions</span>
         <span class="n">check_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">err</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">DiGraph</span><span class="p">()</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">([</span><span class="n">i</span> <span class="o">+</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">graph</span>
+
 
 <div class="viewcode-block" id="TrMatrix.add_trans">
 <a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.add_trans">[docs]</a>
@@ -334,6 +348,7 @@
 
         <span class="bp">self</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">r</span>
         <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">-=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">),</span> <span class="n">j</span><span class="o">+</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">),</span> <span class="n">rate</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">print_rate</span><span class="o">=</span><span class="n">latex</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">symm</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ri</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">ri</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -349,6 +364,7 @@
 
             <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">ri</span>
             <span class="bp">self</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">-=</span> <span class="n">ri</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">j</span><span class="o">+</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">),</span> <span class="n">i</span><span class="o">+</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">zero_index</span><span class="p">),</span> <span class="n">rate</span><span class="o">=</span><span class="n">ri</span><span class="p">,</span> <span class="n">print_rate</span><span class="o">=</span><span class="n">latex</span><span class="p">(</span><span class="n">ri</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">simp</span><span class="p">:</span>
             <span class="n">simplify</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mat</span><span class="p">)</span></div>
@@ -419,9 +435,66 @@
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Positivity of transfer rate (</span><span class="si">{</span><span class="n">col</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">) undetermined: </span><span class="si">{</span><span class="bp">self</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="TrMatrix.view_graph">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.view_graph">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">view_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;circular&#39;</span><span class="p">,</span> <span class="n">pos_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">draw_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View the graph representation of the stochastic network. This does not portray rates, it only shows the topology</span>
+<span class="sd">        of the states.</span>
+
+<span class="sd">        :param pos: drawing layout to be used by NetworkX.</span>
+<span class="sd">        :param pos_kwargs: Arguments for the layout function. Should be given as a dict, also for non-kwargs.</span>
+<span class="sd">                           Default is none.</span>
+<span class="sd">        :param draw_kwargs: kwargs for the draw function. Should be given as a dict. Default is ``{&#39;with_labels&#39;: True}``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">show</span>
+
+        <span class="k">if</span> <span class="n">pos_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pos_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">draw_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">draw_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;with_labels&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">drawmap</span><span class="p">[</span><span class="n">pos</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="o">**</span><span class="n">pos_kwargs</span><span class="p">),</span> <span class="o">**</span><span class="n">draw_kwargs</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="TrMatrix.view_network">
+<a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.TrMatrix.view_network">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">view_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">:</span> <span class="nb">str</span><span class="o">=</span><span class="s1">&#39;circular&#39;</span><span class="p">,</span> <span class="n">pos_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">draw_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">edge_kwargs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        View the full stochastic network, including rates.</span>
+
+<span class="sd">        :param pos: drawing layout to be used by NetworkX.</span>
+<span class="sd">        :param pos_kwargs: Arguments for the layout function. Should be given as a dict, also for non-kwargs.</span>
+<span class="sd">                           Default is none.</span>
+<span class="sd">        :param draw_kwargs: kwargs for the draw function. Should be given as a dict. Default is</span>
+<span class="sd">                            ``{&#39;with_labels&#39;: True, &#39;connectionstyle&#39;: &#39;arc3, rad=0.1&#39;}``.</span>
+<span class="sd">        :param edge_kwargs: kwargs for the edge labels. Should be given as a dict. Default is</span>
+<span class="sd">                            ``{&#39;edge_labels&#39;: edgedict, &#39;connectionstyle&#39;: &#39;arc3, rad=0.1&#39;}``. Note that the connection</span>
+<span class="sd">                            style should be the same as in ``draw_kwargs``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="kn">import</span> <span class="n">show</span>
+
+        <span class="k">if</span> <span class="n">pos_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">pos_kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">draw_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">draw_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;with_labels&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;connectionstyle&#39;</span><span class="p">:</span> <span class="s1">&#39;arc3, rad=0.1&#39;</span><span class="p">}</span>
+
+        <span class="k">if</span> <span class="n">edge_kwargs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span>
+            <span class="n">edgedict</span> <span class="o">=</span> <span class="p">{</span><span class="n">edge</span><span class="p">:</span> <span class="s1">&#39;$&#39;</span> <span class="o">+</span> <span class="n">edges</span><span class="p">[</span><span class="o">*</span><span class="n">edge</span><span class="p">][</span><span class="s1">&#39;print_rate&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;$&#39;</span> <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">}</span>
+            <span class="n">edge_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;edge_labels&#39;</span><span class="p">:</span> <span class="n">edgedict</span><span class="p">,</span> <span class="s1">&#39;connectionstyle&#39;</span><span class="p">:</span> <span class="s1">&#39;arc3, rad=0.1&#39;</span><span class="p">}</span>
+
+
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">drawmap</span><span class="p">[</span><span class="n">pos</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="o">**</span><span class="n">pos_kwargs</span><span class="p">),</span> <span class="o">**</span><span class="n">draw_kwargs</span><span class="p">)</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_edge_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="n">drawmap</span><span class="p">[</span><span class="n">pos</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="o">**</span><span class="n">pos_kwargs</span><span class="p">),</span> <span class="o">**</span><span class="n">edge_kwargs</span><span class="p">)</span>
+        <span class="n">show</span><span class="p">()</span>
+        <span class="k">return</span></div>
 </div>
-
-
 
 <div class="viewcode-block" id="arr_to_mat">
 <a class="viewcode-back" href="../../ref/core_classes.html#stoch_imp.core_classes.arr_to_mat">[docs]</a>
