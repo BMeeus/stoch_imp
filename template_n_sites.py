@@ -24,7 +24,7 @@ plt.rcParams.update({
 })
 
 # Define range of frequencies
-om_arr = np.logspace(-10, 2, 10000)
+om_arr = np.logspace(-10, 2, 1000)
 
 # for curr in [[i, (i+1)%(n+1)] for i in range(n+1)]:
 #     c_i, c_j = curr  # Extract transition
@@ -34,7 +34,7 @@ om_arr = np.logspace(-10, 2, 10000)
 #     line = ax.plot(np.real(res_arr), np.imag(res_arr), label=f"${c_i}\\to{c_j}$")[0]
 #     add_arrow(line)
 
-for ind, cond in w.get_conds():
+for ind, cond in w.get_conds(normal=True):
     res_arr = cond(om_arr)
         # plot result
     line = ax.plot(np.real(res_arr), np.imag(res_arr), label="${}\\to{}$".format(*ind))[0]
