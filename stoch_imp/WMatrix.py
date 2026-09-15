@@ -262,7 +262,7 @@ class WMatrix(TrMatrix):
             i -= 1
             j -= 1
 
-        return -self.coeff[i, j, 0]
+        return -self.coeff[j, i, 0]
 
 
     def get_cond_zero(self, i: int, j: int, **flags) -> Union[float, Expr]:
@@ -290,7 +290,7 @@ class WMatrix(TrMatrix):
             i -= 1
             j -= 1
 
-        return sum(self.coeff[j, i, :])
+        return sum(self.coeff[j, i, 1:])
 
     def to_num(self):
         """Convert internal data to numeric form."""
